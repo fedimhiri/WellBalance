@@ -1,0 +1,47 @@
+{% extends 'backend/baseend.html.twig' %}
+{% block title %}Nouveau Repas{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Nouveau Repas</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Nutrition / Repas / Nouveau</h6>
+        </nav>
+    </div>
+    <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">
+        <i class="bx bx-arrow-back me-2"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {{ form_start(form) }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.typeRepas) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.calories) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.dateRepas) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.planNutrition) }}
+                </div>
+                <div class="col-12 mb-3">
+                    {{ form_row(form.description) }}
+                </div>
+            </div>
+
+            <div class="d-flex gap-3">
+                <button class="btn btn-primary" type="submit">
+                    <i class="bx bx-save me-2"></i>Enregistrer
+                </button>
+                <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

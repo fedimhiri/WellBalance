@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Plan Nutrition #{{ plan.id }}</title>
+  <style>
+    body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color: #222; }
+    .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+    .title { font-size: 18px; font-weight: bold; margin: 0; }
+    .sub { color: #666; margin-top: 4px; }
+    .box { border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 12px; }
+    .grid { width: 100%; border-collapse: collapse; }
+    .grid td { padding: 6px 8px; vertical-align: top; }
+    .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .table th, .table td { border: 1px solid #ddd; padding: 7px 8px; }
+    .table th { background: #f3f3f3; text-align: left; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .success { background: #e7f6ea; color: #1b7a2a; }
+    .secondary { background: #eee; color: #444; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <p class="title">Plan Nutrition #{{ plan.id }}</p>
+  <p class="sub">
+    Généré le {{ generatedAt|date('d/m/Y H:i') }}
+  </p>
+</div>
+
+<div class="box">
+  <table class="grid">
+    <tr>
+      <td width="50%">
+        <strong>Objectif :</strong> {{ plan.objectif }}<br>
+        <strong>Période :</strong> {{ plan.periode ?: 'Non définie' }}<br>
+        <strong>Dates :</strong> {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}<br>
+      </td>
+      <td width="50%">
+        <strong>Utilisateur :</strong>
+        {{ plan.user ? plan.user.email : 'Non assigné' }}<br>
+        <strong>Statut :</strong>
+        {% if plan.dateFin > date() %}
+          <span class="badge success">Actif</span>
+        {% else %}
+          <span class="badge secondary">Terminé</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% if plan.description %}
+      <tr>
+        <td colspan="2">
+          <strong>Description :</strong>
+          <span class="muted">{{ plan.description }}</span>
+        </td>
+      </tr>
+    {% endif %}
+  </table>
+</div>
+
+{% set stats = plan.getStats() %}
+<div class="box">
+  <strong>Statistiques</strong><br>
+  Total calories : <strong>{{ stats.total_calories }}</strong> kcal<br>
+  Moyenne / repas : <strong>{{ stats.moyenne_calories }}</strong> kcal<br>
+  Nombre de repas : <strong>{{ stats.nombre_repas }}</strong>
+</div>
+
+<h3 style="margin: 10px 0 6px;">Repas ({{ plan.repas|length }})</h3>
+
+{% if plan.repas|length == 0 %}
+  <p class="muted">Aucun repas enregistré.</p>
+{% else %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Calories</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in plan.repas %}
+        <tr>
+          <td>{{ r.typeRepas }}</td>
+          <td>{{ r.description }}</td>
+          <td>{{ r.calories }} kcal</td>
+          <td>{{ r.dateRepas ? r.dateRepas|date('d/m/Y H:i') : '-' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+</body>
+</html>

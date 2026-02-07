@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" class="light-style" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Clinique Médicale{% endblock %}</title>
+
+    <!-- CSS vendor -->
+    <link href="{{ asset('assets_frontend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_frontend/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_frontend/vendor/aos/aos.css') }}" rel="stylesheet">
+
+    <!-- CSS principal du thème -->
+    <link href="{{ asset('assets_frontend/css/main.css') }}" rel="stylesheet">
+
+    <!-- ✅ CSS custom (APRÈS main.css) -->
+    <link href="{{ asset('assets_frontend/css/frontend-custom.css') }}?v=9999" rel="stylesheet">
+</head>
+
+<body class="index-page">
+
+    {% include 'frontend/partials/_header.html.twig' %}
+
+    <main class="main">
+        {% block body %}{% endblock %}
+    </main>
+
+    {% include 'frontend/partials/_footer.html.twig' %}
+
+    <!-- JS -->
+    <script src="{{ asset('assets_frontend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets_frontend/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('assets_frontend/js/main.js') }}"></script>
+
+</body>
+</html>

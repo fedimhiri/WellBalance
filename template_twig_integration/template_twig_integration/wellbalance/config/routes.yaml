@@ -1,0 +1,8 @@
+# config/routes.yaml
+# OPTION A : Utilisez les attributes (PHP 8+)
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+
+app_logout_admin:
+  path: /logout

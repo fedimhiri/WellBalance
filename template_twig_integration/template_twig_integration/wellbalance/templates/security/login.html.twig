@@ -1,0 +1,38 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="container py-5" style="max-width: 520px;">
+  <h2 class="mb-4">Se connecter</h2>
+
+  {% if error %}
+    <div class="alert alert-danger">
+      Email ou mot de passe incorrect.
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ path('app_login') }}">
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email"
+             name="_username"
+             class="form-control"
+             value="{{ last_username }}"
+             required autofocus>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Mot de passe</label>
+      <input type="password"
+             name="_password"
+             class="form-control"
+             required>
+    </div>
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+    <button class="btn btn-primary w-100" type="submit">Connexion</button>
+  </form>
+</div>
+{% endblock %}

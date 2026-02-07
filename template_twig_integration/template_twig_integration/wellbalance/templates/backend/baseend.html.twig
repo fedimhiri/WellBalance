@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr" class="light-style layout-menu-fixed" dir="ltr"
+      data-theme="theme-default"
+      data-assets-path="/assets_backend/"
+      data-template="vertical-menu-template-free">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+
+    <link rel="icon" href="{{ asset('assets_backend/img/favicon/favicon.ico') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/fonts/boxicons.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/css/core.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/css/theme-default.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/css/demo.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body>
+
+<div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+
+        {% include 'backend/partials/_sidebar.html.twig' %}
+
+        <div class="layout-page">
+
+            {% include 'backend/partials/_navbar.html.twig' %}
+
+            <div class="content-wrapper">
+                <div class="container-xxl flex-grow-1 container-p-y">
+                    {% block body %}{% endblock %}
+                </div>
+
+                {% include 'backend/partials/_footer.html.twig' %}
+                <div class="content-backdrop fade"></div>
+            </div>
+
+        </div>
+    </div>
+    <div class="layout-overlay layout-menu-toggle"></div>
+</div>
+
+<script src="{{ asset('assets_backend/vendor/libs/jquery/jquery.js') }}"></script>
+<script src="{{ asset('assets_backend/vendor/libs/popper/popper.js') }}"></script>
+<script src="{{ asset('assets_backend/vendor/js/bootstrap.js') }}"></script>
+<script src="{{ asset('assets_backend/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+<script src="{{ asset('assets_backend/vendor/js/menu.js') }}"></script>
+<script src="{{ asset('assets_backend/js/main.js') }}"></script>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

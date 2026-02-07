@@ -1,0 +1,64 @@
+/* =====================================================
+   LAYOUT GLOBAL
+   ===================================================== */
+
+html, body {
+    height: 100%;
+}
+
+body.index-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header fixed → on décale le contenu */
+main.main {
+    flex: 1;
+    margin-top: 120px;   /* empêche le chevauchement */
+    padding: 20px 0;
+}
+
+/* =====================================================
+   FIX FOOTER-16 (cause du gros vide AVANT)
+   ===================================================== */
+
+#footer.footer-16 {
+    padding: 20px 0 0 !important;   /* AVANT: 100px */
+    margin: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.footer-16 .footer-main {
+    margin-bottom: 10px !important; /* AVANT: 80px */
+    padding: 0 !important;
+}
+
+.footer-16 .footer-bottom {
+    margin-top: 10px !important;
+    padding: 8px 0 !important;      /* AVANT: 30px */
+}
+
+/* Texte footer compact */
+#footer h6 {
+    margin-bottom: 6px;
+    font-size: 15px;
+}
+
+#footer a,
+#footer p {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    main.main {
+        margin-top: 140px;
+    }
+
+    #footer.footer-16 {
+        padding: 20px 0 0 !important;
+    }
+}

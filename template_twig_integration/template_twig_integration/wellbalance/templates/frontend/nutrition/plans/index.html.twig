@@ -1,0 +1,88 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Mes plans nutrition{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Mes plans nutrition</h2>
+  </div>
+
+  {% for message in app.flashes('success') %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% endfor %}
+
+  <!-- Recherche / Filtres -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-5">
+          <label class="form-label">Recherche</label>
+          <input type="text" name="q" class="form-control"
+                 placeholder="Objectif ou description..."
+                 value="{{ filters.q|default('') }}">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Objectif</label>
+          <select name="objectif" class="form-select">
+            <option value="">Tous</option>
+            {% for obj in objectifs %}
+              <option value="{{ obj }}" {{ filters.objectif == obj ? 'selected' : '' }}>
+                {{ obj }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Statut</label>
+          <select name="statut" class="form-select">
+            <option value="" {{ filters.statut == '' ? 'selected' : '' }}>Tous</option>
+            <option value="actif" {{ filters.statut == 'actif' ? 'selected' : '' }}>Actif</option>
+            <option value="termine" {{ filters.statut == 'termine' ? 'selected' : '' }}>Terminé</option>
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100" type="submit">Rechercher</button>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <a class="btn btn-outline-secondary w-100" href="{{ path('front_plan_nutrition_index') }}">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if plans is empty %}
+    <div class="alert alert-info">Aucun plan trouvé. Essaie de retirer un filtre.</div>
+  {% else %}
+    <div class="row g-3">
+      {% for plan in plans %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ plan.objectif }}</h5>
+
+              {% if plan.description %}
+                <p class="text-muted small mb-2">{{ plan.description|slice(0, 80) }}{% if plan.description|length > 80 %}...{% endif %}</p>
+              {% endif %}
+
+              <p class="text-muted mb-2">
+                {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}
+                <br>
+                <small>{{ plan.dateFin > date() ? 'Actif' : 'Terminé' }}</small>
+              </p>
+
+              <a class="btn btn-primary btn-sm" href="{{ path('front_plan_nutrition_show', {id: plan.id}) }}">
+                Voir détails
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

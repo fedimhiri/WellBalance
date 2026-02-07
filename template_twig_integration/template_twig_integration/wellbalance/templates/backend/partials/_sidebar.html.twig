@@ -1,0 +1,63 @@
+{# templates/backend/partials/_sidebar.html.twig #}
+
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+    <!-- Logo / Brand -->
+    <div class="app-brand demo">
+        <a href="/admin_dashboard" class="app-brand-link">
+            <span class="app-brand-logo demo">
+                <i class="bx bx-shield-quarter" style="font-size: 26px;"></i>
+            </span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2">Admin</span>
+        </a>
+
+        <a href="javascript:void(0);"
+           class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="bx bx-chevron-left bx-sm align-middle"></i>
+        </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+
+    <!-- Menu -->
+    <ul class="menu-inner py-1">
+
+        <!-- Dashboard -->
+        <li class="menu-item {{ app.request.pathinfo starts with '/admin_dashboard' ? 'active' : '' }}">
+            <a href="/admin_dashboard" class="menu-link">
+                <i class="menu-icon bx bx-home-circle"></i>
+                <div>Dashboard</div>
+            </a>
+        </li>
+
+        <!-- Section Gestion -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestion</span>
+        </li>
+
+        <!-- ✅ Gestion Nutrition (FIXÉ) -->
+        <li class="menu-item {{ app.request.pathinfo starts with '/admin/nutrition' ? 'active' : '' }}">
+            <a href="/admin/nutrition/plans/" class="menu-link">
+                <i class="menu-icon bx bx-food-menu"></i>
+                <div>Gestion nutrition</div>
+            </a>
+        </li>
+
+        <!-- Utilisateurs (exemple) -->
+        <li class="menu-item">
+            <a href="#" class="menu-link">
+                <i class="menu-icon bx bx-user"></i>
+                <div>Utilisateurs</div>
+            </a>
+        </li>
+
+        <!-- Paramètres (exemple) -->
+        <li class="menu-item">
+            <a href="#" class="menu-link">
+                <i class="menu-icon bx bx-cog"></i>
+                <div>Paramètres</div>
+            </a>
+        </li>
+
+    </ul>
+</aside>

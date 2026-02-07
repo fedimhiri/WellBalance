@@ -1,0 +1,249 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Profil{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Profil</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Home / Profil</h6>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="#" class="btn btn-outline-primary">
+            <i class="bx bx-download me-2"></i>Exporter PDF
+        </a>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="bx bx-edit me-2"></i>Modifier le profil
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Profile Card -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="position-relative d-inline-block">
+                    <img src="{{ asset('assets_backend/img/avatars/1.png') }}"
+                         class="rounded-circle mb-3" width="120" height="120">
+                    <button class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom"
+                            title="Changer la photo">
+                        <i class="bx bx-camera"></i>
+                    </button>
+                </div>
+                <h4 class="fw-bold mb-1">John Doe</h4>
+                <span class="badge bg-primary-subtle text-primary mb-3">Administrateur</span>
+                <p class="text-muted mb-4">Administrateur principal avec tous les privilèges</p>
+                
+                <div class="d-flex justify-content-center gap-3 mb-4">
+                    <div class="text-center">
+                        <h5 class="fw-bold mb-0">156</h5>
+                        <span class="text-muted small">Projets</span>
+                    </div>
+                    <div class="text-center">
+                        <h5 class="fw-bold mb-0">2.5k</h5>
+                        <span class="text-muted small">Suiveurs</span>
+                    </div>
+                    <div class="text-center">
+                        <h5 class="fw-bold mb-0">89</h5>
+                        <span class="text-muted small">Commentaires</span>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary">
+                        <i class="bx bx-message me-2"></i>Envoyer un message
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bx bx-share-alt me-2"></i>Partager le profil
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- About Card -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">À propos</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Bio</label>
+                    <p class="mb-0">Développeur full-stack avec 8 ans d'expérience. Passionné par les technologies web modernes.</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Pays</label>
+                    <p class="mb-0">France</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Langues</label>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-label-primary">Français</span>
+                        <span class="badge bg-label-primary">Anglais</span>
+                        <span class="badge bg-label-primary">Espagnol</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="col-lg-8">
+        <!-- Personal Information -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Informations personnelles</h5>
+                <a href="#" class="btn btn-sm btn-link">Modifier</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small text-muted">Nom complet</label>
+                        <p class="fw-medium mb-0">John Doe</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small text-muted">Email</label>
+                        <p class="fw-medium mb-0">john.doe@example.com</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small text-muted">Téléphone</label>
+                        <p class="fw-medium mb-0">+33 1 23 45 67 89</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small text-muted">Poste</label>
+                        <p class="fw-medium mb-0">Lead Developer</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small text-muted">Département</label>
+                        <p class="fw-medium mb-0">Développement</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small text-muted">Date d'embauche</label>
+                        <p class="fw-medium mb-0">15 Mars 2023</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Sécurité</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe</label>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">••••••••</span>
+                            <span class="badge bg-success-subtle text-success ms-3">
+                                <i class="bx bx-check-circle me-1"></i>Fort
+                            </span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="bx bx-edit me-1"></i>Changer
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Authentification à deux facteurs</label>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Désactivée</span>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Activité récente</h5>
+                <a href="#" class="btn btn-sm btn-link">Voir tout</a>
+            </div>
+            <div class="card-body">
+                <div class="timeline timeline-center">
+                    <div class="timeline-item">
+                        <div class="timeline-indicator bg-primary">
+                            <i class="bx bx-lock"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Connexion réussie</h6>
+                            <p class="text-muted small mb-0">Connexion depuis un nouvel appareil</p>
+                            <span class="timeline-time">Aujourd'hui, 09:42</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-indicator bg-success">
+                            <i class="bx bx-edit"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Profil mis à jour</h6>
+                            <p class="text-muted small mb-0">Informations personnelles modifiées</p>
+                            <span class="timeline-time">Hier, 14:23</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-indicator bg-warning">
+                            <i class="bx bx-key"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Mot de passe changé</h6>
+                            <p class="text-muted small mb-0">Mot de passe mis à jour avec succès</p>
+                            <span class="timeline-time">12 Fév 2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier le profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" value="John">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" class="form-control" value="Doe">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="john.doe@example.com">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" class="form-control" value="+33 1 23 45 67 89">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" rows="3">Développeur full-stack avec 8 ans d'expérience...</textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

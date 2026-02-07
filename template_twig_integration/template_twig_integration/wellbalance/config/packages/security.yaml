@@ -1,0 +1,45 @@
+security:
+  password_hashers:
+    App\Entity\User: 'auto'
+
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
+
+  firewalls:
+    dev:
+      pattern: ^/(_profiler|_wdt|assets|build)/
+      security: false
+
+    main:
+      lazy: true
+      provider: app_user_provider
+
+      form_login:
+        login_path: app_login
+        check_path: app_login
+        username_parameter: _username
+        password_parameter: _password
+        enable_csrf: true
+        csrf_parameter: _csrf_token
+        csrf_token_id: authenticate
+        success_handler: App\Security\LoginSuccessHandler
+
+      logout:
+        path: app_logout_admin
+
+  access_control:
+    # pages publiques front
+    - { path: ^/Vue, roles: PUBLIC_ACCESS }
+
+    # login public
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+
+    # nutrition front (connecté)
+    - { path: ^/nutrition, roles: ROLE_USER }
+
+    # admin
+    - { path: ^/admin_dashboard, roles: ROLE_ADMIN }
+    - { path: ^/admin, roles: ROLE_ADMIN }
