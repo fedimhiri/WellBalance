@@ -1,0 +1,71 @@
+{# templates/frontend/base_frontend.html.twig #}
+<!DOCTYPE html>
+<html lang="fr" class="light-style" dir="ltr" data-theme="theme-default">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}Clinique Médicale{% endblock %}</title>
+    <meta name="description" content="{% block description %}Clinique médicale offrant des soins de santé complets et de qualité avec des médecins expérimentés.{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('assets_frontend/img/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('assets_frontend/img/apple-touch-icon.png') }}">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="{{ asset('assets_frontend/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_frontend/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_frontend/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_frontend/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets_frontend/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="{{ asset('assets_frontend/css/main.css') }}" rel="stylesheet">
+    
+    <!-- Custom CSS Frontend -->
+    <link href="{{ asset('assets_frontend/css/frontend-custom.css') }}" rel="stylesheet">
+    
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body class="index-page">
+    
+    <!-- Header -->
+    {% include 'frontend/partials/_header1.html.twig' %}
+    
+    <!-- Main Content -->
+    <main class="main">
+        {% block body %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    {% include 'frontend/partials/_footer.html.twig' %}
+    
+    <!-- Scroll Top -->
+    <a href="#!" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
+    
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Vendor JS -->
+    <script src="{{ asset('assets_frontend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets_frontend/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('assets_frontend/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset('assets_frontend/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+    <script src="{{ asset('assets_frontend/vendor/swiper/swiper-bundle.min.js') }}"></script>
+    
+    <!-- Main JS -->
+    <script src="{{ asset('assets_frontend/js/main.js') }}"></script>
+    
+    <!-- Custom JS Frontend -->
+    <script src="{{ asset('assets_frontend/js/frontend-custom.js') }}"></script>
+    
+    {% block javascripts %}{% endblock %}
+    
+</body>
+</html>
