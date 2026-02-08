@@ -1,0 +1,35 @@
+{% for objectif in objectif_sportifs %}
+    <tr>
+        <td><span class="fw-bold">#{{ objectif.id }}</span></td>
+        <td>
+            <div class="d-flex justify-content-start align-items-center user-name">
+                <div class="avatar-wrapper">
+                    <div class="avatar avatar-sm me-3"><span class="avatar-initial rounded-circle bg-label-primary">{{ objectif.libelle|slice(0,2)|upper }}</span></div>
+                </div>
+                <div class="d-flex flex-column">
+                    <span class="fw-semibold">{{ objectif.libelle }}</span>
+                    <small class="text-muted">{{ objectif.description|slice(0, 20) }}...</small>
+                </div>
+            </div>
+        </td>
+        <td><span class="badge bg-label-info">{{ objectif.typeObjectif }}</span></td>
+        <td>{{ objectif.dateDebut ? objectif.dateDebut|date('d M Y') : '' }}</td>
+        <td>{{ objectif.dateFin ? objectif.dateFin|date('d M Y') : '' }}</td>
+        <td>
+            <span class="badge bg-label-{{ objectif.statut == 'Atteint' ? 'success' : (objectif.statut == 'En cours' ? 'primary' : 'warning') }} me-1">{{ objectif.statut }}</span>
+        </td>
+        <td>
+            <div class="d-flex align-items-center">
+                <a href="{{ path('app_objectif_sportif_show', {'id': objectif.id}) }}" class="text-body btn-icon-action" data-bs-toggle="tooltip" title="Voir"><i class="bx bx-show-alt"></i></a>
+                <a href="{{ path('app_objectif_sportif_edit', {'id': objectif.id}) }}" class="text-body btn-icon-action" data-bs-toggle="tooltip" title="Editer"><i class="bx bx-edit-alt"></i></a>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="7" class="text-center py-5">
+            <i class="bx bx-search fs-1 text-muted mb-2"></i>
+            <p class="mb-0">Aucun objectif trouvé.</p>
+        </td>
+    </tr>
+{% endfor %}

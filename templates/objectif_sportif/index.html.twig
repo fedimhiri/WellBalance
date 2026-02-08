@@ -1,0 +1,225 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Objectifs Sportifs{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Premium Table Design */
+        .table-responsive {
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            background: white;
+            overflow: hidden;
+        }
+        .table thead th {
+            background: linear-gradient(45deg, #696cff, #8592fa);
+            color: white;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 15px;
+        }
+        .table thead th a {
+            color: white !important;
+        }
+        .table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #eee;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.005);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+            position: relative;
+        }
+        .table td {
+            padding: 15px;
+            vertical-align: middle;
+            color: #566a7f;
+            font-weight: 500;
+        }
+        
+        /* Premium Buttons */
+        .btn-create {
+            background: linear-gradient(45deg, #696cff, #8592fa);
+            border: none;
+            box-shadow: 0 4px 15px rgba(105, 108, 255, 0.4);
+            transition: all 0.3s ease;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(105, 108, 255, 0.6);
+            color: white;
+        }
+        .btn-icon-action {
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .btn-icon-action:hover {
+            background-color: #e7e7ff;
+            transform: scale(1.1);
+        }
+
+        /* Search Input */
+        .search-input-group {
+            position: relative;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .search-input-group:focus-within {
+            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        .search-input-group input {
+            border: none;
+            padding: 12px 20px;
+            padding-left: 45px;
+            background: #fff;
+        }
+        .search-input-group .bx-search {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a1acb8;
+            z-index: 10;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Objectifs /</span> Liste</h4>
+
+    <div class="card border-0 shadow-none bg-transparent">
+        <div class="card-header px-0 pb-4 pt-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                     <h3 class="fw-bold mb-1 text-primary">Tableau des Objectifs</h3>
+                     <p class="text-muted mb-0">Gérez vos objectifs sportifs efficacement</p>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                     <div class="search-input-group d-flex align-items-center bg-white px-2">
+                         <i class="bx bx-search fs-4"></i>
+                         <input type="text" id="searchInput" class="form-control shadow-none" placeholder="Rechercher..." value="{{ query }}">
+                         <div id="searchSpinner" class="spinner-border text-primary spinner-border-sm ms-2 d-none" role="status"></div>
+                     </div>
+                     <a href="{{ path('app_objectif_sportif_new') }}" class="btn btn-create">
+                        <i class="bx bx-plus-circle me-2 animate__animated animate__tada"></i> Nouvel Objectif
+                     </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive text-nowrap" id="objectifsTableContainer">
+            <table class="table">
+                <thead>
+                    <tr>
+                        {% set nextDir = direction == 'ASC' ? 'DESC' : 'ASC' %}
+                        <th><a href="#" class="sort-link" data-sort="o.id" data-direction="{{ nextDir }}">Id {% if sort == 'o.id' %}<i class="bx bx-{{ direction == 'ASC' ? 'chevrons-up' : 'chevrons-down' }}"></i>{% endif %}</a></th>
+                        <th><a href="#" class="sort-link" data-sort="o.libelle" data-direction="{{ nextDir }}">Libellé {% if sort == 'o.libelle' %}<i class="bx bx-{{ direction == 'ASC' ? 'chevrons-up' : 'chevrons-down' }}"></i>{% endif %}</a></th>
+                        <th>Type</th>
+                        <th><a href="#" class="sort-link" data-sort="o.dateDebut" data-direction="{{ nextDir }}">Date Début {% if sort == 'o.dateDebut' %}<i class="bx bx-{{ direction == 'ASC' ? 'chevrons-up' : 'chevrons-down' }}"></i>{% endif %}</a></th>
+                        <th>Date Fin</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    {% include 'objectif_sportif/_table_body.html.twig' %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchSpinner = document.getElementById('searchSpinner');
+            const tableContainer = document.getElementById('objectifsTableContainer');
+            let timeoutId;
+
+            // Function to fetch and update table
+            function updateTable(url) {
+                searchSpinner.classList.remove('d-none');
+                
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Create a temp div to parse the HTML
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTbody = doc.querySelector('tbody');
+                    
+                    if (newTbody) {
+                        const currentTbody = document.querySelector('tbody');
+                        currentTbody.innerHTML = newTbody.innerHTML;
+                    }
+                    
+                    // Update URL without refresh
+                    window.history.pushState({}, '', url);
+                })
+                .catch(error => console.error('Error:', error))
+                .finally(() => {
+                    searchSpinner.classList.add('d-none');
+                });
+            }
+
+            // Dynamic Search
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(timeoutId);
+                const query = e.target.value;
+                
+                timeoutId = setTimeout(() => {
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('q', query);
+                    updateTable(currentUrl.toString());
+                }, 300); // 300ms debounce
+            });
+
+            // Dynamic Sort
+            document.querySelectorAll('.sort-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const sort = this.dataset.sort;
+                    const direction = this.dataset.direction;
+                    const query = searchInput.value;
+                    
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('sort', sort);
+                    url.searchParams.set('direction', direction);
+                    url.searchParams.set('q', query);
+                    
+                    updateTable(url.toString());
+                    
+                    // Update sort icons visual state (simplified for this demo)
+                     document.querySelectorAll('.sort-link i').forEach(i => i.remove());
+                     this.innerHTML += `<i class='bx bx-chevrons-${direction === 'ASC' ? 'up' : 'down'}'></i>`;
+                     
+                     // Toggle next direction for next click
+                     const newDir = direction === 'ASC' ? 'DESC' : 'ASC';
+                     this.dataset.direction = newDir;
+                });
+            });
+        });
+    </script>
+{% endblock %}
