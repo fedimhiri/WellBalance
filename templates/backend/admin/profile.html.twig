@@ -1,0 +1,39 @@
+{% extends 'backend/baseend.html.twig' %}
+
+
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h3 class="mb-4">Mon profil</h3>
+
+    
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(profileForm) }}
+
+            <div class="mb-3">
+                {{ form_label(profileForm.email) }}
+                {{ form_widget(profileForm.email, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(profileForm.username) }}
+                {{ form_widget(profileForm.username, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(profileForm.telephone) }}
+                {{ form_widget(profileForm.telephone, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <button class="btn btn-primary">
+                Enregistrer les modifications
+            </button>
+
+            {{ form_end(profileForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %} 

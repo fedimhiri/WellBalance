@@ -1,0 +1,551 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Clinique Médicale - Excellence en Santé{% endblock %}
+
+{% block body %}
+
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="hero d-flex align-items-center">
+    <div class="container">
+        <div class="row gy-4 d-flex justify-content-between">
+            <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
+                <h2 data-aos="fade-up">Votre santé est notre priorité</h2>
+                <p data-aos="fade-up" data-aos-delay="100">
+                    Une clinique médicale moderne offrant des soins complets avec des technologies de pointe 
+                    et une équipe médicale expérimentée.
+                </p>
+
+                <div class="row gy-4 mt-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="col-lg-3 col-6">
+                        <div class="stats-item text-center w-100">
+                            <span data-purecounter-start="0" data-purecounter-end="25" 
+                                  data-purecounter-duration="1" class="purecounter"></span>
+                            <p>Années d'expérience</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="stats-item text-center w-100">
+                            <span data-purecounter-start="0" data-purecounter-end="50" 
+                                  data-purecounter-duration="1" class="purecounter"></span>
+                            <p>Spécialistes</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="stats-item text-center w-100">
+                            <span data-purecounter-start="0" data-purecounter-end="15000" 
+                                  data-purecounter-duration="1" class="purecounter"></span>
+                            <p>Patients satisfaits</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="stats-item text-center w-100">
+                            <span data-purecounter-start="0" data-purecounter-end="24" 
+                                  data-purecounter-duration="1" class="purecounter"></span>
+                            <p>Heures/7j</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
+                <img src="{{ asset('assets_frontend/img/hero-img.svg') }}" class="img-fluid mb-3 mb-lg-0" alt="">
+            </div>
+        </div>
+    </div>
+</section><!-- End Hero Section -->
+
+<!-- ======= Featured Services Section ======= -->
+<section id="featured-services" class="featured-services">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-xl-3 col-md-6 d-flex" data-aos="zoom-out">
+                <div class="service-item position-relative">
+                    <div class="icon"><i class="bi bi-activity icon"></i></div>
+                    <h4><a href="" class="stretched-link">Consultations</a></h4>
+                    <p>Consultations avec nos spécialistes pour un diagnostic précis</p>
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-xl-3 col-md-6 d-flex" data-aos="zoom-out" data-aos-delay="200">
+                <div class="service-item position-relative">
+                    <div class="icon"><i class="bi bi-bounding-box-circles icon"></i></div>
+                    <h4><a href="" class="stretched-link">Urgences 24/7</a></h4>
+                    <p>Service d'urgence disponible 24 heures sur 24, 7 jours sur 7</p>
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-xl-3 col-md-6 d-flex" data-aos="zoom-out" data-aos-delay="400">
+                <div class="service-item position-relative">
+                    <div class="icon"><i class="bi bi-calendar4-week icon"></i></div>
+                    <h4><a href="" class="stretched-link">Prise de RDV en ligne</a></h4>
+                    <p>Prenez rendez-vous facilement avec notre système en ligne</p>
+                </div>
+            </div><!-- End Service Item -->
+
+            <div class="col-xl-3 col-md-6 d-flex" data-aos="zoom-out" data-aos-delay="600">
+                <div class="service-item position-relative">
+                    <div class="icon"><i class="bi bi-broadcast icon"></i></div>
+                    <h4><a href="" class="stretched-link">Téléconsultation</a></h4>
+                    <p>Consultations à distance avec nos médecins spécialistes</p>
+                </div>
+            </div><!-- End Service Item -->
+        </div>
+    </div>
+</section><!-- End Featured Services Section -->
+
+<!-- ======= About Section ======= -->
+<section id="about" class="about pt-0">
+    <div class="container" data-aos="fade-up">
+        <div class="row gy-4">
+            <div class="col-lg-6 position-relative align-self-start order-lg-last order-first">
+                <img src="{{ asset('assets_frontend/img/about.jpg') }}" class="img-fluid" alt="">
+                <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="glightbox play-btn"></a>
+            </div>
+            <div class="col-lg-6 content order-last  order-lg-first">
+                <h3>À propos de Notre Clinique</h3>
+                <p>
+                    Fondée en 1998, notre clinique s'est imposée comme un leader dans le domaine des soins de santé,
+                    combinant expertise médicale de pointe avec une approche humaine et personnalisée.
+                </p>
+                <ul>
+                    <li data-aos="fade-up" data-aos-delay="100">
+                        <i class="bi bi-diagram-3"></i>
+                        <div>
+                            <h5>Équipe multidisciplinaire</h5>
+                            <p>Plus de 50 spécialistes travaillant en collaboration pour vos soins</p>
+                        </div>
+                    </li>
+                    <li data-aos="fade-up" data-aos-delay="200">
+                        <i class="bi bi-fullscreen-exit"></i>
+                        <div>
+                            <h5>Technologies de pointe</h5>
+                            <p>Équipements médicaux les plus avancés pour des diagnostics précis</p>
+                        </div>
+                    </li>
+                    <li data-aos="fade-up" data-aos-delay="300">
+                        <i class="bi bi-broadcast"></i>
+                        <div>
+                            <h5>Approche holistique</h5>
+                            <p>Prise en charge complète du patient, du diagnostic au suivi</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section><!-- End About Section -->
+
+<!-- ======= Services Section ======= -->
+<section id="service" class="services pt-0">
+    <div class="container" data-aos="fade-up">
+        <div class="section-header">
+            <span>Nos Services</span>
+            <h2>Nos Services</h2>
+        </div>
+
+        <div class="row gy-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card">
+                    <div class="card-img">
+                        <img src="{{ asset('assets_frontend/img/storage-service.jpg') }}" alt="" class="img-fluid">
+                    </div>
+                    <h3><a href="#" class="stretched-link">Cardiologie</a></h3>
+                    <p>Soins cardiaques complets avec équipements de diagnostic avancés</p>
+                </div>
+            </div><!-- End Card Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="card">
+                    <div class="card-img">
+                        <img src="{{ asset('assets_frontend/img/logistics-service.jpg') }}" alt="" class="img-fluid">
+                    </div>
+                    <h3><a href="#" class="stretched-link">Neurologie</a></h3>
+                    <p>Diagnostic et traitement des troubles neurologiques complexes</p>
+                </div>
+            </div><!-- End Card Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card">
+                    <div class="card-img">
+                        <img src="{{ asset('assets_frontend/img/cargo-service.jpg') }}" alt="" class="img-fluid">
+                    </div>
+                    <h3><a href="#" class="stretched-link">Pédiatrie</a></h3>
+                    <p>Soins spécialisés pour enfants et adolescents dans un environnement adapté</p>
+                </div>
+            </div><!-- End Card Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="card">
+                    <div class="card-img">
+                        <img src="{{ asset('assets_frontend/img/trucking-service.jpg') }}" alt="" class="img-fluid">
+                    </div>
+                    <h3><a href="#" class="stretched-link">Orthopédie</a></h3>
+                    <p>Traitement des troubles musculo-squelettiques et chirurgie articulaire</p>
+                </div>
+            </div><!-- End Card Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="card">
+                    <div class="card-img">
+                        <img src="{{ asset('assets_frontend/img/packaging-service.jpg') }}" alt="" class="img-fluid">
+                    </div>
+                    <h3><a href="#" class="stretched-link">Dermatologie</a></h3>
+                    <p>Soins de la peau, diagnostic et traitement des maladies cutanées</p>
+                </div>
+            </div><!-- End Card Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="card">
+                    <div class="card-img">
+                        <img src="{{ asset('assets_frontend/img/warehousing-service.jpg') }}" alt="" class="img-fluid">
+                    </div>
+                    <h3><a href="#" class="stretched-link">Imagerie médicale</a></h3>
+                    <p>Scanner, IRM, échographie et radiologie numérique</p>
+                </div>
+            </div><!-- End Card Item -->
+        </div>
+    </div>
+</section><!-- End Services Section -->
+
+<!-- ======= Call To Action Section ======= -->
+<section id="call-to-action" class="call-to-action">
+    <div class="container" data-aos="zoom-out">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3>Besoin de soins médicaux ?</h3>
+                <p>Notre équipe est à votre disposition pour répondre à tous vos besoins de santé.</p>
+                <a class="cta-btn" href="#">Prendre rendez-vous</a>
+            </div>
+        </div>
+    </div>
+</section><!-- End Call To Action Section -->
+
+<!-- ======= Doctors Section ======= -->
+<section id="doctors" class="doctors">
+    <div class="container" data-aos="fade-up">
+        <div class="section-header">
+            <span>Notre Équipe</span>
+            <h2>Notre Équipe</h2>
+        </div>
+
+        <div class="row gy-4">
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
+                <div class="member">
+                    <div class="member-img">
+                        <img src="{{ asset('assets_frontend/img/doctors/doctor-1.jpg') }}" class="img-fluid" alt="">
+                        <div class="social">
+                            <a href=""><i class="bi bi-twitter"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="member-info">
+                        <h4>Dr. Sarah Johnson</h4>
+                        <span>Cardiologue</span>
+                        <p>14 ans d'expérience en cardiologie interventionnelle</p>
+                    </div>
+                </div>
+            </div><!-- End Team Member -->
+
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
+                <div class="member">
+                    <div class="member-img">
+                        <img src="{{ asset('assets_frontend/img/doctors/doctor-2.jpg') }}" class="img-fluid" alt="">
+                        <div class="social">
+                            <a href=""><i class="bi bi-twitter"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="member-info">
+                        <h4>Dr. Marcus Wilson</h4>
+                        <span>Neurologue</span>
+                        <p>Spécialiste des troubles neurologiques complexes</p>
+                    </div>
+                </div>
+            </div><!-- End Team Member -->
+
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
+                <div class="member">
+                    <div class="member-img">
+                        <img src="{{ asset('assets_frontend/img/doctors/doctor-3.jpg') }}" class="img-fluid" alt="">
+                        <div class="social">
+                            <a href=""><i class="bi bi-twitter"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="member-info">
+                        <h4>Dr. Rachel Chen</h4>
+                        <span>Pédiatre</span>
+                        <p>Spécialiste en soins pédiatriques et adolescentaires</p>
+                    </div>
+                </div>
+            </div><!-- End Team Member -->
+
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
+                <div class="member">
+                    <div class="member-img">
+                        <img src="{{ asset('assets_frontend/img/doctors/doctor-4.jpg') }}" class="img-fluid" alt="">
+                        <div class="social">
+                            <a href=""><i class="bi bi-twitter"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="member-info">
+                        <h4>Dr. David Martinez</h4>
+                        <span>Orthopédiste</span>
+                        <p>Expert en chirurgie orthopédique et médecine du sport</p>
+                    </div>
+                </div>
+            </div><!-- End Team Member -->
+        </div>
+    </div>
+</section><!-- End Doctors Section -->
+
+<!-- ======= Testimonials Section ======= -->
+<section id="testimonials" class="testimonials">
+    <div class="container">
+        <div class="slides-1 swiper" data-aos="fade-up">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="testimonial-item">
+                        <img src="{{ asset('assets_frontend/img/testimonials/testimonials-1.jpg') }}" class="testimonial-img" alt="">
+                        <h3>Marie Dubois</h3>
+                        <h4>Patient</h4>
+                        <div class="stars">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p>
+                            <i class="bi bi-quote quote-icon-left"></i>
+                            Excellent service ! Le personnel est très attentionné et les médecins sont compétents. 
+                            Je recommande vivement cette clinique.
+                            <i class="bi bi-quote quote-icon-right"></i>
+                        </p>
+                    </div>
+                </div><!-- End testimonial item -->
+
+                <div class="swiper-slide">
+                    <div class="testimonial-item">
+                        <img src="{{ asset('assets_frontend/img/testimonials/testimonials-2.jpg') }}" class="testimonial-img" alt="">
+                        <h3>Pierre Martin</h3>
+                        <h4>Patient</h4>
+                        <div class="stars">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p>
+                            <i class="bi bi-quote quote-icon-left"></i>
+                            Une équipe médicale exceptionnelle. Les installations sont modernes et le suivi est impeccable.
+                            <i class="bi bi-quote quote-icon-right"></i>
+                        </p>
+                    </div>
+                </div><!-- End testimonial item -->
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section><!-- End Testimonials Section -->
+
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="contact">
+    <div class="container" data-aos="fade-up">
+        <div class="section-header">
+            <span>Contactez-nous</span>
+            <h2>Contactez-nous</h2>
+        </div>
+
+        <div class="row gy-4">
+            <div class="col-md-6">
+                <div class="info-item  d-flex align-items-center">
+                    <i class="icon bi bi-map flex-shrink-0"></i>
+                    <div>
+                        <h3>Notre Adresse</h3>
+                        <p>123 Avenue de la Santé, 75000 Paris, France</p>
+                    </div>
+                </div>
+            </div><!-- End Info Item -->
+
+            <div class="col-md-6">
+                <div class="info-item d-flex align-items-center">
+                    <i class="icon bi bi-envelope flex-shrink-0"></i>
+                    <div>
+                        <h3>Email</h3>
+                        <p>contact@clinique-medicale.fr</p>
+                    </div>
+                </div>
+            </div><!-- End Info Item -->
+
+            <div class="col-md-6">
+                <div class="info-item  d-flex align-items-center">
+                    <i class="icon bi bi-telephone flex-shrink-0"></i>
+                    <div>
+                        <h3>Téléphone</h3>
+                        <p>+33 1 23 45 67 89</p>
+                    </div>
+                </div>
+            </div><!-- End Info Item -->
+
+            <div class="col-md-6">
+                <div class="info-item  d-flex align-items-center">
+                    <i class="icon bi bi-share flex-shrink-0"></i>
+                    <div>
+                        <h3>Urgences 24/7</h3>
+                        <p>+33 1 23 45 67 90</p>
+                    </div>
+                </div>
+            </div><!-- End Info Item -->
+        </div>
+
+        <div class="row gy-4 mt-1">
+            <div class="col-lg-6">
+                <form action="forms/contact.php" method="post" class="php-email-form">
+                    <div class="row gy-4">
+                        <div class="col-md-6">
+                            <input type="text" name="name" class="form-control" placeholder="Votre nom" required>
+                        </div>
+                        <div class="col-md-6 ">
+                            <input type="email" class="form-control" name="email" placeholder="Votre email" required>
+                        </div>
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" name="subject" placeholder="Sujet" required>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea class="form-control" name="message" rows="6" placeholder="Message" required></textarea>
+                        </div>
+                        <div class="col-md-12 text-center">
+                            <div class="loading">Chargement</div>
+                            <div class="error-message"></div>
+                            <div class="sent-message">Votre message a été envoyé. Merci !</div>
+                            <button type="submit">Envoyer le message</button>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- End Contact Form -->
+
+            <div class="col-lg-6">
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937595!2d2.292292615509614!3d48.85837007928746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1643735611519!5m2!1sfr!2sfr" 
+                            style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div><!-- End Map -->
+        </div>
+    </div>
+</section><!-- End Contact Section -->
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation des compteurs
+    if (typeof PureCounter !== 'undefined') {
+        new PureCounter();
+    }
+    
+    // Initialisation AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+    }
+    
+    // Initialisation GLightbox
+    if (typeof GLightbox !== 'undefined') {
+        const lightbox = GLightbox({
+            selector: '.glightbox'
+        });
+    }
+    
+    // Initialisation Swiper pour les témoignages
+    if (typeof Swiper !== 'undefined') {
+        new Swiper('.testimonials-slider', {
+            speed: 600,
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false
+            },
+            slidesPerView: 'auto',
+            pagination: {
+                el: '.swiper-pagination',
+                type: 'bullets',
+                clickable: true
+            }
+        });
+    }
+    
+    // Gestion du formulaire de contact
+    const contactForm = document.querySelector('.php-email-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulation d'envoi
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.textContent = 'Envoi en cours...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                submitBtn.textContent = 'Message envoyé !';
+                submitBtn.classList.add('sent');
+                
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('sent');
+                    contactForm.reset();
+                }, 3000);
+            }, 1500);
+        });
+    }
+    
+    // Gestion du scroll smooth
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Gestion du bouton scroll to top
+    const scrollTopBtn = document.getElementById('scroll-top');
+    if (scrollTopBtn) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 100) {
+                scrollTopBtn.classList.add('active');
+            } else {
+                scrollTopBtn.classList.remove('active');
+            }
+        });
+        
+        scrollTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
