@@ -1,0 +1,61 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Mes Objectifs Sportifs{% endblock %}
+
+{% block body %}
+    <section class="breadcrumbs">
+        <div class="container">
+            <ol>
+                <li><a href="{{ path('app_frontend_vue') }}">Accueil</a></li>
+                <li>Mes Objectifs</li>
+            </ol>
+            <h2>Mes Objectifs Sportifs</h2>
+        </div>
+    </section>
+
+    <section class="inner-page">
+        <div class="container">
+            
+            {% if objectifs is empty %}
+                <div class="alert alert-info">
+                    Vous n'avez pas encore d'objectifs assignés.
+                </div>
+            {% else %}
+                <div class="row">
+                    {% for objectif in objectifs %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ objectif.libelle|default('Objectif') }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ objectif.typeObjectif }}</h6>
+                                    <p class="card-text">
+                                        {{ objectif.description|default('')|slice(0, 100) }}{% if objectif.description|length > 100 %}...{% endif %}
+                                    </p>
+                                    
+                                    <div class="mb-2">
+                                        <span class="badge 
+                                            {% if objectif.statut == 'En cours' %}bg-primary
+                                            {% elseif objectif.statut == 'Atteint' %}bg-success
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ objectif.statut }}
+                                        </span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <small class="text-muted">
+                                            Début: {{ objectif.dateDebut|date('d/m/Y') }}
+                                        </small>
+                                        <a href="{{ path('front_objectif_sportif_show', {'id': objectif.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            Voir détails
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'messenger/_base_front.html.twig' %}
+
+{% block title %}Modifier le message{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <a href="{{ path('front_messenger_index') }}" class="text-decoration-none">
+                                    Messagerie
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ path('front_messenger_show', {id: message.conversation.id}) }}" class="text-decoration-none">
+                                    Dr. #{{ message.conversation.doctor.id }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Modifier le message</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">
+                        <i class="bi bi-pencil-square text-primary me-2"></i>Modifier votre message
+                    </h4>
+                    
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible fade show mb-4" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-{{ label == 'success' ? 'check-circle' : 'exclamation-triangle' }} me-2"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-4">
+                        {{ form_label(form.content, null, {
+                            'label_attr': {'class': 'form-label fw-semibold mb-3'}
+                        }) }}
+                        {{ form_widget(form.content, {
+                            'attr': {
+                                'class': 'form-control' ~ (form.content.vars.errors|length ? ' is-invalid' : ''),
+                                'rows': 6,
+                                'placeholder': 'Modifiez votre message ici...'
+                            }
+                        }) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.content) }}
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Modifiez le contenu de votre message. Le fichier joint peut être conservé ou remplacé.
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary px-4 py-2 flex-grow-1">
+                            <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('front_messenger_show', {id: message.conversation.id}) }}" class="btn btn-outline-secondary px-4 py-2">
+                            <i class="bi bi-x-circle me-2"></i>Annuler
+                        </a>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ path('front_messenger_show', {id: message.conversation.id}) }}" class="text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>Retour à la conversation
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

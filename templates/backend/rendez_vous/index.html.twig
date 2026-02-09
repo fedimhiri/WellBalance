@@ -1,0 +1,107 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Rendez-vous{% endblock %}
+
+{% block body %}
+<h4 class="fw-bold py-3 mb-4">Rendez-vous</h4>
+
+<div class="card mb-3">
+  <div class="card-body">
+
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+
+      <form method="get" action="{{ path('app_rendez_vous_index') }}" class="d-flex flex-wrap gap-2" style="flex:1; min-width: 300px;">
+        <input type="text"
+               name="search"
+               value="{{ search }}"
+               class="form-control"
+               placeholder="Rechercher (titre, lieu, statut, type...)"
+               style="max-width: 520px;">
+
+        {# garder le tri en recherchant #}
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <input type="hidden" name="dir" value="{{ dir }}">
+
+        <button class="btn btn-primary" type="submit">Rechercher</button>
+
+        <a class="btn btn-outline-secondary" href="{{ path('app_rendez_vous_index') }}">Reset</a>
+      </form>
+
+  </div>
+</div>
+
+{% set nextDir = dir == 'ASC' ? 'DESC' : 'ASC' %}
+
+<div class="card">
+  <div class="table-responsive text-nowrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>
+            <a href="{{ path('app_rendez_vous_index', {search: search, sort: 'id', dir: sort == 'id' ? nextDir : 'ASC'}) }}">
+              ID
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ path('app_rendez_vous_index', {search: search, sort: 'titre', dir: sort == 'titre' ? nextDir : 'ASC'}) }}">
+              Titre
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ path('app_rendez_vous_index', {search: search, sort: 'dateRdv', dir: sort == 'dateRdv' ? nextDir : 'ASC'}) }}">
+              Date
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ path('app_rendez_vous_index', {search: search, sort: 'lieu', dir: sort == 'lieu' ? nextDir : 'ASC'}) }}">
+              Lieu
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ path('app_rendez_vous_index', {search: search, sort: 'statut', dir: sort == 'statut' ? nextDir : 'ASC'}) }}">
+              Statut
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ path('app_rendez_vous_index', {search: search, sort: 'type', dir: sort == 'type' ? nextDir : 'ASC'}) }}">
+              Type
+            </a>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="table-border-bottom-0">
+      {% for rdv in rendez_vouses %}
+        <tr>
+          <td>{{ rdv.id }}</td>
+          <td>{{ rdv.titre }}</td>
+          <td>{{ rdv.dateRdv ? rdv.dateRdv|date('Y-m-d H:i') : '' }}</td>
+          <td>{{ rdv.lieu }}</td>
+
+          <td>
+            {% if rdv.statut == 'PLANIFIE' %}
+              <span class="badge bg-label-primary">{{ rdv.statut }}</span>
+            {% elseif rdv.statut == 'TERMINE' %}
+              <span class="badge bg-label-success">{{ rdv.statut }}</span>
+            {% else %}
+              <span class="badge bg-label-danger">{{ rdv.statut }}</span>
+            {% endif %}
+          </td>
+
+          <td>{{ rdv.type }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="7" class="text-center">Aucun rendez-vous</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

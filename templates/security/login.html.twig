@@ -1,0 +1,113 @@
+{# templates/frontend/login.html.twig #}
+{% extends 'frontend/base_frontend.html.twig' %}
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="auth-creative-wrapper py-5">
+    <div class="auth-creative-inner">
+        <div class="creative-card-wrapper">
+            <div class="card my-4 overflow-hidden" style="z-index: 1">
+                <div class="row flex-1 g-0">
+
+                    <!-- Formulaire de connexion -->
+                    <div class="col-lg-6 h-100 my-auto order-1 order-lg-0">
+                        <div class="creative-card-body card-body p-sm-5">
+
+                            <h2 class="fs-20 fw-bolder mb-4">Connexion</h2>
+                            <h4 class="fs-13 fw-bold mb-2">Connectez-vous à votre compte</h4>
+                            <p class="fs-12 fw-medium text-muted">
+                                Accédez à votre espace patient pour gérer vos rendez-vous et consultations.
+                            </p>
+
+                            {# 🔴 ERREUR LOGIN #}
+                            {% if error %}
+                                <div class="alert alert-danger">
+                                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                                </div>
+                            {% endif %}
+
+                            <form method="post" class="w-100 mt-4 pt-2">
+
+                                <!-- EMAIL -->
+                                <div class="mb-4">
+                                    <input type="email"
+                                           name="email"
+                                           value="{{ last_username }}"
+                                           class="form-control"
+                                           placeholder="Adresse email"
+                                           required autofocus>
+                                </div>
+
+                                <!-- PASSWORD -->
+                                <div class="mb-3">
+                                    <input type="password"
+                                           name="password"
+                                           class="form-control"
+                                           placeholder="Mot de passe"
+                                           required>
+                                </div>
+
+                                <!-- REMEMBER ME -->
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               class="form-check-input"
+                                               id="remember_me"
+                                               name="_remember_me">
+                                        <label class="form-check-label" for="remember_me">
+                                            Se souvenir de moi
+                                        </label>
+                                    </div>
+
+                                    <a href="{{ path('frontend_forgot_password') }}"
+                                       class="fs-11 text-primary">
+                                        Mot de passe oublié ?
+                                    </a>
+                                </div>
+
+                                <!-- CSRF -->
+                                <input type="hidden"
+                                       name="_csrf_token"
+                                       value="{{ csrf_token('authenticate') }}">
+
+                                <!-- SUBMIT -->
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-lg btn-primary w-100">
+                                        Se connecter
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="mt-5 text-muted text-center">
+                                <span>Vous n'avez pas de compte ?</span>
+                                <a href="{{ path('app_register') }}" class="fw-bold ms-1">
+                                    Créer un compte
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Image côté -->
+                    <div class="col-lg-6 bg-primary order-0 order-lg-1">
+                        <div class="h-100 d-flex align-items-center justify-content-center p-4">
+                            <div class="text-center text-white">
+                                <h3 class="fw-bold mb-3">Bienvenue</h3>
+                                <p class="mb-4">
+                                    Gérez vos rendez-vous médicaux, consultez vos résultats
+                                    et accédez à votre dossier médical en toute sécurité.
+                                </p>
+                                <a href="{{ path('app_frontend_vue') }}" class="btn btn-light">
+                                    <i class="bi bi-house me-2"></i>
+                                    Retour à l'accueil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}  

@@ -1,0 +1,94 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Dashboard Messagerie{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Tableau de bord Messagerie</h1>
+        <a href="{{ path('admin_messenger_index') }}" class="btn btn-primary">
+            <i class="bx bx-chat me-2"></i>Accéder à la Messagerie
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        {# Cartes Statistiques Simples #}
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Total Conversations</h5>
+                    <p class="card-text display-4">{{ stats.totalConversations }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Total Messages</h5>
+                    <p class="card-text display-4">{{ stats.totalMessages }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-white"><i class="bx bx-envelope me-2"></i>Non lus</h5>
+                    <p class="card-text display-4">{{ stats.unreadMessages }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Docs Analysés</h5>
+                    <p class="card-text display-4">{{ stats.analyzedDocuments }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    Dernières Patient(s)
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for conversation in allConversations|slice(0, 5) %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ conversation.user.username }}</strong>
+                                <br>
+                                <small class="text-muted">{{ conversation.updatedAt|date('d/m/Y H:i') }}</small>
+                            </div>
+                            <a href="{{ path('admin_messenger_show', {id: conversation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item">Aucune activité récente.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    Urgences
+                </div>
+                <div class="card-body">
+                    {% if urgentConversations is not empty %}
+                        <div class="list-group">
+                            {% for urgent in urgentConversations %}
+                                <a href="{{ path('admin_messenger_show', {id: urgent.id}) }}" class="list-group-item list-group-item-action list-group-item-danger">
+                                    {{ urgent.user.username }} - {{ urgent.updatedAt|date('H:i') }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-success">Aucune urgence en cours.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

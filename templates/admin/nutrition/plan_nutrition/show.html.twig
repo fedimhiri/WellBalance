@@ -1,0 +1,84 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Détails Plan Nutrition{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Plan Nutrition #{{ plan_nutrition.id }}</h4>
+    <h6 class="fw-normal text-muted mb-0">
+      <a href="{{ path('admin_plan_nutrition_index') }}" class="text-muted">
+        Nutrition / Plans
+      </a> / #{{ plan_nutrition.id }}
+    </h6>
+  </div>
+
+  <!-- ✅ BOUTONS PDF / EDIT / RETOUR -->
+  <div class="d-flex gap-2">
+    <a href="{{ path('admin_plan_nutrition_pdf', {'id': plan_nutrition.id}) }}"
+       class="btn btn-outline-danger">
+      <i class="bx bxs-file-pdf me-2"></i>PDF
+    </a>
+
+    <a href="{{ path('admin_plan_nutrition_edit', {'id': plan_nutrition.id}) }}"
+       class="btn btn-warning">
+      <i class="bx bx-edit me-2"></i>Modifier
+    </a>
+
+    <a href="{{ path('admin_plan_nutrition_index') }}"
+       class="btn btn-outline-secondary">
+      <i class="bx bx-arrow-back me-2"></i>Retour
+    </a>
+  </div>
+</div>
+
+<!-- INFOS PLAN -->
+<div class="card mb-4">
+  <div class="card-body">
+    <p><strong>Objectif :</strong> {{ plan_nutrition.objectif }}</p>
+    <p><strong>Utilisateur :</strong> {{ plan_nutrition.user.email }}</p>
+    <p><strong>Période :</strong> {{ plan_nutrition.periode }}</p>
+    <p>
+      <strong>Statut :</strong>
+      {% if plan_nutrition.dateFin > date() %}
+        <span class="badge bg-success">Actif</span>
+      {% else %}
+        <span class="badge bg-secondary">Terminé</span>
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+<!-- REPAS -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Repas ({{ plan_nutrition.repas|length }})</h5>
+  </div>
+  <div class="card-body">
+    {% if plan_nutrition.repas|length == 0 %}
+      <p class="text-muted">Aucun repas.</p>
+    {% else %}
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Calories</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in plan_nutrition.repas %}
+            <tr>
+              <td>{{ r.typeRepas }}</td>
+              <td>{{ r.description }}</td>
+              <td>{{ r.calories }} kcal</td>
+              <td>{{ r.dateRepas|date('d/m/Y H:i') }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

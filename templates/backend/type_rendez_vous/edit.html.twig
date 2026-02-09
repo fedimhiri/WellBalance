@@ -1,0 +1,28 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Modifier Type Rendez-vous{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <h4 class="mb-3">Modifier Type Rendez-vous</h4>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+
+                <div class="d-flex align-items-center gap-2 mt-3">
+                    <a class="btn btn-secondary" href="{{ path('app_type_rendez_vous_index') }}">← Retour</a>
+                    <button class="btn btn-warning" type="submit">Mettre à jour</button>
+
+                    <div class="ms-auto">
+                        {{ include('backend/type_rendez_vous/_delete_form.html.twig', { type_rendez_vous: type_rendez_vous }) }}
+                    </div>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

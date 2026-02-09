@@ -1,0 +1,22 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Nouveau document{% endblock %}
+
+{% block body %}
+<section class="py-5" style="min-height: 80vh; background-color: #f8f9fa;">
+    <div class="container">
+        <h2 class="mb-4">Nouveau document</h2>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {{ form_start(form, { attr: { enctype: 'multipart/form-data' } }) }}
+                    {{ form_widget(form) }}
+                    <div class="d-flex gap-2 mt-3">
+                        <a class="btn btn-secondary" href="{{ path('app_document_front_index') }}">← Retour</a>
+                        <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

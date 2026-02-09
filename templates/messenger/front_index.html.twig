@@ -1,0 +1,173 @@
+{% extends 'messenger/_base_front.html.twig' %}
+
+{% block title %}Ma Messagerie{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-chat-text me-2"></i>Ma Messagerie</h2>
+            <p class="text-muted">Espace d'échange sécurisé avec vos médecins.</p>
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        <!-- Colonne Gauche: Liste des Conversations -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">Discussions en cours</h5>
+                    <span class="badge bg-primary rounded-pill">{{ conversations|length }}</span>
+                </div>
+                
+                <div class="card-body">
+                    {# Search & Filter Section #}
+                    <div class="row g-2 align-items-center mb-4">
+                        <div class="col-md-8">
+                            <form method="get" class="d-flex gap-2">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" name="search" class="form-control bg-light border-start-0 ps-0" placeholder="Rechercher..." value="{{ search }}">
+                                    <button type="submit" class="btn btn-primary">Chercher</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-sort-down me-2"></i>Trier
+                                </button>
+                                <ul class="dropdown-menu shadow-sm border-0 w-100">
+                                    <li><a class="dropdown-item {{ sortBy == 'updatedAt' ? 'active' : '' }}" href="{{ path('front_messenger_index', {sortBy: 'updatedAt', sortOrder: 'DESC'}) }}">Plus récents</a></li>
+                                    <li><a class="dropdown-item {{ sortBy == 'createdAt' ? 'active' : '' }}" href="{{ path('front_messenger_index', {sortBy: 'createdAt', sortOrder: 'DESC'}) }}">Date de création</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item {{ sortBy == 'type' ? 'active' : '' }}" href="{{ path('front_messenger_index', {sortBy: 'type', sortOrder: 'ASC'}) }}">Type</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Table Section #}
+                    {% if conversations is not empty %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="conversations-table" data-base-url="{{ path('front_messenger_index')|replace({'/listes': ''}) }}">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Médecin</th>
+                                        <th>Sujet</th>
+                                        <th>Dernier message</th>
+                                        <th>Date</th>
+                                        <th class="text-end pe-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for conv in conversations %}
+                                        {% set unreadCount = conv.getUnreadCountFor(viewer) %}
+                                        <tr class="conversation-row {{ unreadCount > 0 ? 'table-active fw-bold' : '' }}" data-conversation-id="{{ conv.id }}" style="cursor: pointer;" onclick="window.location='{{ path('front_messenger_show', {id: conv.id}) }}'">
+                                            <td class="ps-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-3 bg-primary text-white d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px;">
+                                                        {{ conv.doctor.username|first|upper }}
+                                                    </div>
+                                                    <div>
+                                                        <span class="d-block text-dark fw-bold">Dr. {{ conv.doctor.username }}</span>
+                                                        <small class="text-muted">{{ conv.type|default('Général') }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ conv.sujet|default('Aucun sujet') }}</td>
+                                            <td class="last-message-cell">
+                                                <div class="text-truncate" style="max-width: 180px;">
+                                                {% set lastMsg = conv.getLastMessage() %}
+                                                {% if lastMsg %}
+                                                    <span class="text-secondary">{{ lastMsg.content }}</span>
+                                                {% else %}
+                                                    <em class="text-muted small">Aucun message</em>
+                                                {% endif %}
+                                                </div>
+                                            </td>
+                                            <td class="date-cell text-nowrap text-muted small">{{ conv.updatedAt|date('d/m/Y H:i') }}</td>
+                                            <td class="text-end pe-3">
+                                                <a href="{{ path('front_messenger_show', {id: conv.id}) }}" class="btn btn-sm btn-light text-primary border rounded-pill px-3">
+                                                    Voir
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 border rounded bg-light">
+                            <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+                            <p class="h5 text-muted">Aucune conversation trouvée.</p>
+                            {% if search %}
+                                <p class="text-muted small">Essayez de modifier votre recherche.</p>
+                                <a href="{{ path('front_messenger_index') }}" class="btn btn-outline-secondary btn-sm mt-2">Effacer la recherche</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne Droite: Nouvelle Conversation (Style Réseau Social) -->
+        <div class="col-lg-4">
+            <div class="card shadow border-0 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-pencil-square me-2"></i>Nouveau message</h5>
+                </div>
+                <div class="card-body bg-light">
+                    {{ form_start(form, {'action': path('front_messenger_conversation_create')}) }}
+                        
+                        <!-- Sélection Destinataire avec style moderne -->
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase text-muted fw-bold">Destinataire</label>
+                            {{ form_widget(form.doctor_id, {'attr': {'class': 'form-select border-0 shadow-sm py-2'}}) }}
+                        </div>
+
+                        <!-- Type & Sujet -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-5">
+                                <label class="form-label small text-uppercase text-muted fw-bold">Type</label>
+                                <label class="visually-hidden" for="conversation_type">Type</label>
+                                {{ form_widget(form.conversation_type, {'attr': {'class': 'form-select border-0 shadow-sm py-2'}}) }}
+                            </div>
+                            <div class="col-7">
+                                <label class="form-label small text-uppercase text-muted fw-bold">Sujet</label>
+                                {{ form_widget(form.sujet, {'attr': {'class': 'form-control border-0 shadow-sm py-2', 'placeholder': 'Ex: Ordonnance...'}}) }}
+                            </div>
+                        </div>
+
+                        <!-- Zone de texte style "Post" -->
+                        <div class="mb-3 position-relative">
+                             <label class="form-label small text-uppercase text-muted fw-bold">Message</label>
+                            {{ form_widget(form.content, {'attr': {'class': 'form-control border-0 shadow-sm p-3', 'rows': 5, 'placeholder': 'Écrivez votre message ici...Comme un post !'}}) }}
+                        </div>
+
+                        <!-- Upload & Bouton -->
+                        <div class="d-flex justify-content-end align-items-center mt-3">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow py-2 fw-bold">
+                                <i class="bi bi-send-fill me-2"></i>Envoyer
+                            </button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+                <div class="card-footer bg-white text-center py-3">
+                     <small class="text-muted">Vos échanges sont confidentiels.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Repas{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Repas</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Nutrition / Repas</h6>
+        </nav>
+    </div>
+    <a href="{{ path('admin_repas_new') }}" class="btn btn-primary">
+        <i class="bx bx-plus me-2"></i>Nouveau Repas
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="alert alert-info">
+            <i class="bx bx-info-circle me-2"></i>
+            Calories aujourd'hui : <strong>{{ today_calories }}</strong> kcal
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Calories</th>
+                        <th>Date</th>
+                        <th>Plan</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for repa in repas %}
+                        <tr>
+                            <td>#{{ repa.id }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ repa.typeRepas }}</span>
+                            </td>
+                            <td>{{ repa.description|slice(0, 50) }}...</td>
+                            <td>
+                                <span class="badge bg-warning">{{ repa.calories }} kcal</span>
+                            </td>
+
+                            {# dateRepas peut être DATE ou DATETIME, ça marche dans les 2 cas #}
+                            <td>{{ repa.dateRepas ? repa.dateRepas|date('d/m/Y H:i') : '-' }}</td>
+
+                            {# ✅ MODIF : planNutrition null-safe #}
+                            <td>{{ repa.planNutrition ? repa.planNutrition.objectif : '-' }}</td>
+
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ path('admin_repas_edit', {'id': repa.id}) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bx bx-edit"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('admin_repas_delete', {'id': repa.id}) }}"
+                                          onsubmit="return confirm('Supprimer ce repas ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ repa.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bx bx-food-menu fs-1"></i>
+                                    <p class="mt-2">Aucun repas trouvé</p>
+                                    <a href="{{ path('admin_repas_new') }}" class="btn btn-primary mt-2">
+                                        Ajouter un repas
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

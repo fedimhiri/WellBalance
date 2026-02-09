@@ -1,0 +1,89 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}{{ objectif.libelle }}{% endblock %}
+
+{% block body %}
+    <section class="breadcrumbs">
+        <div class="container">
+            <ol>
+                <li><a href="{{ path('app_frontend_vue') }}">Accueil</a></li>
+                <li><a href="{{ path('front_objectif_sportif_index') }}">Mes Objectifs</a></li>
+                <li>{{ objectif.libelle }}</li>
+            </ol>
+            <h2>{{ objectif.libelle }}</h2>
+        </div>
+    </section>
+
+    <section class="inner-page">
+        <div class="container">
+            
+            <div class="row">
+                <!-- Détails Objectif -->
+                <div class="col-lg-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            Détails de l'objectif
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Type:</strong> {{ objectif.typeObjectif }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Statut:</strong> 
+                                <span class="badge 
+                                    {% if objectif.statut == 'En cours' %}bg-primary
+                                    {% elseif objectif.statut == 'Atteint' %}bg-success
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ objectif.statut }}
+                                </span>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Date Début:</strong> {{ objectif.dateDebut|date('d/m/Y') }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Date Fin:</strong> {{ objectif.dateFin ? objectif.dateFin|date('d/m/Y') : 'Non définie' }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Progression:</strong> {{ objectif.evaluerProgression() }} activités actives
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Description & Activités -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Description</h5>
+                            <p class="card-text">
+                                {{ objectif.description|default('Aucune description.')|nl2br }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <h4 class="mb-3">Activités associées</h4>
+                    {% if objectif.activitePhysiques is empty %}
+                        <div class="alert alert-light">Aucune activité physique associée pour le moment.</div>
+                    {% else %}
+                        <div class="list-group">
+                            {% for activite in objectif.activitePhysiques %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ activite.nom }}</h6>
+                                        <small class="text-muted">{{ activite.typeActivite }} - {{ activite.dureeEstimee }} min - {{ activite.caloriesEstimees }} kcal</small>
+                                    </div>
+                                    <span class="badge bg-info rounded-pill">{{ activite.niveau }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('front_objectif_sportif_index') }}" class="btn btn-secondary">Retour à la liste</a>
+            </div>
+
+        </div>
+    </section>
+{% endblock %}

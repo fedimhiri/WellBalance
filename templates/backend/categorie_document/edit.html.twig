@@ -1,0 +1,20 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Modifier catégorie{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <h4 class="mb-3">Modifier la catégorie</h4>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <div class="d-flex gap-2 mt-3">
+                    <a class="btn btn-secondary" href="{{ path('app_categorie_document_index') }}">← Retour</a>
+                    <button class="btn btn-warning" type="submit">Mettre à jour</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

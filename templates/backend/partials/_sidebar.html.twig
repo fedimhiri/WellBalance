@@ -1,0 +1,170 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    
+    <!-- App Brand corrigé -->
+    <div class="app-brand demo mb-3">
+        <a href="{{ path('admin_dashboard') }}" class="app-brand-link gap-2">
+            <span class="app-brand-logo">
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L2 7.5V18.5L13 24L24 18.5V7.5L13 2Z" fill="currentColor" fill-opacity="0.1"/>
+                    <path d="M13 2L2 7.5V18.5L13 24L24 18.5V7.5L13 2Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M13 10L10 15L13 18L16 15L13 10Z" fill="currentColor"/>
+                </svg>
+            </span>
+            <span class="app-brand-text demo fw-bold fs-4">SYMFONY ADMIN</span>
+        </a>
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-xl-none">
+            <i class="bx bx-chevron-left bx-sm"></i>
+        </a>
+    </div>
+
+    <!-- Divider -->
+    <div class="menu-divider mt-2 mb-3">
+        <hr class="my-0">
+    </div>
+
+    <!-- Menu Container -->
+    <div class="menu-inner-shadow"></div>
+    
+    <ul class="menu-inner py-1">
+        
+        <!-- Dashboard -->
+        <li class="menu-item {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
+            <a href="{{ path('admin_dashboard') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div>Dashboard</div>
+                {% if app.request.get('_route') == 'admin_dashboard' %}
+                <span class="badge bg-primary rounded-pill ms-auto">●</span>
+                {% endif %}
+            </a>
+        </li>
+
+         <!-- Go To Front -->
+        <li class="menu-item {% if app.request.get('_route') == 'app_frontend_vue' %}active{% endif %}">
+            <a href="{{ path('app_frontend_vue') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-globe"></i>
+                <div>Front Office</div>
+            </a>
+        </li>
+
+        <!-- Menu Header -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestion</span>
+        </li>
+
+        <!-- Utilisateurs -->
+        <li class="menu-item {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
+            <a href="{{ path('admin_dashboard') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div>Utilisateurs</div>
+            </a>
+        </li>
+
+
+        <!-- GESTION MESSAGERIE -->
+        <li class="menu-item {% if app.request.get('_route') == 'Messenger_dashboard' %}active{% endif %}">
+            <a href="{{ path('Messenger_dashboard') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-chat"></i>
+                <div>Gestion Messagerie</div>
+            </a>
+        </li>
+
+        <!-- GESTION RENDEZ-VOUS -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestion Rendez-vous</span>
+        </li>
+
+        <li class="menu-item {% if app.request.get('_route') starts with 'app_type_rendez_vous' %}active{% endif %}">
+            <a href="{{ path('app_type_rendez_vous_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-list-ul"></i>
+                <div>Types de RDV</div>
+            </a>
+        </li>
+
+        <li class="menu-item {% if app.request.get('_route') starts with 'app_rendez_vous' %}active{% endif %}">
+            <a href="{{ path('app_rendez_vous_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-calendar"></i>
+                <div>Rendez-vous</div>
+            </a>
+        </li>
+
+
+        <!-- GESTION SPORT -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestion Sport</span>
+        </li>
+
+        <li class="menu-item {% if app.request.get('_route') starts with 'app_objectif_sportif' %}active{% endif %}">
+            <a href="{{ path('app_objectif_sportif_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-trophy"></i>
+                <div>Objectifs Sportifs</div>
+            </a>
+        </li>
+
+        <li class="menu-item {% if app.request.get('_route') starts with 'app_activite_physique' %}active{% endif %}">
+            <a href="{{ path('app_activite_physique_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-run"></i>
+                <div>Activités Physiques</div>
+            </a>
+        </li>
+
+        <!-- GESTION NUTRITION -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestion Nutrition</span>
+        </li>
+
+        <li class="menu-item {% if app.request.get('_route') starts with 'admin_plan_nutrition' %}active{% endif %}">
+            <a href="{{ path('admin_plan_nutrition_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-restaurant"></i>
+                <div>Plans Nutritionnels</div>
+            </a>
+        </li>
+
+        <li class="menu-item {% if app.request.get('_route') starts with 'admin_repas' %}active{% endif %}">
+            <a href="{{ path('admin_repas_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-dish"></i>
+                <div>Repas</div>
+            </a>
+        </li>
+
+        <!-- GESTION DOCUMENTS (Membre) -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Gestion des documents</span>
+        </li>
+        <li class="menu-item {% if app.request.get('_route') starts with 'app_categorie_document' %}active{% endif %}">
+            <a href="{{ path('app_categorie_document_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-folder"></i>
+                <div>Catégories documents</div>
+            </a>
+        </li>
+        <li class="menu-item {% if app.request.get('_route') starts with 'app_document' %}active{% endif %}">
+            <a href="{{ path('app_document_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-file"></i>
+                <div>Documents</div>
+            </a>
+        </li>
+
+        <!-- Paramètres -->
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Configuration</span>
+        </li>
+
+        <!-- Paramètres -->
+        <li class="menu-item">
+            <a href="#" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-cog"></i>
+                <div>Paramètres</div>
+            </a>
+        </li>
+
+        <!-- Support -->
+        <li class="menu-item">
+            <a href="#" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-help-circle"></i>
+                <div>Aide & Support</div>
+                <span class="badge bg-label-dark rounded-pill ms-auto">Nouveau</span>
+            </a>
+        </li>
+
+    </ul>
+
+</aside>

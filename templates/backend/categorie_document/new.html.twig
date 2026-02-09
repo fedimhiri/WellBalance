@@ -1,0 +1,20 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Nouvelle catégorie de document{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <h4 class="mb-3">Nouvelle catégorie de document</h4>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <div class="d-flex gap-2 mt-3">
+                    <a class="btn btn-secondary" href="{{ path('app_categorie_document_index') }}">← Retour</a>
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

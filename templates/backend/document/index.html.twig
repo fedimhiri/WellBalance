@@ -1,0 +1,93 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Gestion des documents</h4>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-danger" href="{{ path('app_document_export_pdf', {q: q, sort: sort, dir: dir}) }}">
+                <i class="bx bx-file-blank me-1"></i> Exporter PDF
+            </a>
+            <a class="btn btn-primary" href="{{ path('app_document_new') }}">+ Nouveau document</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form class="row g-2" method="get" action="{{ path('app_document_index') }}">
+                <div class="col-md-5">
+                    <input class="form-control" name="q" value="{{ q }}" placeholder="Rechercher (titre, type, catégorie)">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="sort">
+                        <option value="titre" {{ sort == 'titre' ? 'selected' : '' }}>Titre</option>
+                        <option value="dateUpload" {{ sort == 'dateUpload' ? 'selected' : '' }}>Date upload</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="dir">
+                        <option value="DESC" {{ dir == 'DESC' ? 'selected' : '' }}>DESC</option>
+                        <option value="ASC" {{ dir == 'ASC' ? 'selected' : '' }}>ASC</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-secondary">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th>Titre</th>
+                            <th>Type</th>
+                            <th>Catégorie</th>
+                            <th>Membre</th>
+                            <th>Date upload</th>
+                            <th style="width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in documents %}
+                            <tr>
+                                <td>{{ d.id }}</td>
+                                <td>{{ d.titre }}</td>
+                                <td>{{ d.typeDocument }}</td>
+                                <td>{{ d.categorie ? d.categorie.description : '-' }}</td>
+                                <td>{{ d.user ? d.user.username : '-' }}</td>
+                                <td>{{ d.dateUpload ? d.dateUpload|date('d/m/Y H:i') : '-' }}</td>
+                                <td class="text-nowrap">
+                                    <div class="btn-group" role="group">
+                                        <a class="btn btn-sm btn-info" href="{{ path('app_document_show', {id: d.id}) }}">👁</a>
+                                        {% if d.cheminFichier %}
+                                            <a class="btn btn-sm btn-outline-primary" href="{{ asset('uploads/documents/' ~ d.cheminFichier) }}" target="_blank">📄</a>
+                                        {% endif %}
+                                        <a class="btn btn-sm btn-warning" href="{{ path('app_document_edit', {id: d.id}) }}">✎</a>
+                                        <form method="post" action="{{ path('app_document_delete', {id: d.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ d.id) }}">
+                                            <button class="btn btn-sm btn-danger" type="submit">🗑</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Aucun document.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

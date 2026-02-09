@@ -1,0 +1,19 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Ajouter un repas{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+  <h2 class="mb-3">Ajouter un repas</h2>
+  <a class="btn btn-outline-secondary mb-3" href="{{ path('front_plan_nutrition_show', {id: plan.id}) }}">Retour</a>
+
+  {{ form_start(form) }}
+    {{ form_row(form.typeRepas) }}
+    {{ form_row(form.calories) }}
+    {{ form_row(form.dateRepas) }}
+    {{ form_row(form.description) }}
+
+    <button class="btn btn-success">Enregistrer</button>
+  {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Prendre un rendez-vous{% endblock %}
+
+{% block body %}
+<section class="py-5" style="min-height: 80vh; background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-4">
+                    <h2 class="mb-2">Prendre un rendez-vous</h2>
+                    <p class="text-muted">Remplissez le formulaire ci-dessous pour réserver votre rendez-vous</p>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        {{ form_start(form) }}
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Titre du rendez-vous</label>
+                                    {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Consultation générale'}}) }}
+                                    {{ form_errors(form.titre) }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Date et heure</label>
+                                    {{ form_widget(form.dateRdv, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(form.dateRdv) }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Type de rendez-vous</label>
+                                    {{ form_widget(form.type, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_errors(form.type) }}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Lieu</label>
+                                    {{ form_widget(form.lieu, {'attr': {'class': 'form-control', 'placeholder': 'Adresse ou lieu du rendez-vous'}}) }}
+                                    {{ form_errors(form.lieu) }}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Statut</label>
+                                    {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_errors(form.statut) }}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Notes</label>
+                                    {{ form_widget(form.notes, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Notes ou informations complémentaires...'}}) }}
+                                    {{ form_errors(form.notes) }}
+                                </div>
+                            </div>
+
+                            {{ form_rest(form) }}
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    Confirmer le rendez-vous
+                                </button>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a href="{{ path('app_frontend_vue') }}" class="btn btn-outline-secondary">
+                        ← Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

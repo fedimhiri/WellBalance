@@ -1,0 +1,80 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block body %}
+<div class="auth-creative-wrapper py-5">
+    <div class="container">
+        <div class="card p-4">
+
+            <h2 class="mb-3">Créer un compte</h2>
+            <p class="text-muted mb-4">
+                Inscrivez-vous pour accéder à votre espace patient.
+            </p>
+
+            {# IMPORTANT : désactivation totale de la validation HTML5 #}
+            {{ form_start(registrationForm, {
+                attr: { novalidate: 'novalidate' }
+            }) }}
+
+            {# erreurs globales #}
+            {{ form_errors(registrationForm) }}
+
+            <!-- EMAIL -->
+            <div class="mb-3">
+                {{ form_widget(registrationForm.email, {
+                    attr: { class: 'form-control', placeholder: 'Email' }
+                }) }}
+                {{ form_errors(registrationForm.email) }}
+            </div>
+
+            <!-- USERNAME -->
+            <div class="mb-3">
+                {{ form_widget(registrationForm.username, {
+                    attr: { class: 'form-control', placeholder: 'Nom d’utilisateur' }
+                }) }}
+                {{ form_errors(registrationForm.username) }}
+            </div>
+
+            <!-- TELEPHONE -->
+            <div class="mb-3">
+                {{ form_widget(registrationForm.telephone, {
+                    attr: { class: 'form-control', placeholder: 'Téléphone (8 chiffres)' }
+                }) }}
+                {{ form_errors(registrationForm.telephone) }}
+            </div>
+
+            <!-- MOT DE PASSE -->
+            <div class="mb-3">
+                {{ form_widget(registrationForm.plainPassword.first, {
+                    attr: { class: 'form-control', placeholder: 'Mot de passe' }
+                }) }}
+            </div>
+
+            <!-- CONFIRMATION -->
+            <div class="mb-3">
+                {{ form_widget(registrationForm.plainPassword.second, {
+                    attr: { class: 'form-control', placeholder: 'Confirmer le mot de passe' }
+                }) }}
+                {{ form_errors(registrationForm.plainPassword) }}
+            </div>
+
+            <!-- CONDITIONS -->
+            <div class="form-check mb-3">
+                {{ form_widget(registrationForm.agreeTerms, {
+                    attr: { class: 'form-check-input' }
+                }) }}
+                {{ form_label(registrationForm.agreeTerms) }}
+                {{ form_errors(registrationForm.agreeTerms) }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Créer mon compte
+            </button>
+
+            {{ form_end(registrationForm) }}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

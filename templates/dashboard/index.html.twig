@@ -1,0 +1,163 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block body %}
+    <h4 class="fw-bold py-3 mb-4">Tableau de Bord</h4>
+
+    <!-- Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ path('app_dashboard') }}" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Rechercher..." value="{{ query }}">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+                {% if query %}
+                    <a href="{{ path('app_dashboard') }}" class="btn btn-secondary ms-2">Reset</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+             <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ stats.totalObjectifs }}</h5>
+                    <p class="card-text">Objectifs Totaux</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+             <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">{{ stats.completionRate }}%</h5>
+                    <p class="card-text">Taux de Réussite</p>
+                </div>
+            </div>
+        </div>
+         <div class="col-md-3">
+             <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">{{ stats.totalActivites }}</h5>
+                    <p class="card-text">Activités Physiques</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+             <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">{{ stats.totalCalories }}</h5>
+                    <p class="card-text">Calories Est. Totales</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Actions Rapides</h5>
+                    <div>
+                        <a href="{{ path('app_objectif_sportif_new') }}" class="btn btn-primary me-2">
+                            <i class="bx bx-plus me-1"></i> Créer Objectif
+                        </a>
+                        <a href="{{ path('app_activite_physique_new') }}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i> Créer Activité
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Objectifs List -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Objectifs Récents</h5>
+                    <a href="{{ path('app_objectif_sportif_index') }}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Libellé</th>
+                                <th>Progression</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for obj in objectifs|slice(0, 5) %}
+                            <tr>
+                                <td>{{ obj.libelle }}</td>
+                                <td><span class="badge bg-secondary">{{ obj.evaluerProgression() }}</span></td>
+                                <td><span class="badge bg-label-{{ obj.statut == 'Atteint' ? 'success' : (obj.statut == 'En cours' ? 'primary' : 'danger') }}">{{ obj.statut }}</span></td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                            <i class="bx bx-dots-vertical-rounded"></i>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ path('app_objectif_sportif_edit', {'id': obj.id}) }}"><i class="bx bx-edit-alt me-1"></i> Editer</a>
+                                            <a class="dropdown-item" href="{{ path('app_objectif_sportif_show', {'id': obj.id}) }}"><i class="bx bx-show-alt me-1"></i> Voir</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                             <tr><td colspan="4" class="text-center">Aucun objectif</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activites List -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Activités Récentes</h5>
+                    <a href="{{ path('app_activite_physique_index') }}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="table-responsive text-nowrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for act in activites|slice(0, 5) %}
+                            <tr>
+                                <td>{{ act.nom }}</td>
+                                <td>{{ act.typeActivite }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                            <i class="bx bx-dots-vertical-rounded"></i>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ path('app_activite_physique_edit', {'id': act.id}) }}"><i class="bx bx-edit-alt me-1"></i> Editer</a>
+                                            <a class="dropdown-item" href="{{ path('app_activite_physique_show', {'id': act.id}) }}"><i class="bx bx-show-alt me-1"></i> Voir</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                             <tr><td colspan="3" class="text-center">Aucune activité</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

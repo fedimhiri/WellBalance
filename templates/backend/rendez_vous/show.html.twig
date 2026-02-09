@@ -1,0 +1,35 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Rendez-vous{% endblock %}
+
+{% block body %}
+<h4 class="fw-bold py-3 mb-4">Détails Rendez-vous</h4>
+
+<div class="card">
+  <div class="card-body">
+    <table class="table table-bordered">
+      <tbody>
+        <tr><th>Id</th><td>{{ rendez_vou.id }}</td></tr>
+        <tr><th>Titre</th><td>{{ rendez_vou.titre }}</td></tr>
+        <tr><th>Date</th><td>{{ rendez_vou.dateRdv ? rendez_vou.dateRdv|date('Y-m-d H:i') : '' }}</td></tr>
+        <tr><th>Lieu</th><td>{{ rendez_vou.lieu }}</td></tr>
+        <tr><th>Notes</th><td>{{ rendez_vou.notes }}</td></tr>
+        <tr><th>Statut</th><td>{{ rendez_vou.statut }}</td></tr>
+        <tr><th>Type</th><td>{{ rendez_vou.type }}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-secondary" href="{{ path('app_rendez_vous_index') }}">⬅ Retour</a>
+      <a class="btn btn-warning" href="{{ path('app_rendez_vous_edit', {'id': rendez_vou.id}) }}">✏️ Modifier</a>
+
+      <form method="post"
+            action="{{ path('app_rendez_vous_delete', {'id': rendez_vou.id}) }}"
+            onsubmit="return confirm('Confirmer la suppression ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ rendez_vou.id) }}">
+        <button class="btn btn-danger" type="submit">🗑 Supprimer</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

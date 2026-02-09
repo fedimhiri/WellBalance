@@ -1,0 +1,40 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Détails du document{% endblock %}
+
+{% block body %}
+<section class="py-5" style="min-height: 80vh; background-color: #f8f9fa;">
+    <div class="container">
+        <h2 class="mb-4">Détails du document</h2>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr><th style="width: 200px;">Titre</th><td>{{ document.titre }}</td></tr>
+                        <tr><th>Type</th><td>{{ document.typeDocument }}</td></tr>
+                        <tr><th>Catégorie</th><td>{{ document.categorie ? document.categorie.description : '-' }}</td></tr>
+                        <tr><th>Date d'upload</th><td>{{ document.dateUpload ? document.dateUpload|date('d/m/Y H:i') : '-' }}</td></tr>
+                        <tr><th>Fichier</th>
+                            <td>
+                                {% if document.cheminFichier %}
+                                    <a href="{{ asset('uploads/documents/' ~ document.cheminFichier) }}" target="_blank" class="btn btn-outline-primary">Ouvrir le fichier</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="d-flex gap-2 mt-3">
+                    <a class="btn btn-secondary" href="{{ path('app_document_front_index') }}">← Retour</a>
+                    <a class="btn btn-warning" href="{{ path('app_document_front_edit', {id: document.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('app_document_front_delete', {id: document.id}) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ document.id) }}">
+                        <button class="btn btn-danger" type="submit">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

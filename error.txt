@@ -1,0 +1,17 @@
+ERROR: An exception occurred while executing a query: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'description' cannot be null
+File: C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\dbal\src\Driver\API\MySQL\ExceptionConverter.php
+Line: 101
+Trace:
+#0 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\dbal\src\Connection.php(1460): Doctrine\DBAL\Driver\API\MySQL\ExceptionConverter->convert(Object(Doctrine\DBAL\Driver\PDO\Exception), Object(Doctrine\DBAL\Query))
+#1 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\dbal\src\Connection.php(1396): Doctrine\DBAL\Connection->handleDriverException(Object(Doctrine\DBAL\Driver\PDO\Exception), Object(Doctrine\DBAL\Query))
+#2 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\dbal\src\Statement.php(108): Doctrine\DBAL\Connection->convertExceptionDuringQuery(Object(Doctrine\DBAL\Driver\PDO\Exception), 'INSERT INTO rep...', Array, Array)
+#3 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\dbal\src\Statement.php(133): Doctrine\DBAL\Statement->execute()
+#4 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\orm\src\Persisters\Entity\BasicEntityPersister.php(253): Doctrine\DBAL\Statement->executeStatement()
+#5 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\orm\src\UnitOfWork.php(1060): Doctrine\ORM\Persisters\Entity\BasicEntityPersister->executeInserts()
+#6 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\orm\src\UnitOfWork.php(403): Doctrine\ORM\UnitOfWork->executeInserts()
+#7 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\doctrine\orm\src\EntityManager.php(268): Doctrine\ORM\UnitOfWork->commit()
+#8 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\backend_test.php(63): Doctrine\ORM\EntityManager->flush()
+#9 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\symfony\runtime\Runner\ClosureRunner.php(28): class@anonymous->__invoke()
+#10 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\vendor\autoload_runtime.php(32): Symfony\Component\Runtime\Runner\ClosureRunner->run()
+#11 C:\Users\21658\Desktop\integration fedi_amine\integration\integration\backend_test.php(11): require_once('C:\\Users\\21658\\...')
+#12 {main}

@@ -1,0 +1,76 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Détails Repas{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Repas #{{ repa.id }}</h4>
+    <nav class="d-flex">
+      <h6 class="fw-normal text-muted mb-0">
+        <a href="{{ path('admin_repas_index') }}" class="text-muted">Nutrition / Repas</a>
+        / #{{ repa.id }}
+      </h6>
+    </nav>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="{{ path('admin_repas_edit', {'id': repa.id}) }}" class="btn btn-warning">
+      <i class="bx bx-edit me-2"></i>Modifier
+    </a>
+    <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">
+      <i class="bx bx-arrow-back me-2"></i>Retour
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted small">Type</label>
+        <h5 class="fw-bold">{{ repa.typeRepas }}</h5>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted small">Calories</label>
+        <h5 class="fw-bold">{{ repa.calories }} kcal</h5>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted small">Date</label>
+        <p class="fw-medium mb-0">{{ repa.dateRepas ? repa.dateRepas|date('d/m/Y H:i') : '-' }}</p>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted small">Plan nutrition</label>
+        <p class="fw-medium mb-0">
+          {% if repa.planNutrition %}
+            <a href="{{ path('admin_plan_nutrition_show', {'id': repa.planNutrition.id}) }}">
+              {{ repa.planNutrition.objectif }}
+            </a>
+          {% else %}
+            -
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="col-12 mb-3">
+        <label class="form-label text-muted small">Description</label>
+        <p class="fw-medium mb-0">{{ repa.description }}</p>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <form method="post"
+            action="{{ path('admin_repas_delete', {'id': repa.id}) }}"
+            onsubmit="return confirm('Supprimer ce repas ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ repa.id) }}">
+        <button class="btn btn-outline-danger">
+          <i class="bx bx-trash me-2"></i>Supprimer
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}{{ rendez_vou.titre }}{% endblock %}
+
+{% block body %}
+<section class="py-5" style="min-height: 80vh; background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mb-4">Détails du rendez-vous</h2>
+
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">{{ rendez_vou.titre }}</h4>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <strong>Date et heure:</strong>
+                                <p>{{ rendez_vou.dateRdv|date('d/m/Y à H:i') }}</p>
+                            </div>
+
+                            <div class="col-md-6">
+                                <strong>Type:</strong>
+                                <p>{{ rendez_vou.type }}</p>
+                            </div>
+
+                            <div class="col-md-12">
+                                <strong>Lieu:</strong>
+                                <p>{{ rendez_vou.lieu ?? 'Non spécifié' }}</p>
+                            </div>
+
+                            <div class="col-md-12">
+                                <strong>Statut:</strong>
+                                <p>
+                                    <span class="badge 
+                                        {% if rendez_vou.statut == 'PLANIFIE' %}bg-primary
+                                        {% elseif rendez_vou.statut == 'TERMINE' %}bg-success
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ rendez_vou.statut }}
+                                    </span>
+                                </p>
+                            </div>
+
+                            {% if rendez_vou.notes %}
+                                <div class="col-md-12">
+                                    <strong>Notes:</strong>
+                                    <p class="text-muted">{{ rendez_vou.notes }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('app_front_rendez_vous_index') }}" class="btn btn-outline-secondary">
+                                ← Retour à la liste
+                            </a>
+                            <div>
+                                <a href="{{ path('app_front_rendez_vous_edit', {id: rendez_vou.id}) }}" 
+                                   class="btn btn-primary me-2">
+                                    Modifier
+                                </a>
+                                <button type="button" class="btn btn-danger" 
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer ce rendez-vous ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_front_rendez_vous_delete', {id: rendez_vou.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ rendez_vou.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

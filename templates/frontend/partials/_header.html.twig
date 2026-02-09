@@ -1,0 +1,78 @@
+{# templates/frontend/partials/_header.html.twig #}
+<header id="header" class="header fixed-top">
+
+    <div class="topbar d-flex align-items-center dark-background">
+        <div class="container d-flex justify-content-center justify-content-md-between">
+            <div class="contact-info d-flex align-items-center">
+                <i class="bi bi-envelope d-flex align-items-center">
+                    <a href="mailto:contact@example.com">contact@clinique.com</a>
+                </i>
+                <i class="bi bi-phone d-flex align-items-center ms-4">
+                    <span>{{ phone_number|default('+1 5589 55488 55') }}</span>
+                </i>
+            </div>
+            <div class="social-links d-none d-md-flex align-items-center">
+                <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="branding d-flex align-items-center">
+        <div class="container position-relative d-flex align-items-center justify-content-between">
+
+            <a href="{{ path('app_frontend_vue') }}" class="logo d-flex align-items-center">
+                <h1 class="sitename">{{ site_name|default('Clinique Médicale') }}</h1>
+            </a>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    {% if not app.user %}
+                        <li><a href="{{ path('app_frontend_vue') }}" class="{{ app.request.get('_route') == 'app_frontend_vue' ? 'active' : '' }}">Accueil</a></li>
+                        <li><a href="{{ path('app_frontend_vue') }}">À propos</a></li>
+                        <li><a href="{{ path('app_frontend_vue') }}">Services</a></li>
+                        <li><a href="{{ path('app_frontend_vue') }}">Contact</a></li>
+                        <li><a href="{{ path('app_login') }}">Se Connecter</a></li>
+                        <li><a href="{{ path('frontend_register') }}">S'inscrire</a></li>
+                    {% else %}
+                        <li><a href="{{ path('front_messenger_index') }}">Messagerie</a></li>
+                        <li><a href="{{ path('app_front_rendez_vous_index') }}">Mes rendez-vous</a></li>
+                        <li>
+                            <a href="{{ path('front_plan_nutrition_index') }}"
+                               class="{{ app.request.get('_route') starts with 'front_plan_nutrition' ? 'active' : '' }}">
+                                Mes plans
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ path('front_objectif_sportif_index') }}"
+                               class="{{ app.request.get('_route') starts with 'front_objectif_sportif' ? 'active' : '' }}">
+                                Mes objectifs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_document_front_index') }}"
+                               class="{{ app.request.get('_route') starts with 'app_document_front' ? 'active' : '' }}">
+                                Mes documents
+                            </a>
+                        </li>
+                        <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item ms-3">
+                            <a href="{{ path('admin_dashboard') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-speedometer2 me-1"></i> Admin
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+
+        </div>
+    </div>
+
+</header>

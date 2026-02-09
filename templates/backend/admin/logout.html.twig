@@ -1,0 +1,201 @@
+{% extends 'backend/base_login.html.twig' %}
+
+{% block title %}Déconnexion{% endblock %}
+
+{% block body %}
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+            <!-- Logout Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-sm-5 text-center">
+                    
+                    <!-- Logo -->
+                    <div class="app-brand justify-content-center mb-4">
+                        <a href="{{ path('admin_dashboard') }}" class="app-brand-link gap-2">
+                            <span class="app-brand-logo demo">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                    <path d="M16 2L2 8V24L16 30L30 24V8L16 2Z" fill="currentColor" fill-opacity="0.1"/>
+                                    <path d="M16 2L2 8V24L16 30L30 24V8L16 2Z" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M16 12L12 20L16 24L20 20L16 12Z" fill="currentColor"/>
+                                </svg>
+                            </span>
+                            <span class="app-brand-text demo fw-bold fs-4">SYMFONY ADMIN</span>
+                        </a>
+                    </div>
+                    <!-- /Logo -->
+
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <div class="avatar avatar-xl bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
+                            <i class="bx bx-log-out text-primary fs-1"></i>
+                        </div>
+                        <h4 class="mb-2">Déconnexion réussie</h4>
+                        <p class="text-muted mb-4">
+                            Vous avez été déconnecté avec succès de votre compte.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3">
+                        <a href="{{ path('app_login') }}" class="btn btn-primary">
+                            <i class="bx bx-log-in me-2"></i>
+                            Se reconnecter
+                        </a>
+                        
+                        <a href="{{ path('admin_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bx bx-home me-2"></i>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+
+                    <!-- Security Tips -->
+                    <div class="mt-4">
+                        <div class="alert alert-warning bg-warning-subtle border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-shield-alt me-2 fs-5"></i>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted">
+                                        <strong>Conseil de sécurité :</strong> 
+                                        Assurez-vous de fermer tous les onglets du navigateur pour une déconnexion complète.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-2 text-muted small">
+                            © {{ "now"|date("Y") }} Symfony Admin Panel
+                            <br>
+                            <span class="text-muted">Session terminée</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- /Logout Card -->
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation to logout icon
+    const logoutIcon = document.querySelector('.bx-log-out');
+    if (logoutIcon) {
+        logoutIcon.style.transition = 'transform 0.5s ease';
+        
+        setTimeout(() => {
+            logoutIcon.style.transform = 'rotate(180deg)';
+        }, 500);
+    }
+});
+</script>
+
+<style>
+.authentication-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 1rem;
+}
+
+.authentication-inner {
+    width: 100%;
+    max-width: 400px;
+}
+
+.card {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.app-brand-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.app-brand-logo.demo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+}
+
+.app-brand-logo.demo svg {
+    color: white;
+}
+
+.app-brand-text.demo {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.avatar.avatar-xl {
+    width: 80px;
+    height: 80px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border: none;
+    padding: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.btn-outline-secondary {
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    border-color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.alert-warning {
+    border-radius: 0.75rem;
+    border: none;
+}
+
+.alert-warning.bg-warning-subtle {
+    background-color: rgba(var(--bs-warning-rgb), 0.1);
+    color: var(--bs-warning);
+}
+
+@media (max-width: 576px) {
+    .authentication-inner {
+        padding: 0;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+    }
+    
+    .card-body {
+        padding: 2rem 1rem !important;
+    }
+}
+</style>
+{% endblock %}

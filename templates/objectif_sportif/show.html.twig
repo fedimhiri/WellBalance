@@ -1,0 +1,98 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Détails Objectif{% endblock %}
+
+{% block body %}
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Objectifs /</span> Détails</h4>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <!-- Header with Gradient -->
+                <div class="card-body p-0">
+                     <div class="bg-primary p-5 text-center text-white" style="background: linear-gradient(135deg, #696cff 0%, #8592fa 100%);">
+                        <div class="avatar avatar-xl mx-auto mb-3 bg-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <span class="text-primary fw-bold display-6">{{ objectif_sportif.libelle|slice(0,2)|upper }}</span>
+                        </div>
+                        <h2 class="text-white mb-1">{{ objectif_sportif.libelle }}</h2>
+                        <p class="text-white-50 fs-5 mb-3">{{ objectif_sportif.typeObjectif }}</p>
+                        <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill shadow-sm">{{ objectif_sportif.statut }}</span>
+                     </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center p-3 border rounded-3 bg-light">
+                                <div class="avatar avatar-md me-3 bg-label-primary rounded p-2">
+                                     <i class="bx bx-calendar fs-3"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 0.75rem;">DATE DÉBUT</small>
+                                    <span class="fs-5 fw-semibold">{{ objectif_sportif.dateDebut ? objectif_sportif.dateDebut|date('d M Y') : 'N/A' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                             <div class="d-flex align-items-center p-3 border rounded-3 bg-light">
+                                <div class="avatar avatar-md me-3 bg-label-warning rounded p-2">
+                                     <i class="bx bx-calendar-check fs-3"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block uppercase fw-bold" style="font-size: 0.75rem;">DATE FIN</small>
+                                    <span class="fs-5 fw-semibold">{{ objectif_sportif.dateFin ? objectif_sportif.dateFin|date('d M Y') : 'N/A' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted text-uppercase fw-bold mb-3 small"><i class="bx bx-detail me-2"></i>Description</h6>
+                        <p class="fs-5 text-secondary lh-lg">{{ objectif_sportif.description }}</p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                        <a href="{{ path('app_objectif_sportif_index') }}" class="btn btn-outline-secondary px-4 rounded-pill">
+                            <i class="bx bx-arrow-back me-2"></i> Retour
+                        </a>
+                        <div class="d-flex gap-2">
+                             {{ include('objectif_sportif/_delete_form.html.twig') }}
+                             <a href="{{ path('app_objectif_sportif_edit', {'id': objectif_sportif.id}) }}" class="btn btn-primary px-4 rounded-pill shadow-sm hover-elevate">
+                                <i class="bx bx-edit-alt me-2"></i> Editer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Associated Activities Preview (Optional enhancement) -->
+    <div class="row justify-content-center mt-5">
+         <div class="col-md-10 col-lg-8">
+            <h5 class="fw-bold mb-4 text-center">Activités Liées</h5>
+            <div class="row g-3">
+            {% for activite in objectif_sportif.activitePhysiques %}
+                <div class="col-md-6">
+                    <div class="card h-100 border shadow-sm hover-shadow transition-all">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="avatar bg-label-warning rounded me-3">
+                                <i class='bx bx-run'></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <strong class="text-dark">{{ activite.nom }}</strong>
+                                <small class="text-muted">{{ activite.caloriesEstimees }} kcal • {{ activite.dureeEstimee }} min</small>
+                            </div>
+                            <a href="{{ path('app_activite_physique_show', {'id': activite.id}) }}" class="btn btn-icon btn-sm btn-outline-secondary ms-auto rounded-circle">
+                                <i class="bx bx-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center text-muted">Aucune activité liée pour le moment.</div>
+            {% endfor %}
+            </div>
+         </div>
+    </div>
+{% endblock %}

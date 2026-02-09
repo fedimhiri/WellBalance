@@ -1,0 +1,109 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Mes documents{% endblock %}
+
+{% block body %}
+<section class="py-5" style="min-height: 80vh; background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 class="mb-2">Mes documents</h2>
+                <p class="text-muted">Gérez vos documents personnels</p>
+            </div>
+            <div class="col-md-4 text-end d-flex gap-2 justify-content-end">
+                <a href="{{ path('app_document_front_export_pdf', {q: q, sort: sort, dir: dir}) }}" class="btn btn-outline-danger">
+                    <i class="bi bi-file-pdf me-1"></i> Exporter PDF
+                </a>
+                <a href="{{ path('app_document_front_new') }}" class="btn btn-primary">
+                    + Nouveau document
+                </a>
+            </div>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_document_front_index') }}" class="row g-3">
+                    <div class="col-md-5">
+                        <input type="text" name="q" class="form-control" 
+                               placeholder="Rechercher (titre, type, catégorie)" 
+                               value="{{ q }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="sort" class="form-select">
+                            <option value="titre" {{ sort == 'titre' ? 'selected' : '' }}>Trier par titre</option>
+                            <option value="dateUpload" {{ sort == 'dateUpload' ? 'selected' : '' }}>Trier par date</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="dir" class="form-select">
+                            <option value="DESC" {{ dir == 'DESC' ? 'selected' : '' }}>↓ Desc</option>
+                            <option value="ASC" {{ dir == 'ASC' ? 'selected' : '' }}>↑ Asc</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Catégorie</th>
+                                <th>Date d'upload</th>
+                                <th style="width: 200px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in documents %}
+                                <tr>
+                                    <td>{{ d.titre }}</td>
+                                    <td>{{ d.typeDocument }}</td>
+                                    <td>{{ d.categorie ? d.categorie.description : '-' }}</td>
+                                    <td>{{ d.dateUpload ? d.dateUpload|date('d/m/Y H:i') : '-' }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a class="btn btn-outline-primary" href="{{ path('app_document_front_show', {id: d.id}) }}">Voir</a>
+                                            {% if d.cheminFichier %}
+                                                <a class="btn btn-outline-secondary" href="{{ asset('uploads/documents/' ~ d.cheminFichier) }}" target="_blank">Télécharger</a>
+                                            {% endif %}
+                                            <a class="btn btn-outline-warning" href="{{ path('app_document_front_edit', {id: d.id}) }}">Modifier</a>
+                                            <form method="post" action="{{ path('app_document_front_delete', {id: d.id}) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ d.id) }}">
+                                                <button class="btn btn-outline-danger" type="submit">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">Aucun document.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

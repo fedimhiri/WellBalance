@@ -1,0 +1,91 @@
+{% extends 'messenger/_base_admin.html.twig' %}
+
+{% block title %}Messagerie Admin{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Summaries of Conversations</h2>
+        <a href="{{ path('Messenger_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Tableau de bord Messagerie
+        </a>
+    </div>
+
+    {# Flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-body">
+            {# Recherche #}
+            <form method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ search }}">
+                    <button type="submit" class="btn btn-secondary">Rechercher</button>
+                    {% if search %}
+                        <a href="{{ path('admin_messenger_index') }}" class="btn btn-outline-secondary">Effacer</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            {# Liste #}
+            {% if conversations is not empty %}
+                <table class="table table-striped" id="conversations-table" data-base-url="{{ path('admin_messenger_index')|replace({'/listes_conversations': ''}) }}">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Dernier message</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conversation in conversations %}
+                            {% set lastMessage = conversation.messages|last %}
+                            {% set unread = conversation.getUnreadCountFor(app.user) %}
+                            <tr class="conversation-row" data-conversation-id="{{ conversation.id }}">
+                                <td>
+                                    {{ conversation.user.username }}
+                                    <br>
+                                    <small class="text-muted">#{{ conversation.user.id }}</small>
+                                </td>
+                                <td class="last-message-cell">
+                                    {% if lastMessage %}
+                                        {{ lastMessage.content|slice(0, 50) }}...
+                                    {% else %}
+                                        <em>Aucun message</em>
+                                    {% endif %}
+                                </td>
+                                <td class="status-cell">
+                                    {% if unread > 0 %}
+                                        <span class="badge bg-danger status-badge">{{ unread }} non lu(s)</span>
+                                    {% else %}
+                                        <span class="badge bg-success status-badge">À jour</span>
+                                    {% endif %}
+                                </td>
+                                <td class="date-cell">
+                                    {{ conversation.updatedAt|date('d/m/Y H:i') }}
+                                </td>
+                                <td>
+                                    <a href="{{ path('admin_messenger_show', {id: conversation.id}) }}" class="btn btn-sm btn-info text-white">Voir</a>
+                                    <a href="{{ path('admin_messenger_conversation_delete', {id: conversation.id}) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Supprimer ?')">Supprimer</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-center">Aucune conversation trouvée.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

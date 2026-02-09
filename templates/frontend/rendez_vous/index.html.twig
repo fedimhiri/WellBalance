@@ -1,0 +1,144 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Mes rendez-vous{% endblock %}
+
+{% block body %}
+<section class="py-5" style="min-height: 80vh; background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 class="mb-2">Mes rendez-vous</h2>
+                <p class="text-muted">Gérez vos rendez-vous médicaux</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ path('app_front_rendez_vous_new') }}" class="btn btn-primary">
+                    + Nouveau rendez-vous
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Sort -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="Rechercher par titre, lieu ou type..." 
+                               value="{{ search }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="sort" class="form-select">
+                            <option value="dateRdv" {{ sort == 'dateRdv' ? 'selected' : '' }}>Trier par date</option>
+                            <option value="titre" {{ sort == 'titre' ? 'selected' : '' }}>Trier par titre</option>
+                            <option value="statut" {{ sort == 'statut' ? 'selected' : '' }}>Trier par statut</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="dir" class="form-select">
+                            <option value="DESC" {{ dir == 'DESC' ? 'selected' : '' }}>↓ Desc</option>
+                            <option value="ASC" {{ dir == 'ASC' ? 'selected' : '' }}>↑ Asc</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">🔍</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            {% if rendez_vouses is empty %}
+                <div class="col-12">
+                    <div class="card shadow-sm text-center py-5">
+                        <div class="card-body">
+                            <h5 class="text-muted">Aucun rendez-vous</h5>
+                            <p>Vous n'avez pas encore de rendez-vous enregistré.</p>
+                            <a href="{{ path('app_front_rendez_vous_new') }}" class="btn btn-primary mt-3">
+                                Prendre un rendez-vous
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {% for rendez_vou in rendez_vouses %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ rendez_vou.titre }}</h5>
+                                <p class="text-muted mb-2">
+                                    <strong>Date:</strong> {{ rendez_vou.dateRdv|date('d/m/Y à H:i') }}
+                                </p>
+                                <p class="text-muted mb-2">
+                                    <strong>Type:</strong> {{ rendez_vou.type }}
+                                </p>
+                                {% if rendez_vou.lieu %}
+                                    <p class="text-muted mb-2">
+                                        <strong>Lieu:</strong> {{ rendez_vou.lieu }}
+                                    </p>
+                                {% endif %}
+                                <span class="badge 
+                                    {% if rendez_vou.statut == 'PLANIFIE' %}bg-primary
+                                    {% elseif rendez_vou.statut == 'TERMINE' %}bg-success
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ rendez_vou.statut }}
+                                </span>
+                            </div>
+                            <div class="card-footer bg-white">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{{ path('app_front_rendez_vous_show', {id: rendez_vou.id}) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        Voir
+                                    </a>
+                                    <a href="{{ path('app_front_rendez_vous_edit', {id: rendez_vou.id}) }}" 
+                                       class="btn btn-sm btn-outline-secondary">
+                                        Modifier
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ rendez_vou.id }}">
+                                        Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal de confirmation de suppression -->
+                        <div class="modal fade" id="deleteModal{{ rendez_vou.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmer la suppression</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Êtes-vous sûr de vouloir supprimer le rendez-vous "{{ rendez_vou.titre }}" ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <form method="post" action="{{ path('app_front_rendez_vous_delete', {id: rendez_vou.id}) }}" style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ rendez_vou.id) }}">
+                                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ path('app_frontend_vue') }}" class="btn btn-outline-secondary">
+                ← Retour à l'accueil
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

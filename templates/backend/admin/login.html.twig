@@ -1,0 +1,307 @@
+{% extends 'backend/base_login.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+            <!-- Login Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-sm-5">
+                    
+                    <!-- Logo -->
+                    <div class="app-brand justify-content-center mb-4">
+                        <a href="{{ path('admin_dashboard') }}" class="app-brand-link gap-2">
+                            <span class="app-brand-logo demo">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                    <path d="M16 2L2 8V24L16 30L30 24V8L16 2Z" fill="currentColor" fill-opacity="0.1"/>
+                                    <path d="M16 2L2 8V24L16 30L30 24V8L16 2Z" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M16 12L12 20L16 24L20 20L16 12Z" fill="currentColor"/>
+                                </svg>
+                            </span>
+                            <span class="app-brand-text demo fw-bold fs-4">SYMFONY ADMIN</span>
+                        </a>
+                    </div>
+                    <!-- /Logo -->
+
+                    <h4 class="mb-2 text-center">Bienvenue sur Symfony Admin! 👋</h4>
+                    <p class="mb-4 text-center text-muted">Veuillez vous connecter à votre compte</p>
+                    <form id="formAuthentication" method="POST" action="{{ path('app_login') }}">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email ou nom d'utilisateur</label>
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text">
+                                    <i class="bx bx-user"></i>
+                                </span>
+                                <input type="text" class="form-control" 
+                                       id="email" 
+                                       name="email" 
+                                       placeholder="admin@example.com" 
+                                       autofocus required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text">
+                                    <i class="bx bx-lock-alt"></i>
+                                </span>
+                                <input type="password" id="password" 
+                                       class="form-control" 
+                                       name="password" 
+                                       placeholder="············" 
+                                       required>
+                                <span class="input-group-text cursor-pointer toggle-password">
+                                    <i class="bx bx-hide"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       id="remember-me" 
+                                       name="_remember_me">
+                                <label class="form-check-label" for="remember-me">
+                                    Se souvenir de moi
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <button class="btn btn-primary d-grid w-100" type="submit">
+                                <i class="bx bx-log-in me-2"></i>
+                                Se connecter
+                            </button>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" 
+                               value="{{ csrf_token('authenticate') }}">
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <a href="#" class="text-muted small">
+                            <i class="bx bx-question-mark me-1"></i>
+                            Problème de connexion ?
+                        </a>
+                    </div>
+
+                    <div class="divider my-4">
+                        <div class="divider-text text-muted">ou</div>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-2 text-muted small">
+                            © {{ "now"|date("Y") }} Symfony Admin Panel
+                            <br>
+                            <span class="text-muted">Version 1.0.0</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- /Login Card -->
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle password visibility
+    const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+    
+    togglePasswordBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.closest('.input-group').querySelector('input');
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bx-hide');
+                icon.classList.add('bx-show');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bx-show');
+                icon.classList.add('bx-hide');
+            }
+        });
+    });
+
+    // Form validation
+    const form = document.getElementById('formAuthentication');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            
+            if (!email.value.trim()) {
+                e.preventDefault();
+                email.focus();
+                return false;
+            }
+            
+            if (!password.value.trim()) {
+                e.preventDefault();
+                password.focus();
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="bx bx-loader bx-spin me-2"></i>Connexion...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.authentication-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 1rem;
+}
+
+.authentication-inner {
+    width: 100%;
+    max-width: 400px;
+}
+
+.card {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.app-brand-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.app-brand-logo.demo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+}
+
+.app-brand-logo.demo svg {
+    color: white;
+}
+
+.app-brand-text.demo {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.input-group-merge .input-group-text {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+}
+
+.input-group-merge .form-control {
+    border-left: none;
+}
+
+.input-group-merge .form-control:focus {
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+    box-shadow: none;
+}
+
+.toggle-password {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-password:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    border: none;
+    padding: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.divider-text {
+    padding: 0 1rem;
+    font-size: 0.875rem;
+}
+
+.alert {
+    border-radius: 0.75rem;
+    border: none;
+}
+
+.alert-danger {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger);
+    border-left: 4px solid var(--bs-danger);
+}
+
+.form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+@media (max-width: 576px) {
+    .authentication-inner {
+        padding: 0;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+    }
+    
+    .card-body {
+        padding: 2rem 1rem !important;
+    }
+}
+</style>
+{% endblock %}

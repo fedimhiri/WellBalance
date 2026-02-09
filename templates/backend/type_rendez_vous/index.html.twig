@@ -1,0 +1,92 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Types Rendez-vous{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Types Rendez-vous</h4>
+        <a class="btn btn-primary" href="{{ path('app_type_rendez_vous_new') }}">+ Nouveau</a>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form class="row g-2" method="get">
+                <div class="col-md-6">
+                    <input class="form-control" name="q" value="{{ q }}" placeholder="Rechercher (libellé / description)">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="sort">
+                        <option value="id" {{ sort == 'id' ? 'selected' : '' }}>Trier par ID</option>
+                        <option value="libelle" {{ sort == 'libelle' ? 'selected' : '' }}>Trier par Libellé</option>
+                        <option value="description" {{ sort == 'description' ? 'selected' : '' }}>Trier par Description</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="dir">
+                        <option value="asc" {{ dir == 'asc' ? 'selected' : '' }}>ASC</option>
+                        <option value="desc" {{ dir == 'desc' ? 'selected' : '' }}>DESC</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-grid">
+                    <button class="btn btn-secondary">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 90px;">ID</th>
+                            <th>Libellé</th>
+                            <th>Description</th>
+                            <th style="width: 250px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for t in type_rendez_vouses %}
+                        <tr>
+                            <td>{{ t.id }}</td>
+                            <td>{{ t.libelle }}</td>
+                            <td>{{ t.description ?: '-' }}</td>
+                           <td class="text-nowrap">
+    <div class="btn-group" role="group">
+        <a class="btn btn-sm btn-info" href="{{ path('app_type_rendez_vous_show', {id: t.id}) }}">
+            👁 Voir
+        </a>
+
+        <a class="btn btn-sm btn-warning" href="{{ path('app_type_rendez_vous_edit', {id: t.id}) }}">
+            ✎ Modifier
+        </a>
+
+        <form method="post"
+              action="{{ path('app_type_rendez_vous_delete', {id: t.id}) }}"
+              onsubmit="return confirm('Confirmer la suppression ?');"
+              class="d-inline">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ t.id) }}">
+            <button class="btn btn-sm btn-danger" type="submit">
+                🗑 Supprimer
+            </button>
+        </form>
+    </div>
+</td>
+
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Aucun type trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

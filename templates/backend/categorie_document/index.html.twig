@@ -1,0 +1,76 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Catégories de documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Catégories de documents</h4>
+        <a class="btn btn-primary" href="{{ path('app_categorie_document_new') }}">+ Nouvelle catégorie</a>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form class="row g-2" method="get" action="{{ path('app_categorie_document_index') }}">
+                <div class="col-md-6">
+                    <input class="form-control" name="q" value="{{ q }}" placeholder="Rechercher (description)">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="sort">
+                        <option value="id" {{ sort == 'id' ? 'selected' : '' }}>Trier par ID</option>
+                        <option value="description" {{ sort == 'description' ? 'selected' : '' }}>Trier par Description</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" name="dir">
+                        <option value="ASC" {{ dir == 'ASC' ? 'selected' : '' }}>ASC</option>
+                        <option value="DESC" {{ dir == 'DESC' ? 'selected' : '' }}>DESC</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-grid">
+                    <button class="btn btn-secondary">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 90px;">ID</th>
+                            <th>Description</th>
+                            <th style="width: 250px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in categorie_documents %}
+                            <tr>
+                                <td>{{ c.id }}</td>
+                                <td>{{ c.description }}</td>
+                                <td class="text-nowrap">
+                                    <div class="btn-group" role="group">
+                                        <a class="btn btn-sm btn-warning" href="{{ path('app_categorie_document_edit', {id: c.id}) }}">✎ Modifier</a>
+                                        <form method="post" action="{{ path('app_categorie_document_delete', {id: c.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ c.id) }}">
+                                            <button class="btn btn-sm btn-danger" type="submit">🗑 Supprimer</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Aucune catégorie trouvée.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

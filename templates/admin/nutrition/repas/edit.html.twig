@@ -1,0 +1,151 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Modifier Repas{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Modifier Repas #{{ repa.id }}</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">
+                <a href="{{ path('admin_repas_index') }}" class="text-muted">Nutrition / Repas</a> 
+                / #{{ repa.id }} / Modifier
+            </h6>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_repas_show', {'id': repa.id}) }}" 
+           class="btn btn-outline-primary">
+            <i class="bx bx-show me-2"></i>Voir
+        </a>
+        <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">
+            <i class="bx bx-arrow-back me-2"></i>Retour
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.typeRepas, 'Type de repas') }}
+                            {{ form_widget(form.typeRepas, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.calories, 'Calories') }}
+                            {{ form_widget(form.calories, {'attr': {'class': 'form-control', 'min': 0}}) }}
+                            <div class="form-text">kcal</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.dateRepas, 'Date et heure') }}
+                            {{ form_widget(form.dateRepas, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.planNutrition, 'Plan nutrition') }}
+                            {{ form_widget(form.planNutrition, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            {{ form_label(form.description, 'Description') }}
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+                            <div class="form-text">Liste des aliments et quantités</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-2"></i>Enregistrer
+                        </button>
+                        <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">
+                            Annuler
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bx bx-info-circle me-2"></i>Informations</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted small">ID :</span>
+                    <p class="fw-medium mb-0">#{{ repa.id }}</p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small">Créé le :</span>
+                    <p class="fw-medium mb-0">{{ repa.dateRepas ? repa.dateRepas|date('d/m/Y H:i') : 'Non défini' }}</p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small">Plan associé :</span>
+                    <p class="fw-medium mb-0">
+                        {% if repa.planNutrition %}
+                            <a href="{{ path('admin_plan_nutrition_show', {'id': repa.planNutrition.id}) }}">
+                                {{ repa.planNutrition.objectif }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">Aucun</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bx bx-food-menu me-2"></i>Valeurs nutritionnelles</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">Équivalences calories :</h6>
+                    <ul class="mb-0 small">
+                        <li>100-300 kcal : Collation légère</li>
+                        <li>300-500 kcal : Petit déjeuner</li>
+                        <li>500-800 kcal : Repas principal</li>
+                        <li>800+ kcal : Repas copieux</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mettre la date et heure actuelles par défaut si vide
+    const dateRepas = document.querySelector('#{{ form.dateRepas.vars.id }}');
+    
+    if (dateRepas && !dateRepas.value) {
+        const now = new Date();
+        // Format: YYYY-MM-DDTHH:MM
+        const formattedDate = now.toISOString().slice(0, 16);
+        dateRepas.value = formattedDate;
+    }
+    
+    // Validation des calories
+    const caloriesInput = document.querySelector('#{{ form.calories.vars.id }}');
+    if (caloriesInput) {
+        caloriesInput.addEventListener('change', function() {
+            const value = parseInt(this.value);
+            if (value < 0) {
+                this.value = 0;
+            } else if (value > 5000) {
+                this.value = 5000;
+                alert('Valeur maximale : 5000 kcal');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

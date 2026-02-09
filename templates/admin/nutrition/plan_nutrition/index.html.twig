@@ -1,0 +1,178 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Gestion des Plans Nutrition{% endblock %}
+
+{% block body %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Plans Nutrition</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Nutrition / Plans</h6>
+        </nav>
+    </div>
+
+    <!-- ✅ BOUTONS ACTIONS -->
+    <div class="d-flex gap-2">
+        <!-- 🔥 Bouton STATS -->
+        <a href="{{ path('admin_plan_nutrition_stats') }}" class="btn btn-outline-primary">
+            <i class="bx bx-bar-chart-alt-2 me-2"></i>Stats
+        </a>
+
+        <!-- Nouveau plan -->
+        <a href="{{ path('admin_plan_nutrition_new') }}" class="btn btn-primary">
+            <i class="bx bx-plus me-2"></i>Nouveau Plan
+        </a>
+    </div>
+</div>
+
+<!-- Statistiques rapides -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-hover border-0 shadow-sm">
+            <div class="card-body">
+                <span class="text-muted small">Total Plans</span>
+                <h3 class="fw-bold mt-2">{{ stats.total }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-hover border-0 shadow-sm">
+            <div class="card-body">
+                <span class="text-muted small">Plans Actifs</span>
+                <h3 class="fw-bold mt-2">{{ stats.actifs }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recherche / Filtres -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Recherche</label>
+                <input type="text"
+                       name="q"
+                       class="form-control"
+                       placeholder="Objectif, description, nom, email..."
+                       value="{{ filters.q }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Objectif</label>
+                <select name="objectif" class="form-select">
+                    <option value="">Tous les objectifs</option>
+                    {% for obj in objectifs %}
+                        <option value="{{ obj }}" {{ filters.objectif == obj ? 'selected' : '' }}>
+                            {{ obj }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Statut</label>
+                <select name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="actif" {{ filters.statut == 'actif' ? 'selected' : '' }}>Actif</option>
+                    <option value="termine" {{ filters.statut == 'termine' ? 'selected' : '' }}>Terminé</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bx bx-search me-2"></i>Rechercher
+                </button>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="{{ path('admin_plan_nutrition_index') }}" class="btn btn-outline-secondary w-100">
+                    <i class="bx bx-reset me-2"></i>Reset
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Objectif</th>
+                        <th>Utilisateur</th>
+                        <th>Période</th>
+                        <th>Dates</th>
+                        <th>Repas</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for plan in plan_nutritions %}
+                    <tr>
+                        <td>#{{ plan.id }}</td>
+                        <td>
+                            <strong>{{ plan.objectif }}</strong>
+                            {% if plan.description %}
+                                <div class="text-muted small">
+                                    {{ plan.description|slice(0,50) }}{% if plan.description|length > 50 %}...{% endif %}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ plan.user.nom }}
+                            <div class="text-muted small">{{ plan.user.email }}</div>
+                        </td>
+                        <td>{{ plan.periode }}</td>
+                        <td>
+                            {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}
+                            <div class="text-muted small">
+                                {{ plan.dateFin > date() ? 'Actif' : 'Terminé' }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ plan.repas|length }} repas</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('admin_plan_nutrition_show', {id: plan.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bx bx-show"></i>
+                                </a>
+
+                                <a href="{{ path('admin_plan_nutrition_edit', {id: plan.id}) }}"
+                                   class="btn btn-sm btn-outline-warning">
+                                    <i class="bx bx-edit"></i>
+                                </a>
+
+                                <form method="post"
+                                      action="{{ path('admin_plan_nutrition_delete', {id: plan.id}) }}"
+                                      onsubmit="return confirm('Supprimer ce plan ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ plan.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            Aucun plan trouvé
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

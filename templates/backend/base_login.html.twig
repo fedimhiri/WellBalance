@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr" class="light-style" dir="ltr" data-theme="theme-default">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+
+    <link rel="icon" href="{{ asset('assets_backend/img/favicon/favicon.ico') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/fonts/boxicons.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/css/core.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/vendor/css/theme-default.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/css/demo.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_backend/css/custom.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body>
+    {% block body %}{% endblock %}
+
+    <script src="{{ asset('assets_backend/vendor/libs/jquery/jquery.js') }}"></script>
+    <script src="{{ asset('assets_backend/vendor/libs/popper/popper.js') }}"></script>
+    <script src="{{ asset('assets_backend/vendor/js/bootstrap.js') }}"></script>
+    <script src="{{ asset('assets_backend/vendor/js/menu.js') }}"></script>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
