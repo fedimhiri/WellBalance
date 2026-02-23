@@ -1,0 +1,74 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Nouvel Objectif{% endblock %}
+
+{% block body %}
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Objectifs /</span> Nouveau</h4>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header bg-primary text-white text-center py-4" style="background: linear-gradient(135deg, #696cff 0%, #8592fa 100%);">
+                    <h4 class="mb-0 text-white"><i class="bx bx-plus-circle me-2"></i> Créer un Objectif</h4>
+                    <p class="mb-0 text-white-50 mt-1">Définissez votre nouveau challenge sportif</p>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    {{ form_start(form) }}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                {{ form_label(form.libelle, 'Libellé', {'label_attr': {'class': 'form-label fw-bold small text-uppercase'}}) }}
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bx bx-tag"></i></span>
+                                    {{ form_widget(form.libelle, {'attr': {'class': 'form-control ps-2', 'placeholder': 'Ex: Perte de poids'}}) }}
+                                </div>
+                                <div class="form-text text-danger">{{ form_errors(form.libelle) }}</div>
+                            </div>
+                            
+                            <div class="col-12">
+                                {{ form_label(form.typeObjectif, 'Type', {'label_attr': {'class': 'form-label fw-bold small text-uppercase'}}) }}
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bx bx-category"></i></span>
+                                    {{ form_widget(form.typeObjectif, {'attr': {'class': 'form-control ps-2'}}) }}
+                                </div>
+                                <div class="form-text text-danger">{{ form_errors(form.typeObjectif) }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label fw-bold small text-uppercase'}}) }}
+                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Décrivez votre objectif...'}}) }}
+                                <div class="form-text text-danger">{{ form_errors(form.description) }}</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form_label(form.dateDebut, 'Date de début', {'label_attr': {'class': 'form-label fw-bold small text-uppercase'}}) }}
+                                {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                                <div class="form-text text-danger">{{ form_errors(form.dateDebut) }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_label(form.dateFin, 'Date de fin', {'label_attr': {'class': 'form-label fw-bold small text-uppercase'}}) }}
+                                {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                                <div class="form-text text-danger">{{ form_errors(form.dateFin) }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label fw-bold small text-uppercase'}}) }}
+                                {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
+                                <div class="form-text text-danger">{{ form_errors(form.statut) }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 d-flex justify-content-between align-items-center">
+                             <a href="{{ path('app_objectif_sportif_index') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="bx bx-arrow-back me-2"></i> Annuler
+                             </a>
+                             {{ form_widget(form._token) }}
+                             <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm hover-elevate">
+                                <i class="bx bx-save me-2"></i> Enregistrer
+                             </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

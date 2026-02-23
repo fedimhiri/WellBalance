@@ -1,0 +1,53 @@
+<nav class="layout-navbar navbar navbar-expand-xl navbar-detached bg-navbar-theme">
+
+    <!-- Toggle -->
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 d-xl-none">
+        <a class="nav-item nav-link px-0" href="javascript:void(0)">
+            <i class="bx bx-menu bx-sm"></i>
+        </a>
+    </div>
+
+    <!-- Search -->
+    <div class="navbar-nav align-items-center">
+        <div class="nav-item d-flex align-items-center">
+            <i class="bx bx-search fs-4 lh-0"></i>
+            <input type="text" class="form-control border-0 shadow-none"
+                   placeholder="Search..." aria-label="Search">
+        </div>
+    </div>
+
+    <!-- Right -->
+    <div class="navbar-nav-right d-flex align-items-center ms-auto">
+
+        <ul class="navbar-nav flex-row align-items-center">
+
+            <!-- Profile -->
+            <li class="nav-item dropdown-user dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow"
+                   data-bs-toggle="dropdown">
+                    <div class="avatar avatar-online">
+                        <img src="{{ asset('assets_backend/img/avatars/1.png') }}"
+                             class="rounded-circle">
+                    </div>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="{{ path('admin_profile') }}">
+                            <i class="bx bx-user me-2"></i>
+                            <span>My Profile</span>
+                        </a>
+                    </li>
+                    <li><div class="dropdown-divider"></div></li>
+                    <li>
+                        <a class="dropdown-item" href="{{ path('app_logout_admin') }}">
+                            <i class="bx bx-power-off me-2"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</nav>

@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -18,3 +17,9 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+/vendor/
+/var/
+.env
+.env.local
+.env.*
+node_modules/

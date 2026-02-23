@@ -1,0 +1,178 @@
+{# templates/frontend/login.html.twig #}
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Connexion - Clinique Médicale{% endblock %}
+
+{% block body %}
+<div class="auth-creative-wrapper py-5">
+    <div class="auth-creative-inner">
+        <div class="creative-card-wrapper">
+            <div class="card my-4 overflow-hidden" style="z-index: 1">
+                <div class="row flex-1 g-0">
+                    <!-- Formulaire de connexion -->
+                    <div class="col-lg-6 h-100 my-auto order-1 order-lg-0">
+                        <div class="creative-card-body card-body p-sm-5">
+                            <h2 class="fs-20 fw-bolder mb-4">Connexion</h2>
+                            <h4 class="fs-13 fw-bold mb-2">Connectez-vous à votre compte</h4>
+                            <p class="fs-12 fw-medium text-muted">
+                                Accédez à votre espace patient pour gérer vos rendez-vous et consultations.
+                            </p>
+                            
+                            <form method="POST" action="{{ path('frontend_login') }}" class="w-100 mt-4 pt-2">
+                                
+                                <div class="mb-4">
+                                    <input type="email" 
+                                           name="_username" 
+                                           class="form-control" 
+                                           placeholder="Email" 
+                                           required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <input type="password" 
+                                           name="_password" 
+                                           class="form-control" 
+                                           placeholder="Mot de passe" 
+                                           required>
+                                </div>
+                                
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div>
+                                        <div class="form-check">
+                                            <input type="checkbox" 
+                                                   class="form-check-input" 
+                                                   id="remember_me"
+                                                   name="_remember_me">
+                                            <label class="form-check-label" for="remember_me">
+                                                Se souvenir de moi
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <a href="{{ path('frontend_forgot_password') }}" class="fs-11 text-primary">
+                                            Mot de passe oublié ?
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                                
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-lg btn-primary w-100">
+                                        Se connecter
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div class="w-100 mt-5 text-center mx-auto">
+                                <div class="mb-4 border-bottom position-relative">
+                                    <span class="small py-1 px-3 text-uppercase text-muted bg-white position-absolute translate-middle">
+                                        ou
+                                    </span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <a href="#" class="btn btn-outline-secondary flex-fill">
+                                        <i class="bi bi-facebook me-2"></i>
+                                        Facebook
+                                    </a>
+                                    <a href="#" class="btn btn-outline-secondary flex-fill">
+                                        <i class="bi bi-google me-2"></i>
+                                        Google
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-5 text-muted text-center">
+                                <span>Vous n'avez pas de compte ?</span>
+                                <a href="{{ path('app_register') }}" class="fw-bold ms-1">
+                                    Créer un compte
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image côté -->
+                    <div class="col-lg-6 bg-primary order-0 order-lg-1">
+                        <div class="h-100 d-flex align-items-center justify-content-center p-4">
+                            <div class="text-center text-white">
+                                <h3 class="fw-bold mb-3">Bienvenue</h3>
+                                <p class="mb-4">
+                                    Gérez vos rendez-vous médicaux, consultez vos résultats 
+                                    et accédez à votre dossier médical en toute sécurité.
+                                </p>
+                                <div class="mt-4">
+                                    <a href="{{ path('app_frontend_vue') }}" class="btn btn-light">
+                                        <i class="bi bi-house me-2"></i>
+                                        Retour à l'accueil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.auth-creative-wrapper {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.creative-card-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, var(--bs-primary), #0d6efd) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--bs-primary), #0d6efd);
+    border: none;
+    padding: 12px;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0b5ed7, #0a58ca);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
+.form-control {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+@media (max-width: 991px) {
+    .auth-creative-wrapper {
+        padding: 2rem 1rem;
+    }
+    
+    .col-lg-6.bg-primary {
+        padding: 3rem 1rem;
+        min-height: 300px;
+    }
+}
+</style>
+{% endblock %}

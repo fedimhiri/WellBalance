@@ -1,0 +1,131 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+
+    <h3 class="mb-4 fw-bold">Gestion des utilisateurs</h3>
+
+    {# ============================
+       BARRE RECHERCHE + TRI
+       ============================ #}
+    <form method="get" action="{{ path('admin_dashboard') }}" class="row g-2 mb-3">
+
+        <div class="col-md-6">
+            <input type="text"
+                   name="search"
+                   class="form-control"
+                   placeholder="Rechercher par email, username ou téléphone"
+                   value="{{ search ?? '' }}">
+        </div>
+
+        <div class="col-md-3">
+            <select name="sort" class="form-select">
+                <option value="">Trier par défaut</option>
+                <option value="email" {{ sort == 'email' ? 'selected' : '' }}>Email</option>
+                <option value="username" {{ sort == 'username' ? 'selected' : '' }}>Username</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-primary w-100">
+                Rechercher/Trier
+            </button>
+
+            <a href="{{ path('admin_dashboard') }}"
+               class="btn btn-outline-secondary w-100">
+                Réinitialiser
+            </a>
+        </div>
+    </form>
+
+    {# ============================
+       TABLE UTILISATEURS
+       ============================ #}
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>#</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Téléphone</th>
+                            <th>Rôle</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td class="text-center">{{ user.id }}</td>
+
+                            <td>{{ user.email }}</td>
+
+                            <td>
+                                <strong>{{ user.username }}</strong>
+                            </td>
+
+                            <td>{{ user.telephone }}</td>
+
+                            <td class="text-center">
+                                {% if 'ROLE_ADMIN' in user.roles %}
+                                    <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-end">
+                                <a href="{{ path('admin_user_edit', {id: user.id}) }}"
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    Modifier
+                                </a>
+
+                                <form method="post"
+                                      action="{{ path('admin_user_delete', {id: user.id}) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Confirmer la suppression de cet utilisateur ?');">
+                                    <input type="hidden"
+                                           name="_token"
+                                           value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Aucun utilisateur trouvé
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

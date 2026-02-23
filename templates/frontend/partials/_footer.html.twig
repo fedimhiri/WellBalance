@@ -1,0 +1,131 @@
+{# templates/frontend/partials/_footer.html.twig #}
+<footer id="footer" class="footer-16 footer position-relative">
+    
+    <div class="container">
+        <div class="footer-main" data-aos="fade-up" data-aos-delay="100">
+            <div class="row align-items-start">
+                
+                <!-- Brand Section -->
+                <div class="col-lg-5">
+                    <div class="brand-section">
+                        <a href="{{ path('app_frontend_vue') }}" class="logo d-flex align-items-center mb-4">
+                            <span class="sitename">{{ site_name|default('Clinique Médicale') }}</span>
+                        </a>
+                        <p class="brand-description">
+                            Votre santé, notre priorité. Nous offrons des soins médicaux complets avec des technologies de pointe et une équipe d'experts dévoués.
+                        </p>
+                        
+                        <div class="contact-info mt-5">
+                            <div class="contact-item">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>123 Avenue de la Santé, 75000 Paris, France</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="bi bi-telephone"></i>
+                                <span>+33 1 23 45 67 89</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="bi bi-envelope"></i>
+                                <span>contact@clinique-medicale.fr</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="col-lg-7">
+                    <div class="footer-nav-wrapper">
+                        <div class="row">
+                            
+                            <!-- Services -->
+                            <div class="col-6 col-lg-3">
+                                <div class="nav-column">
+                                    <h6>Services</h6>
+                                    <nav class="footer-nav">
+                                        <a href="{{ path('app_frontend_vue') }}">Consultations</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Urgences</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Chirurgie</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Imagerie Médicale</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Laboratoire</a>
+                                    </nav>
+                                </div>
+                            </div>
+                            
+                            <!-- Départements -->
+                            <div class="col-6 col-lg-3">
+                                <div class="nav-column">
+                                    <h6>Départements</h6>
+                                    <nav class="footer-nav">
+                                        <a href="{{ path('app_frontend_vue') }}">Cardiologie</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Neurologie</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Pédiatrie</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Orthopédie</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Dermatologie</a>
+                                    </nav>
+                                </div>
+                            </div>
+                            
+                            <!-- Informations -->
+                            <div class="col-6 col-lg-3">
+                                <div class="nav-column">
+                                    <h6>Informations</h6>
+                                    <nav class="footer-nav">
+                                        <a href="{{ path('app_frontend_vue') }}">À propos</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Nos médecins</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Témoignages</a>
+                                        <a href="{{ path('app_frontend_vue') }}">FAQ</a>
+                                        <a href="{{ path('app_frontend_vue') }}">Contact</a>
+                                    </nav>
+                                </div>
+                            </div>
+                            
+                            <!-- Liens rapides -->
+                            <div class="col-6 col-lg-3">
+                                <div class="nav-column">
+                                    <h6>Liens rapides</h6>
+                                    <nav class="footer-nav">
+                                        <a href="{{ path('app_frontend_vue') }}">Prendre RDV</a>
+                                        <a href="#">Urgences 24/7</a>
+                                        <a href="#">Téléconsultation</a>
+                                        <a href="#">Résultats en ligne</a>
+                                        <a href="#">Espace patient</a>
+                                    </nav>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="bottom-content" data-aos="fade-up" data-aos-delay="300">
+                <div class="row align-items-center">
+                    
+                    <!-- Copyright -->
+                    <div class="col-lg-6">
+                        <div class="copyright">
+                            <p>© {{ "now"|date("Y") }} <span class="sitename">{{ site_name|default('Clinique Médicale') }}</span>. Tous droits réservés.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Legal Links -->
+                    <div class="col-lg-6">
+                        <div class="legal-links">
+                            <a href="#">Politique de confidentialité</a>
+                            <a href="#">Mentions légales</a>
+                            <a href="#">Conditions d'utilisation</a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</footer>

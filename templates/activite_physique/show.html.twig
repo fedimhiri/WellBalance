@@ -1,0 +1,82 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Détails Activité{% endblock %}
+
+{% block body %}
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Activités /</span> Détails</h4>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+             <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <!-- Header with Gradient -->
+                <div class="card-body p-0">
+                     <div class="bg-warning p-5 text-center text-white" style="background: linear-gradient(135deg, #ffab00 0%, #ffcd57 100%);">
+                        <div class="avatar avatar-xl mx-auto mb-3 bg-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class='bx bx-run text-warning display-4'></i>
+                        </div>
+                        <h2 class="text-white mb-1">{{ activite_physique.nom }}</h2>
+                        <span class="badge bg-white text-warning fw-bold px-3 py-2 rounded-pill shadow-sm mt-2">{{ activite_physique.typeActivite }}</span>
+                     </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <!-- Key Stats Grid -->
+                    <div class="row g-4 mb-5 text-center">
+                        <div class="col-4">
+                            <div class="p-3 border rounded-3 bg-light hover-shadow transition-all">
+                                <i class="bx bx-time-five text-primary fs-2 mb-2"></i>
+                                <h5 class="mb-0 fw-bold">{{ activite_physique.dureeEstimee }}</h5>
+                                <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Minutes</small>
+                            </div>
+                        </div>
+                         <div class="col-4">
+                            <div class="p-3 border rounded-3 bg-light hover-shadow transition-all">
+                                <i class="bx bx-fire text-danger fs-2 mb-2"></i>
+                                <h5 class="mb-0 fw-bold">{{ activite_physique.caloriesEstimees }}</h5>
+                                <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Calories</small>
+                            </div>
+                        </div>
+                         <div class="col-4">
+                            <div class="p-3 border rounded-3 bg-light hover-shadow transition-all">
+                                <i class="bx bx-bar-chart-alt-2 text-info fs-2 mb-2"></i>
+                                <h5 class="mb-0 fw-bold">{{ activite_physique.niveau }}</h5>
+                                <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Niveau</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted text-uppercase fw-bold mb-3 small"><i class="bx bx-detail me-2"></i>Description</h6>
+                        <p class="fs-5 text-secondary lh-lg">{{ activite_physique.description }}</p>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-label-secondary rounded-3 d-flex align-items-center">
+                        <i class="bx bx-target-lock fs-3 me-3"></i>
+                        <div>
+                            <small class="text-muted d-block uppercase fw-bold" style="font-size: 0.75rem;">OBJECTIF ASSOCIÉ</small>
+                            {% if activite_physique.objectifSportif %}
+                                <a href="{{ path('app_objectif_sportif_show', {'id': activite_physique.objectifSportif.id}) }}" class="fs-6 fw-bold text-primary text-decoration-none">
+                                    {{ activite_physique.objectifSportif.libelle }} <i class="bx bx-link-external ms-1"></i>
+                                </a>
+                            {% else %}
+                                <span class="text-muted fst-italic">Aucun objectif lié</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                        <a href="{{ path('app_activite_physique_index') }}" class="btn btn-outline-secondary px-4 rounded-pill">
+                            <i class="bx bx-arrow-back me-2"></i> Retour
+                        </a>
+                        <div class="d-flex gap-2">
+                             {{ include('activite_physique/_delete_form.html.twig') }}
+                             <a href="{{ path('app_activite_physique_edit', {'id': activite_physique.id}) }}" class="btn btn-primary px-4 rounded-pill shadow-sm hover-elevate">
+                                <i class="bx bx-edit-alt me-2"></i> Editer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
