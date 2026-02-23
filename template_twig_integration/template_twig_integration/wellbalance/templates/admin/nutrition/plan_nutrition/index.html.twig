@@ -3,7 +3,6 @@
 {% block title %}Gestion des Plans Nutrition{% endblock %}
 
 {% block body %}
-<!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0">Plans Nutrition</h4>
@@ -12,27 +11,22 @@
         </nav>
     </div>
 
-    <!-- ✅ BOUTONS ACTIONS -->
     <div class="d-flex gap-2">
-        <!-- 🔥 Bouton STATS -->
         <a href="{{ path('admin_plan_nutrition_stats') }}" class="btn btn-outline-primary">
             <i class="bx bx-bar-chart-alt-2 me-2"></i>Stats
         </a>
-
-        <!-- Nouveau plan -->
         <a href="{{ path('admin_plan_nutrition_new') }}" class="btn btn-primary">
             <i class="bx bx-plus me-2"></i>Nouveau Plan
         </a>
     </div>
 </div>
 
-<!-- Statistiques rapides -->
 <div class="row g-4 mb-4">
     <div class="col-xl-3 col-md-6">
         <div class="card card-hover border-0 shadow-sm">
             <div class="card-body">
                 <span class="text-muted small">Total Plans</span>
-                <h3 class="fw-bold mt-2">{{ stats.total }}</h3>
+                <h3 class="fw-bold mt-2" id="statTotal">{{ stats.total }}</h3>
             </div>
         </div>
     </div>
@@ -41,16 +35,15 @@
         <div class="card card-hover border-0 shadow-sm">
             <div class="card-body">
                 <span class="text-muted small">Plans Actifs</span>
-                <h3 class="fw-bold mt-2">{{ stats.actifs }}</h3>
+                <h3 class="fw-bold mt-2" id="statActifs">{{ stats.actifs }}</h3>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recherche / Filtres -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
-        <form method="get" class="row g-3">
+        <form method="get" class="row g-3" id="filtersForm">
 
             <div class="col-md-4">
                 <label class="form-label">Recherche</label>
@@ -98,81 +91,64 @@
     </div>
 </div>
 
-<!-- Table -->
 <div class="card border-0 shadow-sm">
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Objectif</th>
-                        <th>Utilisateur</th>
-                        <th>Période</th>
-                        <th>Dates</th>
-                        <th>Repas</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for plan in plan_nutritions %}
-                    <tr>
-                        <td>#{{ plan.id }}</td>
-                        <td>
-                            <strong>{{ plan.objectif }}</strong>
-                            {% if plan.description %}
-                                <div class="text-muted small">
-                                    {{ plan.description|slice(0,50) }}{% if plan.description|length > 50 %}...{% endif %}
-                                </div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ plan.user.nom }}
-                            <div class="text-muted small">{{ plan.user.email }}</div>
-                        </td>
-                        <td>{{ plan.periode }}</td>
-                        <td>
-                            {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}
-                            <div class="text-muted small">
-                                {{ plan.dateFin > date() ? 'Actif' : 'Terminé' }}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-primary">{{ plan.repas|length }} repas</span>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <a href="{{ path('admin_plan_nutrition_show', {id: plan.id}) }}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="bx bx-show"></i>
-                                </a>
-
-                                <a href="{{ path('admin_plan_nutrition_edit', {id: plan.id}) }}"
-                                   class="btn btn-sm btn-outline-warning">
-                                    <i class="bx bx-edit"></i>
-                                </a>
-
-                                <form method="post"
-                                      action="{{ path('admin_plan_nutrition_delete', {id: plan.id}) }}"
-                                      onsubmit="return confirm('Supprimer ce plan ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ plan.id) }}">
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bx bx-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">
-                            Aucun plan trouvé
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <div id="plansTable">
+            {% include 'admin/nutrition/plan_nutrition/_table.html.twig' with { plan_nutritions: plan_nutritions } %}
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('filtersForm');
+    if (!form) return;
+
+    const tableBox = document.getElementById('plansTable');
+    const statTotal = document.getElementById('statTotal');
+    const statActifs = document.getElementById('statActifs');
+
+    const qInput = form.querySelector('input[name="q"]');
+    const objectifSel = form.querySelector('select[name="objectif"]');
+    const statutSel = form.querySelector('select[name="statut"]');
+
+    let timer = null;
+
+    async function fetchPlans() {
+        const params = new URLSearchParams(new FormData(form));
+        const url = window.location.pathname;
+        const fullUrl = url + '?' + params.toString();
+
+        // update URL without reload
+        window.history.replaceState({}, '', fullUrl);
+
+        const res = await fetch(fullUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (tableBox) tableBox.innerHTML = data.html;
+        if (statTotal) statTotal.textContent = data.stats.total;
+        if (statActifs) statActifs.textContent = data.stats.actifs;
+    }
+
+    function scheduleFetch() {
+        clearTimeout(timer);
+        timer = setTimeout(fetchPlans, 250);
+    }
+
+    if (qInput) qInput.addEventListener('input', scheduleFetch);
+    if (objectifSel) objectifSel.addEventListener('change', fetchPlans);
+    if (statutSel) statutSel.addEventListener('change', fetchPlans);
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchPlans();
+    });
+});
+</script>
 {% endblock %}

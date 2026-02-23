@@ -1,0 +1,115 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Chat Nutrition IA{% endblock %}
+
+{% block body %}
+<div class="container py-4" style="max-width: 900px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-0">💬 Chat Nutrition IA</h3>
+      <div class="text-muted small">Pose une question selon ton plan actif.</div>
+    </div>
+    <a class="btn btn-outline-secondary"
+       href="{{ app.request.headers.get('referer') ?: path('front_plan_nutrition_index') }}">
+      Retour
+    </a>
+  </div>
+
+  <div id="chatBox" class="border rounded p-3 mb-3" style="height: 430px; overflow:auto; background:#fff;">
+    <div class="text-muted small">
+      Exemples : “Puis-je manger pizza ?” • “Propose un petit déjeuner” • “Combien de calories aujourd’hui ?”
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <input id="chatInput" class="form-control" placeholder="Écris ton message..." autocomplete="off">
+    <button id="chatSend" class="btn btn-primary">Envoyer</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const box = document.getElementById('chatBox');
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('chatSend');
+
+  let previousResponseId = null;
+
+  function addMsg(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'mb-3';
+
+    const badge = document.createElement('span');
+    badge.className = role === 'user' ? 'badge bg-secondary' : 'badge bg-success';
+    badge.textContent = role === 'user' ? 'Vous' : 'IA';
+
+    const p = document.createElement('div');
+    p.className = 'mt-2';
+    p.style.whiteSpace = 'pre-wrap';
+    p.textContent = text;
+
+    wrap.appendChild(badge);
+    wrap.appendChild(p);
+    box.appendChild(wrap);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function send() {
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  addMsg('user', msg);
+  input.value = '';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('{{ path("api_chat_ask") }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        previous_response_id: previousResponseId
+      })
+    });
+
+    const contentType = res.headers.get('content-type') || '';
+    const rawText = await res.text();
+
+    let data = null;
+    if (contentType.includes('application/json')) {
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        addMsg('assistant', `❌ Réponse JSON invalide (HTTP ${res.status}).\n` + rawText.slice(0, 400));
+        return;
+      }
+    } else {
+      // ✅ Symfony renvoie souvent une page HTML en cas d'erreur 500
+      addMsg('assistant', `❌ Serveur (HTTP ${res.status}) a renvoyé du HTML au lieu de JSON.\n` +
+        rawText.replace(/<[^>]*>/g, '').slice(0, 400)
+      );
+      return;
+    }
+
+    if (!data || data.ok !== true) {
+      addMsg('assistant', (data && data.error) ? data.error : `❌ Erreur (HTTP ${res.status})`);
+      return;
+    }
+
+    addMsg('assistant', data.answer);
+    previousResponseId = data.previous_response_id || null;
+
+  } catch (e) {
+    addMsg('assistant', '❌ Erreur réseau/fetch: ' + (e?.message || e));
+  } finally {
+    btn.disabled = false;
+    input.focus();
+  }
+}
+  btn.addEventListener('click', send);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') send();
+  });
+})();
+</script>
+{% endblock %}

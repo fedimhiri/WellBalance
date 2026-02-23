@@ -16,6 +16,9 @@
 
     <!-- ✅ CSS custom (APRÈS main.css) -->
     <link href="{{ asset('assets_frontend/css/frontend-custom.css') }}?v=9999" rel="stylesheet">
+
+    {# ✅ (optionnel) CSS spécifique page #}
+    {% block stylesheets %}{% endblock %}
 </head>
 
 <body class="index-page">
@@ -32,6 +35,9 @@
     <script src="{{ asset('assets_frontend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets_frontend/vendor/aos/aos.js') }}"></script>
     <script src="{{ asset('assets_frontend/js/main.js') }}"></script>
+
+    {# ✅ IMPORTANT : JS spécifique page (dynamique) #}
+    {% block javascripts %}{% endblock %}
 
 </body>
 </html>

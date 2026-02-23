@@ -17,9 +17,10 @@
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
-        <div class="alert alert-info">
+        <div class="alert alert-info mb-0">
             <i class="bx bx-info-circle me-2"></i>
-            Calories aujourd'hui : <strong>{{ today_calories }}</strong> kcal
+            Calories aujourd'hui :
+            <strong>{{ today_calories|default(0) }}</strong> kcal
         </div>
     </div>
 </div>
@@ -27,46 +28,105 @@
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Type</th>
                         <th>Description</th>
                         <th>Calories</th>
+                        <th>Macros</th>
                         <th>Date</th>
                         <th>Plan</th>
-                        <th>Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for repa in repas %}
                         <tr>
-                            <td>#{{ repa.id }}</td>
+                            <td class="fw-medium">#{{ repa.id }}</td>
+
                             <td>
-                                <span class="badge bg-primary">{{ repa.typeRepas }}</span>
-                            </td>
-                            <td>{{ repa.description|slice(0, 50) }}...</td>
-                            <td>
-                                <span class="badge bg-warning">{{ repa.calories }} kcal</span>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="badge bg-primary">{{ repa.typeRepas }}</span>
+
+                                    {# ✅ Badge API si barcode existe #}
+                                    {% if repa.barcode %}
+                                        <span class="badge bg-info">
+                                            <i class="bx bx-cloud-download me-1"></i>API
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </td>
 
-                            {# dateRepas peut être DATE ou DATETIME, ça marche dans les 2 cas #}
+                            <td>
+                                {% set desc = repa.description|default('') %}
+                                {% if desc|length > 60 %}
+                                    {{ desc|slice(0, 60) }}…
+                                {% else %}
+                                    {{ desc != '' ? desc : '-' }}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if repa.calories is not null %}
+                                    <span class="badge bg-warning text-dark">{{ repa.calories }} kcal</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            {# ✅ Macros #}
+                            <td>
+                                <div class="small">
+                                    <span class="me-2">
+                                        <span class="text-muted">P:</span>
+                                        <strong>{{ repa.proteines is not null ? repa.proteines ~ 'g' : '-' }}</strong>
+                                    </span>
+                                    <span class="me-2">
+                                        <span class="text-muted">G:</span>
+                                        <strong>{{ repa.glucides is not null ? repa.glucides ~ 'g' : '-' }}</strong>
+                                    </span>
+                                    <span>
+                                        <span class="text-muted">L:</span>
+                                        <strong>{{ repa.lipides is not null ? repa.lipides ~ 'g' : '-' }}</strong>
+                                    </span>
+                                </div>
+
+                                {# Portion #}
+                                {% if repa.portionSize %}
+                                    <div class="text-muted small">Portion: {{ repa.portionSize }}</div>
+                                {% endif %}
+                            </td>
+
                             <td>{{ repa.dateRepas ? repa.dateRepas|date('d/m/Y H:i') : '-' }}</td>
 
-                            {# ✅ MODIF : planNutrition null-safe #}
-                            <td>{{ repa.planNutrition ? repa.planNutrition.objectif : '-' }}</td>
-
                             <td>
-                                <div class="d-flex gap-2">
+                                {% if repa.planNutrition %}
+                                    <a href="{{ path('admin_plan_nutrition_show', {'id': repa.planNutrition.id}) }}">
+                                        {{ repa.planNutrition.objectif }}
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ path('admin_repas_show', {'id': repa.id}) }}"
+                                       class="btn btn-sm btn-outline-primary" title="Voir">
+                                        <i class="bx bx-show"></i>
+                                    </a>
+
                                     <a href="{{ path('admin_repas_edit', {'id': repa.id}) }}"
-                                       class="btn btn-sm btn-outline-warning">
+                                       class="btn btn-sm btn-outline-warning" title="Modifier">
                                         <i class="bx bx-edit"></i>
                                     </a>
+
                                     <form method="post" action="{{ path('admin_repas_delete', {'id': repa.id}) }}"
                                           onsubmit="return confirm('Supprimer ce repas ?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ repa.id) }}">
-                                        <button class="btn btn-sm btn-outline-danger">
+                                        <button class="btn btn-sm btn-outline-danger" title="Supprimer">
                                             <i class="bx bx-trash"></i>
                                         </button>
                                     </form>
@@ -75,10 +135,10 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="7" class="text-center py-4">
+                            <td colspan="8" class="text-center py-4">
                                 <div class="text-muted">
                                     <i class="bx bx-food-menu fs-1"></i>
-                                    <p class="mt-2">Aucun repas trouvé</p>
+                                    <p class="mt-2 mb-2">Aucun repas trouvé</p>
                                     <a href="{{ path('admin_repas_new') }}" class="btn btn-primary mt-2">
                                         Ajouter un repas
                                     </a>

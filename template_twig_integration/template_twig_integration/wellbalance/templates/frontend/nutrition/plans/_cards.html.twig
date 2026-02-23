@@ -1,0 +1,31 @@
+{% if plans is empty %}
+  <div class="alert alert-info">Aucun plan trouvé. Essaie de retirer un filtre.</div>
+{% else %}
+  <div class="row g-3">
+    {% for plan in plans %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ plan.objectif }}</h5>
+
+            {% if plan.description %}
+              <p class="text-muted small mb-2">
+                {{ plan.description|slice(0, 80) }}{% if plan.description|length > 80 %}...{% endif %}
+              </p>
+            {% endif %}
+
+            <p class="text-muted mb-2">
+              {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}
+              <br>
+              <small>{{ plan.dateFin > date() ? 'Actif' : 'Terminé' }}</small>
+            </p>
+
+            <a class="btn btn-primary btn-sm" href="{{ path('front_plan_nutrition_show', {id: plan.id}) }}">
+              Voir détails
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

@@ -29,7 +29,7 @@ class PlanNutritionRepository extends ServiceEntityRepository
 
         if ($objectif) {
             $qb->andWhere('p.objectif = :objectif')
-                ->setParameter('objectif', $objectif);
+               ->setParameter('objectif', $objectif);
         }
 
         if ($q) {
@@ -40,7 +40,7 @@ class PlanNutritionRepository extends ServiceEntityRepository
                 u.nom LIKE :q OR
                 u.email LIKE :q
             ')
-            ->setParameter('q', '%'.$q.'%');
+            ->setParameter('q', '%' . $q . '%');
         }
 
         if ($statut === 'actif') {
@@ -66,13 +66,13 @@ class PlanNutritionRepository extends ServiceEntityRepository
 
         if ($objectif) {
             $qb->andWhere('p.objectif = :objectif')
-                ->setParameter('objectif', $objectif);
+               ->setParameter('objectif', $objectif);
         }
 
         if ($q) {
             $q = trim($q);
             $qb->andWhere('(p.objectif LIKE :q OR p.description LIKE :q)')
-               ->setParameter('q', '%'.$q.'%');
+               ->setParameter('q', '%' . $q . '%');
         }
 
         if ($statut === 'actif') {
@@ -84,6 +84,26 @@ class PlanNutritionRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * ✅ NEW : Plan actif du user (pour le Chatbot IA)
+     * Règle: dateDebut <= today <= dateFin
+     */
+    public function findActivePlanForUserId(int $userId): ?PlanNutrition
+    {
+        $today = new \DateTimeImmutable('today');
+
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.user = :uid')
+            ->setParameter('uid', $userId)
+            ->andWhere('p.dateDebut <= :today')
+            ->andWhere('p.dateFin >= :today')
+            ->setParameter('today', $today)
+            ->orderBy('p.dateDebut', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
@@ -100,7 +120,7 @@ class PlanNutritionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_values(array_filter(array_map(static fn ($r) => $r['objectif'] ?? null, $rows)));
+        return array_values(array_filter(array_map(static fn($r) => $r['objectif'] ?? null, $rows)));
     }
 
     /**
@@ -156,9 +176,8 @@ class PlanNutritionRepository extends ServiceEntityRepository
     {
         $months = max(1, min(24, $months));
 
-        // date de début = 1er jour du mois (N-1 mois en arrière)
         $start = (new \DateTimeImmutable('first day of this month 00:00:00'))
-            ->modify('-'.($months - 1).' months');
+            ->modify('-' . ($months - 1) . ' months');
 
         $rows = $this->createQueryBuilder('p')
             ->select('p.dateDebut AS dateDebut')
@@ -167,7 +186,6 @@ class PlanNutritionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        // init tableau mois
         $map = [];
         $cursor = $start;
         for ($i = 0; $i < $months; $i++) {
@@ -189,7 +207,7 @@ class PlanNutritionRepository extends ServiceEntityRepository
         $labels = [];
         $values = [];
         foreach ($map as $ym => $count) {
-            $dt = \DateTimeImmutable::createFromFormat('Y-m-d', $ym.'-01');
+            $dt = \DateTimeImmutable::createFromFormat('Y-m-d', $ym . '-01');
             $labels[] = $dt ? $dt->format('M Y') : $ym;
             $values[] = $count;
         }

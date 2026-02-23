@@ -48,18 +48,16 @@ class PlanNutritionType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('user', EntityType::class, [
-                'label' => 'Utilisateur',
+                'label' => 'Patient',
                 'class' => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getNom() . ' (' . $user->getEmail() . ')';
-                },
-                'placeholder' => 'Sélectionner un utilisateur',
+                'choice_label' => fn(User $user) => $user->getNom() . ' (' . $user->getEmail() . ')',
+                'placeholder' => 'Sélectionner un patient',
                 'attr' => ['class' => 'form-select'],
             ])
             ->add('periode', TextType::class, [
                 'label' => 'Période (calculée automatiquement)',
                 'required' => false,
-                'mapped' => false,   // IMPORTANT: on la calcule côté JS, et côté controller si tu veux
+                'mapped' => false,
                 'attr' => [
                     'readonly' => true,
                     'class' => 'form-control',

@@ -12,10 +12,9 @@
     <div class="alert alert-success">{{ message }}</div>
   {% endfor %}
 
-  <!-- Recherche / Filtres -->
   <div class="card mb-4">
     <div class="card-body">
-      <form method="get" class="row g-3">
+      <form method="get" class="row g-3" id="frontFiltersForm">
         <div class="col-md-5">
           <label class="form-label">Recherche</label>
           <input type="text" name="q" class="form-control"
@@ -55,34 +54,55 @@
     </div>
   </div>
 
-  {% if plans is empty %}
-    <div class="alert alert-info">Aucun plan trouvé. Essaie de retirer un filtre.</div>
-  {% else %}
-    <div class="row g-3">
-      {% for plan in plans %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">{{ plan.objectif }}</h5>
-
-              {% if plan.description %}
-                <p class="text-muted small mb-2">{{ plan.description|slice(0, 80) }}{% if plan.description|length > 80 %}...{% endif %}</p>
-              {% endif %}
-
-              <p class="text-muted mb-2">
-                {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}
-                <br>
-                <small>{{ plan.dateFin > date() ? 'Actif' : 'Terminé' }}</small>
-              </p>
-
-              <a class="btn btn-primary btn-sm" href="{{ path('front_plan_nutrition_show', {id: plan.id}) }}">
-                Voir détails
-              </a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+  <div id="plansCards">
+    {% include 'frontend/nutrition/plans/_cards.html.twig' with { plans: plans } %}
+  </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('frontFiltersForm');
+    if (!form) return;
+
+    const cardsBox = document.getElementById('plansCards');
+    const qInput = form.querySelector('input[name="q"]');
+    const objectifSel = form.querySelector('select[name="objectif"]');
+    const statutSel = form.querySelector('select[name="statut"]');
+
+    let timer = null;
+
+    async function fetchPlans() {
+        const params = new URLSearchParams(new FormData(form));
+        const url = window.location.pathname;
+        const fullUrl = url + '?' + params.toString();
+
+        window.history.replaceState({}, '', fullUrl);
+
+        const res = await fetch(fullUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (cardsBox) cardsBox.innerHTML = data.html;
+    }
+
+    function scheduleFetch() {
+        clearTimeout(timer);
+        timer = setTimeout(fetchPlans, 250);
+    }
+
+    if (qInput) qInput.addEventListener('input', scheduleFetch);
+    if (objectifSel) objectifSel.addEventListener('change', fetchPlans);
+    if (statutSel) statutSel.addEventListener('change', fetchPlans);
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchPlans();
+    });
+});
+</script>
 {% endblock %}

@@ -53,18 +53,58 @@ class RepasRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * ✅ Derniers repas d’un plan (contexte Chatbot)
+     * @return Repas[]
+     */
+    public function findLastForPlan(int $planId, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.planNutrition = :pid')
+            ->setParameter('pid', $planId)
+            ->orderBy('r.dateRepas', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * ✅ Calories total aujourd'hui (tous users)
+     * (tu l'avais déjà)
+     */
     public function getTodayTotalCalories(): int
     {
         $todayStart = new \DateTimeImmutable('today 00:00:00');
         $todayEnd   = new \DateTimeImmutable('today 23:59:59');
 
-        $qb = $this->createQueryBuilder('r')
+        return (int) $this->createQueryBuilder('r')
             ->select('COALESCE(SUM(r.calories), 0) as total')
             ->andWhere('r.dateRepas BETWEEN :start AND :end')
             ->setParameter('start', $todayStart)
-            ->setParameter('end', $todayEnd);
+            ->setParameter('end', $todayEnd)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+    /**
+     * ✅ NEW : Calories total aujourd'hui pour un user (via son plan)
+     */
+    public function getTodayTotalCaloriesForUser(int $userId): int
+    {
+        $todayStart = new \DateTimeImmutable('today 00:00:00');
+        $todayEnd   = new \DateTimeImmutable('today 23:59:59');
+
+        return (int) $this->createQueryBuilder('r')
+            ->select('COALESCE(SUM(r.calories), 0) as total')
+            ->leftJoin('r.planNutrition', 'p')
+            ->leftJoin('p.user', 'u')
+            ->andWhere('u.id = :uid')
+            ->andWhere('r.dateRepas BETWEEN :start AND :end')
+            ->setParameter('uid', $userId)
+            ->setParameter('start', $todayStart)
+            ->setParameter('end', $todayEnd)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     public function deleteMultiple(array $ids): void

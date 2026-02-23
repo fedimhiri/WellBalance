@@ -8,6 +8,11 @@ security:
         class: App\Entity\User
         property: email
 
+  # ✅ IMPORTANT : Admin hérite de tout
+  role_hierarchy:
+    ROLE_ADMIN: [ROLE_NUTRITIONNISTE, ROLE_USER]
+    ROLE_NUTRITIONNISTE: [ROLE_USER]
+
   firewalls:
     dev:
       pattern: ^/(_profiler|_wdt|assets|build)/
@@ -31,15 +36,21 @@ security:
         path: app_logout_admin
 
   access_control:
-    # pages publiques front
+    # public
     - { path: ^/Vue, roles: PUBLIC_ACCESS }
-
-    # login public
     - { path: ^/login, roles: PUBLIC_ACCESS }
 
-    # nutrition front (connecté)
+    # ✅ API Chat (admin aussi grâce à role_hierarchy)
+    - { path: ^/api/chat, roles: ROLE_USER }
+
+    # front patient (admin aussi grâce à role_hierarchy)
     - { path: ^/nutrition, roles: ROLE_USER }
 
-    # admin
+    # admin nutrition (nutritionniste + admin)
+    - { path: ^/admin/nutrition, roles: ROLE_NUTRITIONNISTE }
+
+    # admin dashboard
     - { path: ^/admin_dashboard, roles: ROLE_ADMIN }
+
+    # admin global (doit être après)
     - { path: ^/admin, roles: ROLE_ADMIN }

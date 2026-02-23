@@ -4,18 +4,22 @@ namespace App\Controller\Admin\Nutrition;
 
 use App\Entity\PlanNutrition;
 use App\Form\PlanNutritionType;
+use App\Repository\AlerteNutritionRepository;
 use App\Repository\PlanNutritionRepository;
+use App\Repository\SuiviNutritionRepository;
+use App\Service\RiskAnalyzerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/nutrition/plans')]
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_NUTRITIONNISTE')]
 class PlanNutritionController extends AbstractController
 {
     #[Route('/', name: 'admin_plan_nutrition_index', methods: ['GET'])]
@@ -31,15 +35,19 @@ class PlanNutritionController extends AbstractController
 
         $plans = $repo->searchAdmin($q, $objectif, $statut);
 
+        // ✅ sécurité métier : nutritionniste ne voit que ses plans
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $me = $this->getUser();
+            $plans = array_values(array_filter($plans, fn($p) => $p->getNutritionniste() === $me));
+        }
+
         $total = count($plans);
         $actifs = 0;
         $today = new \DateTimeImmutable('today');
 
         foreach ($plans as $plan) {
-            if (method_exists($plan, 'getDateFin') && $plan->getDateFin() instanceof \DateTimeInterface) {
-                if ($plan->getDateFin() >= $today) {
-                    $actifs++;
-                }
+            if ($plan->getDateFin() instanceof \DateTimeInterface && $plan->getDateFin() >= $today) {
+                $actifs++;
             }
         }
 
@@ -49,6 +57,18 @@ class PlanNutritionController extends AbstractController
         ];
 
         $objectifs = $repo->getDistinctObjectifs();
+
+        // ✅ AJAX live (recherche dynamique)
+        if ($request->isXmlHttpRequest()) {
+            $html = $this->renderView('admin/nutrition/plan_nutrition/_table.html.twig', [
+                'plan_nutritions' => $plans,
+            ]);
+
+            return new JsonResponse([
+                'html' => $html,
+                'stats' => $stats,
+            ]);
+        }
 
         return $this->render('admin/nutrition/plan_nutrition/index.html.twig', [
             'plan_nutritions' => $plans,
@@ -84,11 +104,13 @@ class PlanNutritionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (method_exists($planNutrition, 'calculerPeriode')) {
-                $periode = $planNutrition->calculerPeriode();
-                if (method_exists($planNutrition, 'setPeriode')) {
-                    $planNutrition->setPeriode($periode);
-                }
+
+            if (method_exists($planNutrition, 'setNutritionniste')) {
+                $planNutrition->setNutritionniste($this->getUser());
+            }
+
+            if (method_exists($planNutrition, 'calculerPeriode') && method_exists($planNutrition, 'setPeriode')) {
+                $planNutrition->setPeriode($planNutrition->calculerPeriode());
             }
 
             $entityManager->persist($planNutrition);
@@ -105,26 +127,68 @@ class PlanNutritionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'admin_plan_nutrition_show', methods: ['GET'])]
-    public function show(PlanNutrition $planNutrition): Response
-    {
+    public function show(
+        PlanNutrition $planNutrition,
+        AlerteNutritionRepository $alerteRepo,
+        SuiviNutritionRepository $suiviRepo
+    ): Response {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($planNutrition->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
         $stats = [];
         if (method_exists($planNutrition, 'getStats')) {
             $stats = $planNutrition->getStats();
         }
 
+        $alertes = $alerteRepo->findBy(
+            ['planNutrition' => $planNutrition, 'resolvedAt' => null],
+            ['createdAt' => 'DESC']
+        );
+
+        $suivisCount = count($suiviRepo->findBy(['planNutrition' => $planNutrition]));
+
         return $this->render('admin/nutrition/plan_nutrition/show.html.twig', [
             'plan_nutrition' => $planNutrition,
             'stats' => $stats,
+            'alertes' => $alertes,
+            'suivis_count' => $suivisCount,
         ]);
     }
 
-    // ✅ EXPORT PDF (ADMIN)
+    #[Route('/{id}/analyze', name: 'admin_plan_nutrition_analyze', methods: ['GET'])]
+    public function analyze(
+        PlanNutrition $planNutrition,
+        RiskAnalyzerService $riskAnalyzer
+    ): Response {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($planNutrition->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
+        $risks = $riskAnalyzer->analyze($planNutrition, true);
+
+        return $this->render('admin/nutrition/plan_nutrition/analyze.html.twig', [
+            'plan_nutrition' => $planNutrition,
+            'risks' => $risks,
+        ]);
+    }
+
     #[Route('/{id}/pdf', name: 'admin_plan_nutrition_pdf', methods: ['GET'])]
     public function exportPdf(PlanNutrition $planNutrition): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($planNutrition->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
         $options = new Options();
         $options->set('defaultFont', 'DejaVu Sans');
-        $options->set('isRemoteEnabled', true); // si tu veux des images via URL
+        $options->set('isRemoteEnabled', true);
 
         $dompdf = new Dompdf($options);
 
@@ -137,14 +201,14 @@ class PlanNutritionController extends AbstractController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        $filename = 'plan_nutrition_'.$planNutrition->getId().'.pdf';
+        $filename = 'plan_nutrition_' . $planNutrition->getId() . '.pdf';
 
         return new Response(
             $dompdf->output(),
             200,
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="'.$filename.'"',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
             ]
         );
     }
@@ -152,15 +216,25 @@ class PlanNutritionController extends AbstractController
     #[Route('/{id}/edit', name: 'admin_plan_nutrition_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, PlanNutrition $planNutrition, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($planNutrition->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
         $form = $this->createForm(PlanNutritionType::class, $planNutrition);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (method_exists($planNutrition, 'calculerPeriode')) {
-                $periode = $planNutrition->calculerPeriode();
-                if (method_exists($planNutrition, 'setPeriode')) {
-                    $planNutrition->setPeriode($periode);
+
+            if (method_exists($planNutrition, 'getNutritionniste') && method_exists($planNutrition, 'setNutritionniste')) {
+                if ($planNutrition->getNutritionniste() === null) {
+                    $planNutrition->setNutritionniste($this->getUser());
                 }
+            }
+
+            if (method_exists($planNutrition, 'calculerPeriode') && method_exists($planNutrition, 'setPeriode')) {
+                $planNutrition->setPeriode($planNutrition->calculerPeriode());
             }
 
             $entityManager->flush();
@@ -178,7 +252,13 @@ class PlanNutritionController extends AbstractController
     #[Route('/{id}', name: 'admin_plan_nutrition_delete', methods: ['POST'])]
     public function delete(Request $request, PlanNutrition $planNutrition, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$planNutrition->getId(), (string) $request->request->get('_token'))) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($planNutrition->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
+        if ($this->isCsrfTokenValid('delete' . $planNutrition->getId(), (string) $request->request->get('_token'))) {
             $entityManager->remove($planNutrition);
             $entityManager->flush();
             $this->addFlash('success', 'Le plan nutrition a été supprimé avec succès.');

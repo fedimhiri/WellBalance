@@ -1,0 +1,72 @@
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Objectif</th>
+            <th>Utilisateur</th>
+            <th>Période</th>
+            <th>Dates</th>
+            <th>Repas</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for plan in plan_nutritions %}
+            <tr>
+                <td>#{{ plan.id }}</td>
+                <td>
+                    <strong>{{ plan.objectif }}</strong>
+                    {% if plan.description %}
+                        <div class="text-muted small">
+                            {{ plan.description|slice(0,50) }}{% if plan.description|length > 50 %}...{% endif %}
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ plan.user.nom }}
+                    <div class="text-muted small">{{ plan.user.email }}</div>
+                </td>
+                <td>{{ plan.periode }}</td>
+                <td>
+                    {{ plan.dateDebut|date('d/m/Y') }} → {{ plan.dateFin|date('d/m/Y') }}
+                    <div class="text-muted small">
+                        {{ plan.dateFin > date() ? 'Actif' : 'Terminé' }}
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-primary">{{ plan.repas|length }} repas</span>
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('admin_plan_nutrition_show', {id: plan.id}) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bx bx-show"></i>
+                        </a>
+
+                        <a href="{{ path('admin_plan_nutrition_edit', {id: plan.id}) }}"
+                           class="btn btn-sm btn-outline-warning">
+                            <i class="bx bx-edit"></i>
+                        </a>
+
+                        <form method="post"
+                              action="{{ path('admin_plan_nutrition_delete', {id: plan.id}) }}"
+                              onsubmit="return confirm('Supprimer ce plan ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ plan.id) }}">
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                    Aucun plan trouvé
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

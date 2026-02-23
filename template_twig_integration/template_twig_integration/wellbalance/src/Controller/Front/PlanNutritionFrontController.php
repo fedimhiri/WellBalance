@@ -7,6 +7,7 @@ use App\Repository\PlanNutritionRepository;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -31,14 +32,24 @@ final class PlanNutritionFrontController extends AbstractController
 
         $objectifs = [];
         foreach ($plans as $p) {
-            if (method_exists($p, 'getObjectif')) {
-                $obj = $p->getObjectif();
-                if (is_string($obj) && $obj !== '') {
-                    $objectifs[$obj] = $obj;
-                }
+            $obj = $p->getObjectif();
+            if (is_string($obj) && $obj !== '') {
+                $objectifs[$obj] = $obj;
             }
         }
         $objectifs = array_values($objectifs);
+
+        // ✅ AJAX live
+        if ($request->isXmlHttpRequest()) {
+            $html = $this->renderView('frontend/nutrition/plans/_cards.html.twig', [
+                'plans' => $plans,
+            ]);
+
+            return new JsonResponse([
+                'html' => $html,
+                'count' => count($plans),
+            ]);
+        }
 
         return $this->render('frontend/nutrition/plans/index.html.twig', [
             'plans' => $plans,
@@ -63,7 +74,6 @@ final class PlanNutritionFrontController extends AbstractController
         ]);
     }
 
-    // ✅ EXPORT PDF (USER)
     #[Route('/{id}/pdf', name: 'front_plan_nutrition_pdf', methods: ['GET'])]
     public function exportPdf(PlanNutrition $planNutrition): Response
     {

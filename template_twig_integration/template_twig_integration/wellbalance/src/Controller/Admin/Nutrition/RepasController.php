@@ -3,9 +3,10 @@
 namespace App\Controller\Admin\Nutrition;
 
 use App\Entity\Repas;
-use App\Entity\PlanNutrition;
 use App\Form\RepasType;
+use App\Repository\PlanNutritionRepository;
 use App\Repository\RepasRepository;
+use App\Service\MealPresetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,114 +15,137 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/nutrition/repas')]
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_NUTRITIONNISTE')]
 class RepasController extends AbstractController
 {
     #[Route('/', name: 'admin_repas_index', methods: ['GET'])]
-    public function index(RepasRepository $repasRepository, Request $request): Response
+    public function index(RepasRepository $repo): Response
     {
-        $page = $request->query->getInt('page', 1);
-        $limit = 15;
-
-        $type = $request->query->get('type');
-        $date = $request->query->get('date'); // attendu YYYY-MM-DD
-        $planId = $request->query->getInt('plan');
-
-        $repas = $repasRepository->findWithFilters($type, $date, $planId, $page, $limit);
-        $todayCalories = $repasRepository->getTodayTotalCalories();
+        $repas = $repo->findAll();
 
         return $this->render('admin/nutrition/repas/index.html.twig', [
             'repas' => $repas,
-            'today_calories' => $todayCalories,
-            'types_repas' => ['Petit-déjeuner', 'Déjeuner', 'Dîner', 'Collation', 'En-cas'],
         ]);
     }
 
+    // ✅ URL: /admin/nutrition/repas/new?plan_id=2
     #[Route('/new', name: 'admin_repas_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $repas = new Repas();
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        PlanNutritionRepository $planRepo,
+        MealPresetService $presetService
+    ): Response {
+        $planId = $request->query->getInt('plan_id', 0);
+        $plan = $planId ? $planRepo->find($planId) : null;
 
-        // préselection plan si plan_id présent
-        $planId = $request->query->getInt('plan_id');
-        if ($planId) {
-            $plan = $entityManager->getRepository(PlanNutrition::class)->find($planId);
-            if ($plan) {
-                $repas->setPlanNutrition($plan);
+        if (!$plan) {
+            throw $this->createNotFound_exception('Plan nutrition introuvable.');
+        }
+
+        // ✅ Sécurité métier : le nutritionniste ne gère que ses plans
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($plan->getNutritionniste() && $plan->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
             }
         }
 
-        // date par défaut
-        if (!$repas->getDateRepas()) {
-            $repas->setDateRepas(new \DateTime());
-        }
+        $repas = new Repas();
+        $repas->setPlanNutrition($plan);
 
-        $form = $this->createForm(RepasType::class, $repas);
+        $form = $this->createForm(RepasType::class, $repas, [
+            'plan' => $plan,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($repas);
-            $entityManager->flush();
+            $repas->setPlanNutrition($plan);
 
-            $this->addFlash('success', 'Le repas a été créé avec succès.');
+            $em->persist($repas);
+            $em->flush();
 
-            // si on vient d’un plan → retour plan
-            if ($planId) {
-                return $this->redirectToRoute('admin_plan_nutrition_show', ['id' => $planId]);
-            }
-
-            return $this->redirectToRoute('admin_repas_index');
+            $this->addFlash('success', 'Repas ajouté avec succès.');
+            return $this->redirectToRoute('admin_plan_nutrition_show', ['id' => $plan->getId()]);
         }
 
         return $this->render('admin/nutrition/repas/new.html.twig', [
-            'repa' => $repas,
-            'form' => $form,
+            'form' => $form->createView(),
+            'plan' => $plan,
+            // ✅ repas précis selon objectif
+            'presets' => $presetService->presetsForObjectif($plan->getObjectif()),
         ]);
     }
 
     #[Route('/{id}', name: 'admin_repas_show', methods: ['GET'])]
     public function show(Repas $repa): Response
     {
+        $plan = $repa->getPlanNutrition();
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($plan && $plan->getNutritionniste() && $plan->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
         return $this->render('admin/nutrition/repas/show.html.twig', [
             'repa' => $repa,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'admin_repas_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Repas $repa, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(RepasType::class, $repa);
+    public function edit(
+        Request $request,
+        Repas $repa,
+        EntityManagerInterface $em,
+        MealPresetService $presetService
+    ): Response {
+        $plan = $repa->getPlanNutrition();
+
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($plan && $plan->getNutritionniste() && $plan->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
+            }
+        }
+
+        $form = $this->createForm(RepasType::class, $repa, [
+            'plan' => $plan,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-            $this->addFlash('success', 'Le repas a été modifié avec succès.');
+            if ($plan) {
+                $repa->setPlanNutrition($plan);
+            }
 
-            return $this->redirectToRoute('admin_repas_index');
+            $em->flush();
+            $this->addFlash('success', 'Repas modifié avec succès.');
+
+            return $this->redirectToRoute('admin_plan_nutrition_show', ['id' => $plan?->getId()]);
         }
 
         return $this->render('admin/nutrition/repas/edit.html.twig', [
+            'form' => $form->createView(),
             'repa' => $repa,
-            'form' => $form,
+            'presets' => $presetService->presetsForObjectif($plan?->getObjectif()),
         ]);
     }
 
     #[Route('/{id}', name: 'admin_repas_delete', methods: ['POST'])]
-    public function delete(Request $request, Repas $repa, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Repas $repa, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$repa->getId(), (string) $request->request->get('_token'))) {
-            $planId = $repa->getPlanNutrition()?->getId();
+        $plan = $repa->getPlanNutrition();
 
-            $entityManager->remove($repa);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Le repas a été supprimé avec succès.');
-
-            if ($planId) {
-                return $this->redirectToRoute('admin_plan_nutrition_show', ['id' => $planId]);
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            if ($plan && $plan->getNutritionniste() && $plan->getNutritionniste() !== $this->getUser()) {
+                throw $this->createAccessDeniedException();
             }
         }
 
-        return $this->redirectToRoute('admin_repas_index');
+        if ($this->isCsrfTokenValid('delete'.$repa->getId(), (string) $request->request->get('_token'))) {
+            $em->remove($repa);
+            $em->flush();
+            $this->addFlash('success', 'Repas supprimé.');
+        }
+
+        return $this->redirectToRoute('admin_plan_nutrition_show', ['id' => $plan?->getId()]);
     }
 }

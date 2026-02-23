@@ -39,23 +39,34 @@ class PlanNutrition
     )]
     private ?\DateTimeInterface $dateFin = null;
 
+    // ✅ PATIENT (celui qui reçoit le plan)
     #[ORM\ManyToOne(inversedBy: 'planNutritions')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull(message: "Veuillez sélectionner un utilisateur.")]
+    #[Assert\NotNull(message: "Veuillez sélectionner un utilisateur (patient).")]
     private ?User $user = null;
 
+    // ✅ NUTRITIONNISTE (celui qui crée le plan)
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'nutritionniste_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?User $nutritionniste = null;
+
+    // ✅ Repas recommandés
     #[ORM\OneToMany(mappedBy: 'planNutrition', targetEntity: Repas::class, cascade: ['persist', 'remove'])]
     private Collection $repas;
+
+    // ✅ Suivis patient (option métier)
+    #[ORM\OneToMany(mappedBy: 'planNutrition', targetEntity: SuiviNutrition::class, cascade: ['remove'])]
+    private Collection $suivis;
 
     public function __construct()
     {
         $this->repas = new ArrayCollection();
+        $this->suivis = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
 
     public function getObjectif(): ?string { return $this->objectif; }
-
     public function setObjectif(string $objectif): static
     {
         $this->objectif = $objectif;
@@ -63,7 +74,6 @@ class PlanNutrition
     }
 
     public function getDescription(): ?string { return $this->description; }
-
     public function setDescription(?string $description): static
     {
         $this->description = $description;
@@ -71,7 +81,6 @@ class PlanNutrition
     }
 
     public function getPeriode(): ?string { return $this->periode; }
-
     public function setPeriode(?string $periode): static
     {
         $this->periode = $periode;
@@ -79,7 +88,6 @@ class PlanNutrition
     }
 
     public function getDateDebut(): ?\DateTimeInterface { return $this->dateDebut; }
-
     public function setDateDebut(\DateTimeInterface $dateDebut): static
     {
         $this->dateDebut = $dateDebut;
@@ -87,18 +95,25 @@ class PlanNutrition
     }
 
     public function getDateFin(): ?\DateTimeInterface { return $this->dateFin; }
-
     public function setDateFin(\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
         return $this;
     }
 
+    // ✅ PATIENT
     public function getUser(): ?User { return $this->user; }
-
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    // ✅ NUTRITIONNISTE
+    public function getNutritionniste(): ?User { return $this->nutritionniste; }
+    public function setNutritionniste(?User $nutritionniste): static
+    {
+        $this->nutritionniste = $nutritionniste;
         return $this;
     }
 
@@ -129,7 +144,16 @@ class PlanNutrition
         return $this;
     }
 
-    // ========== MÉTHODES PERSONNALISÉES ==========
+    /**
+     * @return Collection<int, SuiviNutrition>
+     */
+    public function getSuivis(): Collection
+    {
+        return $this->suivis;
+    }
+
+    // ========== MÉTHODES PERSONNALISÉES (TES MÉTHODES) ==========
+
     public function calculerPeriode(): string
     {
         if (!$this->dateDebut || !$this->dateFin) {
@@ -140,7 +164,7 @@ class PlanNutrition
         $jours = $interval->days;
 
         if ($jours >= 30) {
-            $mois = floor($jours / 30);
+            $mois = (int) floor($jours / 30);
             return $mois . ' mois' . ($mois > 1 ? 's' : '');
         }
 
@@ -200,7 +224,7 @@ class PlanNutrition
 
     public function getResume(): string
     {
-        $resume = $this->objectif;
+        $resume = (string) $this->objectif;
         if ($this->description) {
             $resume .= ' : ' . substr($this->description, 0, 100) . '...';
         }
@@ -209,6 +233,7 @@ class PlanNutrition
 
     public function __toString(): string
     {
-        return $this->objectif . ' (' . $this->getUser()?->getEmail() . ')';
+        $patient = $this->getUser()?->getEmail() ?? 'N/A';
+        return $this->objectif . ' (Patient: ' . $patient . ')';
     }
 }
