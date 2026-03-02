@@ -1,0 +1,154 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Gestion des Plans Nutrition{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Plans Nutrition</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Nutrition / Plans</h6>
+        </nav>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_plan_nutrition_stats') }}" class="btn btn-outline-primary">
+            <i class="bx bx-bar-chart-alt-2 me-2"></i>Stats
+        </a>
+        <a href="{{ path('admin_plan_nutrition_new') }}" class="btn btn-primary">
+            <i class="bx bx-plus me-2"></i>Nouveau Plan
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-hover border-0 shadow-sm">
+            <div class="card-body">
+                <span class="text-muted small">Total Plans</span>
+                <h3 class="fw-bold mt-2" id="statTotal">{{ stats.total }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-hover border-0 shadow-sm">
+            <div class="card-body">
+                <span class="text-muted small">Plans Actifs</span>
+                <h3 class="fw-bold mt-2" id="statActifs">{{ stats.actifs }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3" id="filtersForm">
+
+            <div class="col-md-4">
+                <label class="form-label">Recherche</label>
+                <input type="text"
+                       name="q"
+                       class="form-control"
+                       placeholder="Objectif, description, username, email..."
+                       value="{{ filters.q }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Objectif</label>
+                <select name="objectif" class="form-select">
+                    <option value="">Tous les objectifs</option>
+                    {% for obj in objectifs %}
+                        <option value="{{ obj }}" {{ filters.objectif == obj ? 'selected' : '' }}>
+                            {{ obj }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Statut</label>
+                <select name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="actif" {{ filters.statut == 'actif' ? 'selected' : '' }}>Actif</option>
+                    <option value="termine" {{ filters.statut == 'termine' ? 'selected' : '' }}>Terminé</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bx bx-search me-2"></i>Rechercher
+                </button>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="{{ path('admin_plan_nutrition_index') }}" class="btn btn-outline-secondary w-100">
+                    <i class="bx bx-reset me-2"></i>Reset
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div id="plansTable">
+            {% include 'admin/nutrition/plan_nutrition/_table.html.twig' with { plan_nutritions: plan_nutritions } %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('filtersForm');
+    if (!form) return;
+
+    const tableBox = document.getElementById('plansTable');
+    const statTotal = document.getElementById('statTotal');
+    const statActifs = document.getElementById('statActifs');
+
+    const qInput = form.querySelector('input[name="q"]');
+    const objectifSel = form.querySelector('select[name="objectif"]');
+    const statutSel = form.querySelector('select[name="statut"]');
+
+    let timer = null;
+
+    async function fetchPlans() {
+        const params = new URLSearchParams(new FormData(form));
+        const url = window.location.pathname;
+        const fullUrl = url + '?' + params.toString();
+
+        // update URL without reload
+        window.history.replaceState({}, '', fullUrl);
+
+        const res = await fetch(fullUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (tableBox) tableBox.innerHTML = data.html;
+        if (statTotal) statTotal.textContent = data.stats.total;
+        if (statActifs) statActifs.textContent = data.stats.actifs;
+    }
+
+    function scheduleFetch() {
+        clearTimeout(timer);
+        timer = setTimeout(fetchPlans, 250);
+    }
+
+    if (qInput) qInput.addEventListener('input', scheduleFetch);
+    if (objectifSel) objectifSel.addEventListener('change', fetchPlans);
+    if (statutSel) statutSel.addEventListener('change', fetchPlans);
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchPlans();
+    });
+});
+</script>
+{% endblock %}

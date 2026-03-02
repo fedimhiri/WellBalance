@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -41,10 +42,12 @@ class GoogleAuthenticator extends AbstractAuthenticator
         $client = $this->clientRegistry->getClient('google');
         $googleUser = $client->fetchUser();
 
-        $email = $googleUser->getEmail();
-        $firstname = $googleUser->getFirstName() ?? 'user';
-        $lastname = $googleUser->getLastName() ?? rand(100, 999);
-        $avatar = $googleUser->getAvatar();
+        // Use toArray() to get user data from OAuth provider
+        $userData = $googleUser->toArray();
+        $email = $userData['email'] ?? '';
+        $firstname = $userData['first_name'] ?? $userData['given_name'] ?? 'user';
+        $lastname = $userData['last_name'] ?? $userData['family_name'] ?? rand(100, 999);
+        $avatar = $userData['picture'] ?? $userData['avatar'] ?? null;
 
         return new SelfValidatingPassport(
             new UserBadge($email, function () use ($email, $firstname, $lastname, $avatar) {
@@ -98,12 +101,14 @@ class GoogleAuthenticator extends AbstractAuthenticator
         // 🔴 1️⃣ Vérification BAN
         if ($user->isBanned()) {
 
-            $request->getSession()->invalidate();
-
-            $request->getSession()->getFlashBag()->add(
-                'danger',
-                'Votre compte a été suspendu. Contactez l’administration.'
-            );
+            $session = $request->getSession();
+            if ($session instanceof Session) {
+                $session->invalidate();
+                $session->getFlashBag()->add(
+                    'danger',
+                    'Votre compte a été suspendu. Contactez l\'administration.'
+                );
+            }
 
             return new RedirectResponse(
                 $this->urlGenerator->generate('app_login')

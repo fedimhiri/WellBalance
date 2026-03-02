@@ -1,0 +1,210 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Demande de rendez-vous{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .rdv-calendar {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            background: #fff;
+        }
+        .rdv-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.35rem;
+        }
+        .rdv-calendar-weekday {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            text-align: center;
+            padding: 0.3rem 0;
+        }
+        .rdv-day {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            min-height: 54px;
+            background: #fff;
+            color: #111827;
+            position: relative;
+            font-weight: 600;
+        }
+        .rdv-day:disabled {
+            color: #9ca3af;
+            background: #f9fafb;
+            cursor: not-allowed;
+        }
+        .rdv-day.is-selected {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        .rdv-day.is-partial::after,
+        .rdv-day.is-full::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+        }
+        .rdv-day.is-partial::after { background: #f59e0b; }
+        .rdv-day.is-full::after { background: #10b981; }
+        .rdv-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+            gap: 0.5rem;
+        }
+        .rdv-slot-btn {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 0.45rem 0.5rem;
+            background: #fff;
+            font-weight: 600;
+        }
+        .rdv-slot-btn[aria-selected="true"] {
+            border-color: #2563eb;
+            color: #1d4ed8;
+            background: #eff6ff;
+        }
+        .rdv-hidden-field {
+            display: none;
+        }
+        .rdv-form-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            background: #ffffff;
+            margin-bottom: 1rem;
+        }
+        .rdv-form-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.85rem;
+        }
+        .rdv-field {
+            margin-bottom: 0.9rem;
+        }
+        .rdv-field label {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: #334155;
+            font-weight: 600;
+        }
+        .rdv-field .form-control,
+        .rdv-field .form-select {
+            border-radius: 10px;
+        }
+        .rdv-submit-wrap {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 1rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <section class="section py-5">
+        <div class="container">
+            <h1 class="h4 mb-4">Demander un rendez-vous</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form, {
+                        attr: {
+                            novalidate: 'novalidate',
+                            'data-rdv-calendar-form': '1',
+                            'data-timezone': 'Africa/Tunis',
+                            'data-availability-url-template': '/doctors/__doctorId__/availability'
+                        }
+                    }) }}
+                        {{ form_errors(form) }}
+                        <div class="rdv-form-card">
+                            <div class="rdv-form-title">Informations du rendez-vous</div>
+                            <div class="row">
+                                <div class="col-md-6 rdv-field">
+                                    {{ form_label(form.titre) }}
+                                    {{ form_widget(form.titre, { attr: form.titre.vars.attr|merge({ class: 'form-control' }) }) }}
+                                    {{ form_errors(form.titre) }}
+                                </div>
+                                <div class="col-md-6 rdv-field">
+                                    {{ form_label(form.typeRendezVous) }}
+                                    {{ form_widget(form.typeRendezVous, { attr: form.typeRendezVous.vars.attr|merge({ class: 'form-select' }) }) }}
+                                    {{ form_errors(form.typeRendezVous) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 rdv-field">
+                                    {{ form_label(form.medecin) }}
+                                    {{ form_widget(form.medecin, { attr: form.medecin.vars.attr|merge({ class: 'form-select' }) }) }}
+                                    {{ form_errors(form.medecin) }}
+                                </div>
+                                <div class="col-md-6 rdv-field">
+                                    {{ form_label(form.description) }}
+                                    {{ form_widget(form.description, { attr: form.description.vars.attr|merge({ class: 'form-control' }) }) }}
+                                    {{ form_errors(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rdv-hidden-field" data-wb-skip-field-validation="1">
+                            {{ form_row(form.dateRdv) }}
+                            {{ form_row(form.heureRdv) }}
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <div class="col-lg-8">
+                                <div class="rdv-calendar">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-cal-prev>Mois precedent</button>
+                                        <strong data-cal-label></strong>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-cal-next>Mois suivant</button>
+                                    </div>
+                                    <div class="rdv-calendar-grid mb-1">
+                                        <div class="rdv-calendar-weekday">Lun</div>
+                                        <div class="rdv-calendar-weekday">Mar</div>
+                                        <div class="rdv-calendar-weekday">Mer</div>
+                                        <div class="rdv-calendar-weekday">Jeu</div>
+                                        <div class="rdv-calendar-weekday">Ven</div>
+                                        <div class="rdv-calendar-weekday">Sam</div>
+                                        <div class="rdv-calendar-weekday">Dim</div>
+                                    </div>
+                                    <div class="rdv-calendar-grid" data-cal-days></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="rdv-calendar h-100">
+                                    <h6 class="mb-2" data-slot-title>Selectionnez une date</h6>
+                                    <div class="rdv-slots" data-slot-list></div>
+                                    <div class="wb-field-error mt-2" data-slot-error></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rdv-submit-wrap">
+                            <button class="btn btn-primary" type="submit" data-submit-btn disabled>Confirmer le rendez-vous</button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets_frontend/js/rendezvous-calendar.js') }}"></script>
+{% endblock %}

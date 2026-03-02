@@ -1,0 +1,9 @@
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{% block form_start %}
+    {% set attr = attr|merge({
+        novalidate: 'novalidate',
+        'data-wb-validate': attr['data-wb-validate']|default('1')
+    }) %}
+    {{ parent() }}
+{% endblock %}

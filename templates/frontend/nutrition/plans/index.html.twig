@@ -1,0 +1,108 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Mes plans nutrition{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Mes plans nutrition</h2>
+  </div>
+
+  {% for message in app.flashes('success') %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% endfor %}
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3" id="frontFiltersForm">
+        <div class="col-md-5">
+          <label class="form-label">Recherche</label>
+          <input type="text" name="q" class="form-control"
+                 placeholder="Objectif ou description..."
+                 value="{{ filters.q|default('') }}">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Objectif</label>
+          <select name="objectif" class="form-select">
+            <option value="">Tous</option>
+            {% for obj in objectifs %}
+              <option value="{{ obj }}" {{ filters.objectif == obj ? 'selected' : '' }}>
+                {{ obj }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Statut</label>
+          <select name="statut" class="form-select">
+            <option value="" {{ filters.statut == '' ? 'selected' : '' }}>Tous</option>
+            <option value="actif" {{ filters.statut == 'actif' ? 'selected' : '' }}>Actif</option>
+            <option value="termine" {{ filters.statut == 'termine' ? 'selected' : '' }}>Terminé</option>
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button class="btn btn-primary w-100" type="submit">Rechercher</button>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <a class="btn btn-outline-secondary w-100" href="{{ path('front_plan_nutrition_index') }}">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="plansCards">
+    {% include 'frontend/nutrition/plans/_cards.html.twig' with { plans: plans } %}
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('frontFiltersForm');
+    if (!form) return;
+
+    const cardsBox = document.getElementById('plansCards');
+    const qInput = form.querySelector('input[name="q"]');
+    const objectifSel = form.querySelector('select[name="objectif"]');
+    const statutSel = form.querySelector('select[name="statut"]');
+
+    let timer = null;
+
+    async function fetchPlans() {
+        const params = new URLSearchParams(new FormData(form));
+        const url = window.location.pathname;
+        const fullUrl = url + '?' + params.toString();
+
+        window.history.replaceState({}, '', fullUrl);
+
+        const res = await fetch(fullUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (cardsBox) cardsBox.innerHTML = data.html;
+    }
+
+    function scheduleFetch() {
+        clearTimeout(timer);
+        timer = setTimeout(fetchPlans, 250);
+    }
+
+    if (qInput) qInput.addEventListener('input', scheduleFetch);
+    if (objectifSel) objectifSel.addEventListener('change', fetchPlans);
+    if (statutSel) statutSel.addEventListener('change', fetchPlans);
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchPlans();
+    });
+});
+</script>
+{% endblock %}

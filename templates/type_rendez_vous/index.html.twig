@@ -1,0 +1,84 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Types de rendez-vous{% endblock %}
+
+{% block body %}
+    {% set currentSearch = currentSearch|default('') %}
+    {% set currentSort = currentSort|default('nom') %}
+    {% set currentDir = currentDir|default('asc') %}
+
+    <div id="type-rdv-config"
+         data-endpoint="{{ path('admin_type_rendez_vous_index') }}"
+         data-sort="{{ currentSort }}"
+         data-dir="{{ currentDir }}">
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Types de rendez-vous</h1>
+        <a href="{{ path('admin_type_rendez_vous_new') }}" class="btn btn-primary">Nouveau type</a>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" action="{{ path('admin_type_rendez_vous_index') }}" class="row g-2">
+                <div class="col-md-6">
+                    <input id="type-rdv-search" type="text" class="form-control" name="q" value="{{ currentSearch }}" placeholder="Rechercher par id, nom, description...">
+                </div>
+                <div class="col-md-2">
+                    <select id="type-rdv-sort" class="form-select" name="sort">
+                        <option value="nom" {% if currentSort == 'nom' %}selected{% endif %}>Nom</option>
+                        <option value="id" {% if currentSort == 'id' %}selected{% endif %}>ID</option>
+                        <option value="description" {% if currentSort == 'description' %}selected{% endif %}>Description</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select id="type-rdv-dir" class="form-select" name="dir">
+                        <option value="asc" {% if currentDir == 'asc' %}selected{% endif %}>ASC</option>
+                        <option value="desc" {% if currentDir == 'desc' %}selected{% endif %}>DESC</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-primary flex-fill">Rechercher</button>
+                    <a href="{{ path('admin_type_rendez_vous_index') }}" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="type-rdv-tbody">
+                {% for type in types %}
+                    <tr>
+                        <td>{{ type.id }}</td>
+                        <td>{{ type.nomType }}</td>
+                        <td>{{ type.description ?: '-' }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ path('admin_type_rendez_vous_show', {id: type.id}) }}">Voir</a>
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ path('admin_type_rendez_vous_edit', {id: type.id}) }}">Editer</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">Aucun type enregistre.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/type-rendezvous-list.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Rendez-vous medecin{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Mes rendez-vous medicaux</h1>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Patient</th>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for rdv in rendezVousList %}
+                    <tr>
+                        <td>{{ rdv.id }}</td>
+                        <td>{{ rdv.titre }}</td>
+                        <td>{{ rdv.patient ? rdv.patient.displayName : '-' }}</td>
+                        <td>{{ rdv.dateRdv|date('d/m/Y') }}</td>
+                        <td>{{ rdv.heureRdv|date('H:i') }}</td>
+                        <td>{% include 'rendez_vous/_status_badge.html.twig' with { statut: rdv.statut } only %}</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ path('medecin_rendez_vous_show', {id: rdv.id}) }}">Voir</a>
+                            {% if rdv.statut == constant('App\\Entity\\RendezVous::STATUT_EN_ATTENTE') %}
+                                <form class="d-inline" method="post" action="{{ path('medecin_rendez_vous_accepter', {id: rdv.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('rdv_action_' ~ rdv.id) }}">
+                                    <button class="btn btn-sm btn-success" type="submit">Accepter</button>
+                                </form>
+                                <form class="d-inline" method="post" action="{{ path('medecin_rendez_vous_rejeter', {id: rdv.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('rdv_action_' ~ rdv.id) }}">
+                                    <button class="btn btn-sm btn-danger" type="submit">Rejeter</button>
+                                </form>
+                            {% elseif rdv.statut == constant('App\\Entity\\RendezVous::STATUT_ACCEPTE') %}
+                                <form class="d-inline" method="post" action="{{ path('medecin_rendez_vous_encours', {id: rdv.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('rdv_action_' ~ rdv.id) }}">
+                                    <button class="btn btn-sm btn-warning" type="submit">En cours</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">Aucun rendez-vous.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

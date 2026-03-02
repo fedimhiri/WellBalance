@@ -1,0 +1,121 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Dashboard Documents Médicaux{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bx bx-bar-chart-alt-2 me-2"></i>Dashboard — Documents Médicaux
+        </h4>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_document_stats') }}" class="btn btn-outline-primary">
+                <i class="bx bx-bar-chart-alt-2 me-1"></i> Statistiques Détaillées
+            </a>
+            <a href="{{ path('admin_document_crud_index') }}" class="btn btn-outline-secondary">
+                <i class="bx bx-list me-1"></i> Liste
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-primary">
+                                <i class="bx bx-file bx-sm"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Total Documents</small>
+                            <h4 class="card-title mb-0">{{ total_documents }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-info">
+                                <i class="bx bx-brain bx-sm"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Analysés (IA)</small>
+                            <h4 class="card-title mb-0">{{ total_analyzed }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-success">
+                                <i class="bx bx-shield bx-sm"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Soumissions assurance</small>
+                            <h4 class="card-title mb-0">{{ total_insurance_submitted }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-3">
+                            <span class="avatar-initial rounded bg-label-warning">
+                                <i class="bx bx-error bx-sm"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Anomalies détectées</small>
+                            <h4 class="card-title mb-0">{{ total_anomalies }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Gestion rapide</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ path('admin_ea') }}" class="btn btn-primary w-100">
+                                <i class="bx bx-list-ul me-1"></i> Gérer les documents
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ path('admin_categorie_document_index') }}" class="btn btn-outline-primary w-100">
+                                <i class="bx bx-category me-1"></i> Gérer les catégories
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ path('app_document_new') }}" class="btn btn-outline-success w-100">
+                                <i class="bx bx-plus me-1"></i> Ajouter un document
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,48 +1,110 @@
 {% extends 'frontend/base_frontend.html.twig' %}
 
-{% block title %}Mon profil{% endblock %}
-
 {% block body %}
-<div class="container mt-5">
-    <h3 class="mb-4">Mon profil</h3>
+<div class="container py-5">
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
 
-    <div class="card">
-        <div class="card-body">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
 
-            {{ form_start(profileForm) }}
+                    <h3 class="text-center fw-bold mb-4">
+                        <i class="bi bi-person-circle me-2 text-primary"></i>
+                        Mon Profil
+                    </h3>
 
-            <div class="mb-3">
-                {{ form_label(profileForm.email) }}
-                {{ form_widget(profileForm.email, {
-                    attr: { class: 'form-control' }
-                }) }}
+                    {# Flash messages #}
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {% for message in app.flashes('danger') %}
+                        <div class="alert alert-danger text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {{ form_start(profileForm) }}
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Adresse email</label>
+                        {{ form_widget(profileForm.email, {
+                            'attr': {'class': 'form-control bg-light'}
+                        }) }}
+                    </div>
+
+                    <!-- Username -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Nom d'utilisateur</label>
+                        {{ form_widget(profileForm.username, {
+                            'attr': {'class': 'form-control'}
+                        }) }}
+                        <div class="text-danger small">
+                            {{ form_errors(profileForm.username) }}
+                        </div>
+                    </div>
+
+                    <!-- Telephone -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Téléphone</label>
+                        {{ form_widget(profileForm.telephone, {
+                            'attr': {'class': 'form-control'}
+                        }) }}
+                        <div class="text-danger small">
+                            {{ form_errors(profileForm.telephone) }}
+                        </div>
+                    </div>
+
+                    <hr class="my-5">
+
+                    <!-- PASSWORD SECTION -->
+                    <h5 class="fw-bold text-primary mb-4">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        Modifier le mot de passe
+                    </h5>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Nouveau mot de passe
+                        </label>
+                        {{ form_widget(profileForm.plainPassword.first, {
+                            'attr': {'class': 'form-control'}
+                        }) }}
+                        <div class="text-danger small">
+                            {{ form_errors(profileForm.plainPassword.first) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Confirmer le mot de passe
+                        </label>
+                        {{ form_widget(profileForm.plainPassword.second, {
+                            'attr': {'class': 'form-control'}
+                        }) }}
+                        <div class="text-danger small">
+                            {{ form_errors(profileForm.plainPassword.second) }}
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary px-5 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Enregistrer les modifications
+                        </button>
+                    </div>
+
+                    {{ form_end(profileForm) }}
+
+                </div>
             </div>
-
-            <div class="mb-3">
-                {{ form_label(profileForm.username) }}
-                {{ form_widget(profileForm.username, {
-                    attr: { class: 'form-control' }
-                }) }}
-            </div>
-
-            <div class="mb-3">
-                {{ form_label(profileForm.telephone) }}
-                {{ form_widget(profileForm.telephone, {
-                    attr: { class: 'form-control' }
-                }) }}
-            </div>
-
-            <button class="btn btn-primary w-100">
-                Enregistrer
-            </button>
-
-            {{ form_end(profileForm) }}
 
         </div>
     </div>
+
 </div>
 {% endblock %}

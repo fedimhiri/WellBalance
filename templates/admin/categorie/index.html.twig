@@ -1,0 +1,61 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Catégories de documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><i class="bx bx-folder me-2"></i>Catégories</h4>
+        <a href="{{ path('admin_categorie_new') }}" class="btn btn-success">
+            <i class="bx bx-plus me-1"></i> Créer une catégorie
+        </a>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categorie in categories %}
+                        <tr>
+                            <td>{{ categorie.id }}</td>
+                            <td>{{ categorie.nom }}</td>
+                            <td>{{ categorie.description|default('—') }}</td>
+                            <td class="text-end">
+                                <a href="{{ path('admin_categorie_edit', {id: categorie.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                    <i class="bx bx-edit"></i> Edit
+                                </a>
+                                <form method="post" action="{{ path('admin_categorie_delete', {id: categorie.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette catégorie ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_categorie_' ~ categorie.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                        <i class="bx bx-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">Aucune catégorie.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

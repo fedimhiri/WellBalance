@@ -1,0 +1,19 @@
+{# templates/emails/new_message_notification.html.twig #}
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+    <div style="background-color: #0d6efd; color: white; padding: 15px 20px;">
+        <h2 style="margin: 0;">💬 Nouveau message</h2>
+    </div>
+    <div style="padding: 20px;">
+        <p>Bonjour <strong>{{ recipient.username }}</strong>,</p>
+        <p>Vous avez reçu un nouveau message de <strong>{{ sender.username }}</strong> dans la conversation : <em>{{ conversation.sujet|default('Discussion générale') }}</em>.</p>
+        
+        <div style="background-color: #f8f9fa; border-left: 4px solid #0d6efd; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; font-style: italic;">{{ message.content|nl2br }}</p>
+        </div>
+        
+        <p>Veuillez vous connecter à votre espace personnel pour lire la suite et répondre.</p>
+    </div>
+    <div style="background-color: #f8f9fa; padding: 15px 20px; text-align: center; color: #6c757d; font-size: 12px;">
+        Ceci est un message automatique, merci de ne pas y répondre directement.
+    </div>
+</div>

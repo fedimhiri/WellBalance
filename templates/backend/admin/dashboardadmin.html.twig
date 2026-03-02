@@ -7,125 +7,240 @@
 
     <h3 class="mb-4 fw-bold">Gestion des utilisateurs</h3>
 
-    {# ============================
-       BARRE RECHERCHE + TRI
-       ============================ #}
-    <form method="get" action="{{ path('admin_dashboard') }}" class="row g-2 mb-3">
-
-        <div class="col-md-6">
-            <input type="text"
-                   name="search"
-                   class="form-control"
-                   placeholder="Rechercher par email, username ou téléphone"
-                   value="{{ search ?? '' }}">
-        </div>
-
-        <div class="col-md-3">
-            <select name="sort" class="form-select">
-                <option value="">Trier par défaut</option>
-                <option value="email" {{ sort == 'email' ? 'selected' : '' }}>Email</option>
-                <option value="username" {{ sort == 'username' ? 'selected' : '' }}>Username</option>
-            </select>
-        </div>
-
-        <div class="col-md-3 d-flex gap-2">
-            <button class="btn btn-primary w-100">
-                Rechercher/Trier
-            </button>
-
-            <a href="{{ path('admin_dashboard') }}"
-               class="btn btn-outline-secondary w-100">
-                Réinitialiser
-            </a>
-        </div>
-    </form>
+    <div class="mb-4">
+        <a href="{{ path('admin_document_index') }}" class="btn btn-primary">
+            <i class="bx bx-file me-1"></i> Documents
+        </a>
+        <a href="{{ path('admin_document_stats') }}" class="btn btn-outline-primary ms-2">
+            <i class="bx bx-bar-chart-alt-2 me-1"></i> Statistiques
+        </a>
+        <a href="{{ path('admin_categorie_index') }}" class="btn btn-outline-secondary ms-2">
+            <i class="bx bx-folder me-1"></i> Catégories
+        </a>
+    </div>
 
     {# ============================
-       TABLE UTILISATEURS
-       ============================ #}
-    <div class="card shadow-sm">
+       🔢 STATISTIQUES PRINCIPALES
+    ============================ #}
+    <div class="row mb-4 g-3">
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="text-muted">Total</h6>
+                    <h3 class="fw-bold">{{ stats.total }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-danger text-white">
+                <div class="card-body">
+                    <h6>Admins</h6>
+                    <h3 class="fw-bold">{{ stats.admin }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-primary text-white">
+                <div class="card-body">
+                    <h6>Médecins</h6>
+                    <h3 class="fw-bold">{{ stats.medecin }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-success text-white">
+                <div class="card-body">
+                    <h6>Nutritionnistes</h6>
+                    <h3 class="fw-bold">{{ stats.nutritionniste }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-warning text-dark">
+                <div class="card-body">
+                    <h6>Coach</h6>
+                    <h3 class="fw-bold">{{ stats.coach }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-info text-dark">
+                <div class="card-body">
+                    <h6>Patients</h6>
+                    <h3 class="fw-bold">{{ stats.patient }}</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {# ============================
+       📊 ANALYSE VISUELLE
+    ============================ #}
+    <div class="card shadow-sm mb-4">
         <div class="card-body">
 
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered align-middle">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th>#</th>
-                            <th>Email</th>
-                            <th>Username</th>
-                            <th>Téléphone</th>
-                            <th>Rôle</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
+            <h5 class="fw-bold mb-3">Répartition des rôles</h5>
 
-                    <tbody>
-                    {% for user in users %}
-                        <tr>
-                            <td class="text-center">{{ user.id }}</td>
+            {% set total = stats.total > 0 ? stats.total : 1 %}
 
-                            <td>{{ user.email }}</td>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Admins</span>
+                    <span>{{ ((stats.admin / total) * 100)|round(1) }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-danger"
+                         style="width: {{ (stats.admin / total) * 100 }}%"></div>
+                </div>
+            </div>
 
-                            <td>
-                                <strong>{{ user.username }}</strong>
-                            </td>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Médecins</span>
+                    <span>{{ ((stats.medecin / total) * 100)|round(1) }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-primary"
+                         style="width: {{ (stats.medecin / total) * 100 }}%"></div>
+                </div>
+            </div>
 
-                            <td>{{ user.telephone }}</td>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Nutritionnistes</span>
+                    <span>{{ ((stats.nutritionniste / total) * 100)|round(1) }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-success"
+                         style="width: {{ (stats.nutritionniste / total) * 100 }}%"></div>
+                </div>
+            </div>
 
-                            <td class="text-center">
-                                {% if 'ROLE_ADMIN' in user.roles %}
-                                    <span class="badge bg-danger">Admin</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">User</span>
-                                {% endif %}
-                            </td>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Coach</span>
+                    <span>{{ ((stats.coach / total) * 100)|round(1) }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-warning"
+                         style="width: {{ (stats.coach / total) * 100 }}%"></div>
+                </div>
+            </div>
 
-                            <td class="text-end">
-                                <a href="{{ path('admin_user_edit', {id: user.id}) }}"
-                                   class="btn btn-sm btn-outline-primary me-1">
-                                    Modifier
-                                </a>
-
-                                <form method="post"
-                                      action="{{ path('admin_user_delete', {id: user.id}) }}"
-                                      class="d-inline"
-                                      onsubmit="return confirm('Confirmer la suppression de cet utilisateur ?');">
-                                    <input type="hidden"
-                                           name="_token"
-                                           value="{{ csrf_token('delete' ~ user.id) }}">
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
-                                Aucun utilisateur trouvé
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+            <div>
+                <div class="d-flex justify-content-between">
+                    <span>Patients</span>
+                    <span>{{ ((stats.patient / total) * 100)|round(1) }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-info"
+                         style="width: {{ (stats.patient / total) * 100 }}%"></div>
+                </div>
             </div>
 
         </div>
     </div>
+
+    {# ============================
+       🔎 RECHERCHE + TRI
+    ============================ #}
+    <div class="row g-2 mb-3">
+
+        <div class="col-md-6">
+            <input type="text"
+                   id="search-input"
+                   class="form-control"
+                   placeholder="Rechercher par email, username ou téléphone">
+        </div>
+
+        <div class="col-md-3">
+            <select id="sort-select" class="form-select">
+                <option value="">Trier par défaut</option>
+                <option value="email">Email</option>
+                <option value="username">Username</option>
+                <option value="id">ID</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button id="reset-btn"
+                    class="btn btn-outline-secondary w-100">
+                Réinitialiser
+            </button>
+        </div>
+
+    </div>  
+   
+
+
+    {# ============================
+       TABLE DYNAMIQUE
+    ============================ #}
+    <div class="card shadow-sm">
+    <div class="card-body">
+
+        <div class="table-responsive mb-3" id="users-table">
+            {% include 'backend/admin/_users_table.html.twig' %}
+        </div>
+
+        <!-- Bouton export PDF -->
+        <div class="text-end">
+            <a href="{{ path('admin_export_pdf') }}" class="btn btn-danger">
+                <i class="bi bi-file-earmark-pdf"></i> Exporter en PDF
+            </a>
+        </div>
+
+    </div>
+</div>
+
 
 </div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const tooltipTriggerList = [].slice.call(
-        document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    );
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+
+    const searchInput = document.getElementById('search-input');
+    const sortSelect = document.getElementById('sort-select');
+    const resetBtn = document.getElementById('reset-btn');
+    const tableContainer = document.getElementById('users-table');
+
+    function fetchUsers() {
+
+        const search = searchInput.value;
+        const sort = sortSelect.value;
+
+        fetch(`{{ path('admin_dashboard') }}?search=${search}&sort=${sort}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            tableContainer.innerHTML = html;
+        });
+    }
+
+    searchInput.addEventListener('keyup', fetchUsers);
+    sortSelect.addEventListener('change', fetchUsers);
+
+    resetBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        sortSelect.value = '';
+        fetchUsers();
     });
+
 });
 </script>
+
 {% endblock %}

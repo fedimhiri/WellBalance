@@ -1,0 +1,535 @@
+{# templates/messenger/front_show.html.twig #}
+{% extends 'messenger/_base_front.html.twig' %}
+
+{% block title %}Chat avec {{ conversation.medecin.username }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .chat-container {
+            height: calc(100vh - 160px);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            background-color: #f0f2f5;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e4e6eb;
+            margin-top: 110px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .chat-container, .chat-container * { visibility: visible; }
+            .chat-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto !important;
+                border: none;
+                box-shadow: none;
+            }
+            .chat-messages { overflow: visible !important; }
+            .chat-input-area, .btn-group, .btn, .no-print { display: none !important; }
+            .message-bubble {
+                border: 1px solid #ccc;
+                background-color: white !important;
+                color: black !important;
+            }
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #000;
+            }
+        }
+        .print-header { display: none; }
+        
+        .chat-header {
+            background-color: #fff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: #ffffff;
+        }
+        
+        .message-row {
+            display: flex;
+            max-width: 85%;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .message-row.mine {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .message-row.theirs {
+            align-self: flex-start;
+        }
+        
+        .message-bubble {
+            padding: 10px 16px;
+            border-radius: 18px;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .message-row.mine .message-bubble {
+            background-color: #0084ff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-row.theirs .message-bubble {
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-meta {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #65676b;
+        }
+        
+        .message-row.mine .message-meta {
+            justify-content: flex-end;
+        }
+
+        .message-actions {
+            display: inline-flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .chat-input-area {
+            background-color: #fff;
+            padding: 15px;
+            border-top: 1px solid #e4e6eb;
+        }
+        
+        .input-pill {
+            border-radius: 24px;
+            background-color: #f0f2f5;
+            border: 1px solid transparent;
+            padding: 12px 20px;
+            resize: none;
+            overflow-y: hidden;
+            min-height: 48px;
+            max-height: 120px;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        
+        .input-pill:focus {
+            background-color: #fff;
+            border-color: #0084ff;
+            box-shadow: 0 0 0 2px rgba(0,132,255,0.1); 
+            outline: none;
+        }
+
+        .btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        
+        .btn-circle:hover {
+            background-color: #e4e6eb;
+        }
+        
+        .btn-send {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0084ff;
+            color: white;
+            border: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-send:hover {
+            background-color: #0077e6;
+            transform: scale(1.05);
+        }
+        .btn-send:disabled {
+            background-color: #e4e6eb;
+            color: #b0b3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #65676b;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .message-attachment img {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .file-attachment {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.2s;
+        }
+        
+        .message-row.mine .file-attachment {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        
+        .message-row.theirs .file-attachment {
+            background: #ffffff;
+            color: #2c3e50;
+            border: 1px solid #dee2e6;
+        }
+        
+        .file-attachment:hover {
+            background: rgba(255,255,255,0.3);
+            text-decoration: none;
+        }
+
+        #attachment-preview {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-status {
+            width: 10px;
+            height: 10px;
+            background-color: #31a24c;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/realtime-messenger.js') }}?v={{ 'now'|date('U') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.querySelector('[data-message-search]');
+            if (searchInput) {
+                var timer;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(timer);
+                    timer = setTimeout(function() {
+                        var form = searchInput.closest('form');
+                        if (form) {
+                            form.submit();
+                        }
+                    }, 300);
+                });
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="chat-container">
+        <!-- Print Header -->
+        <div class="print-header">
+            <h3>Rapport de Conversation</h3>
+            <p><strong>Médecin :</strong> {{ conversation.medecin.username }} | <strong>Date :</strong> {{ 'now'|date('d/m/Y') }}</p>
+        </div>
+
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="d-flex align-items-center">
+                <a href="{{ path('front_messenger_index') }}" class="btn btn-sm btn-outline-secondary me-3 border-0">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                </a>
+                
+                <div class="position-relative me-3">
+                    <div class="avatar-circle">
+                        {{ conversation.medecin.username|first|upper }}
+                    </div>
+                    <div class="user-status"></div>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">Dr. {{ conversation.medecin.username }}</h6>
+                    <small class="text-muted">{{ conversation.type|default('Discussion') }}</small>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center flex-wrap gap-2 no-print">
+                <form method="get" action="{{ path('front_messenger_show', {id: conversation.id}) }}" class="d-flex align-items-center">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="search" name="searchMsg" value="{{ searchMsg|default('') }}" class="form-control" placeholder="Rechercher..." data-message-search>
+                    </div>
+                </form>
+                <div class="btn-group">
+                    {% if prevConv %}
+                        <a href="{{ path('front_messenger_show', {id: prevConv.id}) }}" class="btn btn-circle text-secondary" title="Précédent">
+                            <i class="bi bi-chevron-up"></i>
+                        </a>
+                    {% else %}
+                        <button class="btn btn-circle text-muted" disabled><i class="bi bi-chevron-up"></i></button>
+                    {% endif %}
+                    
+                    {% if nextConv %}
+                        <a href="{{ path('front_messenger_show', {id: nextConv.id}) }}" class="btn btn-circle text-secondary" title="Suivant">
+                            <i class="bi bi-chevron-down"></i>
+                        </a>
+                    {% else %}
+                        <button class="btn btn-circle text-muted" disabled><i class="bi bi-chevron-down"></i></button>
+                    {% endif %}
+                </div>
+                <a href="{{ path('front_messenger_meet', {id: conversation.id}) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-camera-video me-1"></i> Démarrer visio
+                </a>
+                <a href="{{ path('front_messenger_export_pdf', {id: conversation.id}) }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-file-pdf me-1"></i> Exporter PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="messages-container" 
+             data-conversation-id="{{ conversation.id }}"
+             data-user-id="{{ viewer.id }}"
+             data-base-url="{{ path('front_messenger_index')|replace({'/listes': ''}) }}"
+             data-last-update="{{ conversation.updatedAt.timestamp }}">
+             
+            {% for message in messages %}
+                <div class="message-row {{ message.sender == app.user ? 'mine' : 'theirs' }}" data-message-id="{{ message.id }}">
+                    {% if message.sender != app.user %}
+                        <div class="avatar-circle me-2" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                            {{ message.sender.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-flex flex-column {{ message.sender == app.user ? 'align-items-end' : 'align-items-start' }}" style="max-width: 100%;">
+                        <div class="message-bubble">
+                            {# Pièce jointe #}
+                            {% if message.attachment %}
+                                <div class="message-attachment mb-2">
+                                    {% set fileExt = message.attachment|split('.')|last|lower %}
+                                    {% set imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'] %}
+                                    
+                                    {% if fileExt in imageExts %}
+                                        <div class="position-relative d-inline-block">
+                                            <a href="{{ asset('uploads/attachments/' ~ message.attachment) }}" target="_blank">
+                                                <img src="{{ asset('uploads/attachments/' ~ message.attachment) }}" alt="Pièce jointe" class="img-fluid rounded border" style="max-width: 200px; max-height: 200px;">
+                                            </a>
+                                            <a href="{{ asset('uploads/attachments/' ~ message.attachment) }}" download class="btn btn-sm btn-light position-absolute bottom-0 end-0 m-1 opacity-75">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <a href="{{ asset('uploads/attachments/' ~ message.attachment) }}" target="_blank" class="file-attachment">
+                                            <i class="bi bi-file-earmark-text fs-4 me-2"></i>
+                                            <div class="text-start">
+                                                <div class="small fw-bold">{{ message.attachment }}</div>
+                                                <small>Cliquer pour télécharger</small>
+                                            </div>
+                                            <i class="bi bi-download ms-3"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {# Contenu du message #}
+                            {% if message.content %}
+                                <div class="message-text">
+                                    {{ message.content|nl2br }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="message-meta">
+                            <span>{{ message.createdAt|date('H:i') }}</span>
+                            {% if message.sender == app.user %}
+                                <div class="message-actions bg-white shadow-sm border px-2 py-1 rounded ms-2 no-print">
+                                    <a href="{{ path('front_messenger_message_edit', {id: message.id}) }}" class="text-primary text-decoration-none me-2" title="Modifier">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a href="{{ path('front_messenger_message_delete', {id: message.id}) }}" class="text-danger text-decoration-none" title="Supprimer" onclick="return confirm('Supprimer ce message ?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center text-muted m-auto opacity-50">
+                    <i class="bi bi-chat-heart display-1"></i>
+                    <p class="mt-3">Aucun message. Commencez la conversation !</p>
+                </div>
+            {% endfor %}
+            
+            <!-- Typing Indicator -->
+            <div id="typing-indicator" style="display: none;" class="align-self-start">
+                <div class="message-bubble" style="background-color: #f0f2f5; color: #65676b;">
+                    <span class="spinner-grow spinner-grow-sm me-1" style="width: 0.5rem; height: 0.5rem;"></span>
+                    <span class="spinner-grow spinner-grow-sm me-1" style="width: 0.5rem; height: 0.5rem; animation-delay: 0.1s;"></span>
+                    <span class="spinner-grow spinner-grow-sm" style="width: 0.5rem; height: 0.5rem; animation-delay: 0.2s;"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area no-print">
+            {{ form_start(form, {
+                'action': path('front_messenger_message_add', {id: conversation.id}),
+                'attr': {
+                    'id': 'message-form',
+                    'enctype': 'multipart/form-data',
+                    'novalidate': 'novalidate',
+                    'class': 'message-form'
+                }
+            }) }}
+                
+                <div class="d-flex align-items-end gap-2">
+                    <!-- Bouton émoji -->
+                    <button type="button" class="btn btn-light btn-circle border shadow-sm" id="emoji-trigger" title="Insérer un émoji">
+                        <i class="bi bi-emoji-smile-fill text-primary"></i>
+                    </button>
+                    
+                    <!-- Bouton pièce jointe -->
+                    <button type="button" class="btn btn-light btn-circle border shadow-sm" id="attachment-btn" title="Joindre un fichier">
+                        <i class="bi bi-paperclip text-secondary"></i>
+                    </button>
+                    
+                    <!-- Champ fichier (caché) -->
+                    <div style="display: none;">
+                        {{ form_widget(form.attachment, {
+                            'id': 'message_attachment',
+                            'attr': {
+                                'accept': 'image/*,.pdf,.doc,.docx,.xls,.xlsx'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Zone de saisie avec prévisualisation -->
+                    <div class="flex-grow-1 position-relative">
+                        <!-- Prévisualisation de la pièce jointe -->
+                        <div id="attachment-preview" class="d-none p-2 bg-light rounded border mb-2">
+                            <div class="d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-file-earmark me-2 text-primary"></i>
+                                    <span id="attachment-name" class="fw-medium"></span>
+                                </div>
+                                <button type="button" class="btn-close btn-sm" id="clear-attachment" aria-label="Remove"></button>
+                            </div>
+                        </div>
+                        
+                        <!-- Champ de texte -->
+                        {{ form_widget(form.content, {
+                            'id': 'message_content',
+                            'attr': {
+                                'class': 'form-control input-pill',
+                                'placeholder': 'Écrivez votre message... (optionnel si pièce jointe)',
+                                'rows': 1
+                            }
+                        }) }}
+                        
+                        {% if form.content.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.content) }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Bouton d'envoi -->
+                    <button type="submit" class="btn btn-send shadow-sm" id="submit-btn">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<!-- Emoji Picker simplifié -->
+<script>
+    (function() {
+        const trigger = document.getElementById('emoji-trigger');
+        const textarea = document.getElementById('message_content');
+        
+        if (trigger && textarea) {
+            const emojis = ['😊', '😂', '❤️', '👍', '😢', '😮', '🔥', '🎉', '👏', '🙏'];
+            
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+                textarea.focus();
+                textarea.dispatchEvent(new Event('input'));
+            });
+        }
+    })();
+</script>
+{% endblock %}

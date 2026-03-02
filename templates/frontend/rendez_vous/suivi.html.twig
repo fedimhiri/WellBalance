@@ -1,0 +1,139 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Suivi de mes demandes{% endblock %}
+
+{% block body %}
+    <section class="section py-5">
+        <div class="container">
+            {% set currentSearch = currentSearch|default('') %}
+            {% set currentSort = currentSort|default('date') %}
+            {% set currentDir = currentDir|default('asc') %}
+            {% set currentStatut = currentStatut|default('') %}
+            {% set currentType = currentType|default('') %}
+
+            <div id="rdv-patient-config"
+                 data-endpoint="{{ path('rendez_vous_suivi') }}"
+                 data-sort="{{ currentSort }}"
+                 data-dir="{{ currentDir }}"
+                 data-statut="{{ currentStatut }}"
+                 data-type="{{ currentType }}">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0">Suivi de mes demandes</h1>
+                <a href="{{ path('rendez_vous_new') }}" class="btn btn-primary">Nouvelle demande</a>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+            {% if accessError is not empty %}
+                <div class="alert alert-warning">{{ accessError }}</div>
+            {% endif %}
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form method="get" action="{{ path('rendez_vous_suivi') }}" class="row g-2" novalidate>
+                        <div class="col-md-4">
+                            <input
+                                id="rdv-patient-search"
+                                type="text"
+                                class="form-control"
+                                name="q"
+                                value="{{ currentSearch }}"
+                                placeholder="Rechercher par titre, medecin, statut..."
+                            >
+                        </div>
+                        <div class="col-md-2">
+                            <select id="rdv-patient-statut" class="form-select" name="statut">
+                                <option value="">Statut: Tous</option>
+                                <option value="EN_COURS" {% if currentStatut == 'EN_COURS' %}selected{% endif %}>EN_COURS</option>
+                                <option value="ACCEPTE" {% if currentStatut == 'ACCEPTE' %}selected{% endif %}>ACCEPTE</option>
+                                <option value="REFUSE" {% if currentStatut == 'REFUSE' %}selected{% endif %}>REFUSE</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="rdv-patient-type" class="form-select" name="type">
+                                <option value="">Type: Tous</option>
+                                {% for type in types|default([]) %}
+                                    <option value="{{ type.id }}" {% if currentType is same as(type.id) %}selected{% endif %}>{{ type.nomType }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input id="rdv-patient-sort-input" type="hidden" name="sort" value="{{ currentSort }}">
+                        <input id="rdv-patient-dir-input" type="hidden" name="dir" value="{{ currentDir }}">
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-outline-primary flex-fill">Rechercher</button>
+                            <a href="{{ path('rendez_vous_suivi') }}" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <a href="{{ path('rendez_vous_suivi', { q: currentSearch, statut: currentStatut, type: currentType, sort: 'id', dir: (currentSort == 'id' and currentDir == 'asc') ? 'desc' : 'asc' }) }}" class="text-decoration-none text-dark">
+                                        ID{% if currentSort == 'id' %} {{ currentDir == 'asc' ? '?' : '?' }}{% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="{{ path('rendez_vous_suivi', { q: currentSearch, statut: currentStatut, type: currentType, sort: 'titre', dir: (currentSort == 'titre' and currentDir == 'asc') ? 'desc' : 'asc' }) }}" class="text-decoration-none text-dark">
+                                        Titre{% if currentSort == 'titre' %} {{ currentDir == 'asc' ? '?' : '?' }}{% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="{{ path('rendez_vous_suivi', { q: currentSearch, statut: currentStatut, type: currentType, sort: 'date', dir: (currentSort == 'date' and currentDir == 'asc') ? 'desc' : 'asc' }) }}" class="text-decoration-none text-dark">
+                                        Date{% if currentSort == 'date' %} {{ currentDir == 'asc' ? '?' : '?' }}{% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="{{ path('rendez_vous_suivi', { q: currentSearch, statut: currentStatut, type: currentType, sort: 'heure', dir: (currentSort == 'heure' and currentDir == 'asc') ? 'desc' : 'asc' }) }}" class="text-decoration-none text-dark">
+                                        Heure{% if currentSort == 'heure' %} {{ currentDir == 'asc' ? '?' : '?' }}{% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="{{ path('rendez_vous_suivi', { q: currentSearch, statut: currentStatut, type: currentType, sort: 'medecin', dir: (currentSort == 'medecin' and currentDir == 'asc') ? 'desc' : 'asc' }) }}" class="text-decoration-none text-dark">
+                                        Medecin{% if currentSort == 'medecin' %} {{ currentDir == 'asc' ? '?' : '?' }}{% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="{{ path('rendez_vous_suivi', { q: currentSearch, statut: currentStatut, type: currentType, sort: 'statut', dir: (currentSort == 'statut' and currentDir == 'asc') ? 'desc' : 'asc' }) }}" class="text-decoration-none text-dark">
+                                        Statut{% if currentSort == 'statut' %} {{ currentDir == 'asc' ? '?' : '?' }}{% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="rdv-patient-tbody">
+                            {% for rdv in rendezVousList %}
+                                <tr>
+                                    <td>{{ rdv.id }}</td>
+                                    <td>{{ rdv.titre }}</td>
+                                    <td>{{ rdv.dateRdv ? rdv.dateRdv|date('d/m/Y') : '—' }}</td>
+                                    <td>{{ rdv.heureRdv ? rdv.heureRdv|date('H:i') : '—' }}</td>
+                                    <td>{{ rdv.medecin ? rdv.medecin.displayName : '—' }}</td>
+                                    <td>{% include 'rendez_vous/_status_badge.html.twig' with { statut: rdv.statut } only %}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6">Aucune demande de rendez-vous.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/rdv-patient-list.js') }}"></script>
+{% endblock %}

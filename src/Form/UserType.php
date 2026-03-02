@@ -35,6 +35,10 @@ class UserType extends AbstractType
                 'choices' => [
                     'Utilisateur' => 'ROLE_USER',
                     'Administrateur' => 'ROLE_ADMIN',
+                    'Médecin' => 'ROLE_MEDECIN',
+                    'Nutritionniste' => 'ROLE_NUTRITIONNISTE',
+                    'Coach Sportif' => 'ROLE_COACHSPORTIF',
+                    'Patient' => 'ROLE_PATIENT',
                 ],
                 'expanded' => false,
                 'multiple' => true,

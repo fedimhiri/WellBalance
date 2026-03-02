@@ -1,26 +1,63 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-# See also https://symfony.com/doc/current/service_container/import.html
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.banned_words:
+        - insultes
+        - grosmot
+        - interdit
+        - esprit
+        - violence
+    app.message_encryption_enabled: true
+    app.jitsi_domain: 'meet.jit.si'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true      # Injection automatique des dépendances
+        autoconfigure: true # Enregistre automatiquement commandes, events, etc.
+        bind:
+            $projectDir: '%kernel.project_dir%'
+            $encryptionKey: '%env(string:MESSAGE_ENCRYPTION_KEY)%'
+            $encryptionEnabled: '%app.message_encryption_enabled%'
+            $jitsiDomain: '%app.jitsi_domain%'
+            $hmacSecret: '%env(string:MESSAGE_ENCRYPTION_KEY)%'
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    # Rend toutes les classes du dossier src/ disponibles comme services
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\EventListener\SessionIdleListener:
+    # Service personnalisé (si nécessaire)
+    App\Security\LogoutSuccessHandler:
+        autowire: true
+        autoconfigure: true
+
+    App\Security\AppAuthenticator:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $recaptchaSecret: '%env(string:RECAPTCHA_SECRET_KEY)%'
+
+    App\Security\GoogleAuthenticator:
+        autowire: true
+        autoconfigure: true
+
+    App\Service\ContentModerationService:
+        arguments:
+            $bannedWords: '%app.banned_words%'
+
+    App\EventListener\MessageContentSubscriber:
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: doctrine.event_subscriber }
+
+    App\Service\SmsService:
+        arguments:
+            $twilioAccountSid: '%env(string:TWILIO_ACCOUNT_SID)%'
+            $twilioAuthToken: '%env(string:TWILIO_AUTH_TOKEN)%'
+            $twilioPhone: '%env(string:TWILIO_PHONE)%'
+
+    App\Service\EmailService:
+        arguments:
+            $senderEmail: '%env(string:MAILER_FROM)%'

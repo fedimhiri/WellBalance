@@ -1,0 +1,44 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}{{ is_edit ? 'Modifier' : 'Nouvelle' }} Catégorie{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bx bx-{{ is_edit ? 'edit' : 'plus-circle' }} me-2"></i>
+            {{ is_edit ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}
+        </h4>
+        <a href="{{ path('admin_categorie_document_index') }}" class="btn btn-outline-secondary">
+            <i class="bx bx-arrow-back me-1"></i> Retour
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form) }}
+
+            <div class="mb-3">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom) }}
+                {{ form_errors(form.nom) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bx bx-save me-1"></i> {{ is_edit ? 'Enregistrer' : 'Créer' }}
+                </button>
+                <a href="{{ path('admin_categorie_document_index') }}" class="btn btn-outline-secondary ms-2">Annuler</a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

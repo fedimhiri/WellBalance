@@ -1,0 +1,14 @@
+Bonjour {{ patient.displayName|default(patient.email) }},
+
+Votre rendez-vous est refuse.
+
+RDV: {{ rdv.titre }}
+Date/Heure: {{ rdv.dateRdv|date('Y-m-d') }} a {{ rdv.heureRdv|date('H:i') }}
+Type: {{ rdv.typeRendezVous ? rdv.typeRendezVous.nomType : '—' }}
+Medecin: {{ medecinNomComplet }}
+Statut: {{ statusLabel }}
+{% if message is not empty %}
+Message: {{ message }}
+{% endif %}
+
+WellBalance

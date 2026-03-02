@@ -1,0 +1,28 @@
+parameters:
+    level: 5
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
+    ignoreErrors:
+        - '#Property .* id .* is never assigned int#'
+        - '#Call to function is_string.* will always evaluate to true#'
+        - '#Strict comparison .* will always evaluate to true#'
+        - '#Result of && is always true#'
+        - '#Call to function method_exists.* will always evaluate to true#'
+        - '#Variable .* on left side of .* always exists#'
+        - '#Offset .* does not exist on array#'
+        - '#Instanceof .* will always evaluate to true#'
+        - '#Call to an undefined method Doctrine.*getEntityManager#'
+        - '#Call to an undefined method.*UserInterface.*get#'
+        - '#Parameter.*DateTimeImmutable.*expects DateTime#'
+        - '#Property .* is never read, only written#'
+        - '#Method.*invoked with.*parameters.*required#'
+        - '#Using nullsafe method call on non-nullable type#'
+        - '#expects App\\Entity\\User#'
+        - '#array_values#'
+        - '#Offset .* on array.* in .* does not exist#'
+        - '#Offset .* on left side of .* always exists#'
+    reportUnmatchedIgnoredErrors: false

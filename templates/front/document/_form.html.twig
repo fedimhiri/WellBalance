@@ -1,0 +1,42 @@
+{#
+    Reusable document form partial
+    Usage: {% include 'front/document/_form.html.twig' with { form: form } %}
+#}
+
+{{ form_start(form, { 
+    attr: { 
+        enctype: 'multipart/form-data',
+        class: 'document-form'
+    }
+}) }}
+
+<div class="mb-3">
+    {{ form_label(form.titre, 'Titre du document', { label_attr: { class: 'form-label' } }) }}
+    {{ form_widget(form.titre, { attr: { class: 'form-control' } }) }}
+    {{ form_errors(form.titre, { attr: { class: 'invalid-feedback d-block' } }) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.typeDocument, 'Type de document', { label_attr: { class: 'form-label' } }) }}
+    {{ form_widget(form.typeDocument, { attr: { class: 'form-select' } }) }}
+    {{ form_errors(form.typeDocument, { attr: { class: 'invalid-feedback d-block' } }) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.categorie, 'Catégorie (optionnel)', { label_attr: { class: 'form-label' } }) }}
+    {{ form_widget(form.categorie, { attr: { class: 'form-select' } }) }}
+    {{ form_errors(form.categorie, { attr: { class: 'invalid-feedback d-block' } }) }}
+</div>
+
+{% if form.fichier is defined %}
+<div class="mb-3">
+    {{ form_label(form.fichier, 'Fichier PDF', { label_attr: { class: 'form-label' } }) }}
+    {{ form_widget(form.fichier, { attr: { class: 'form-control', accept: '.pdf' } }) }}
+    {{ form_errors(form.fichier, { attr: { class: 'invalid-feedback d-block' } }) }}
+    <div class="form-text">Formats acceptés: PDF (max 5 Mo)</div>
+</div>
+{% endif %}
+
+{{ form_rest(form) }}
+
+{{ form_end(form) }}

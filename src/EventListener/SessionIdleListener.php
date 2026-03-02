@@ -8,7 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SessionIdleListener
 {
-    private int $maxIdleTime = 100000; 
+    private int $maxIdleTime = 10; 
 
     public function __construct(
         private RouterInterface $router

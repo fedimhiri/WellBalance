@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport Statistiques RDV</title>
+    <style>
+        @page {
+            margin: 22px;
+        }
+        body {
+            font-family: "DejaVu Sans", sans-serif;
+            font-size: 12px;
+            color: #1f2937;
+            line-height: 1.4;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+        .subtitle {
+            margin-bottom: 14px;
+            color: #4b5563;
+        }
+        .card {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 14px 0 8px 0;
+            color: #111827;
+        }
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+        .kpi-table td {
+            width: 50%;
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            vertical-align: top;
+        }
+        .kpi-label {
+            display: block;
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        .kpi-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111827;
+        }
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+        table.data th,
+        table.data td {
+            border: 1px solid #d1d5db;
+            padding: 7px 8px;
+            text-align: left;
+        }
+        table.data th {
+            background: #f3f4f6;
+            color: #111827;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .muted {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Rapport Statistiques RDV</div>
+    <div class="subtitle">
+        Medecin ID: <strong>{{ medecinId }}</strong><br>
+        Periode: <strong>{{ from|date('Y-m-d') }}</strong> au <strong>{{ to|date('Y-m-d') }}</strong><br>
+        Date de generation: <strong>{{ generatedAt|date('Y-m-d H:i:s') }}</strong>
+    </div>
+
+    <div class="card">
+        <div class="section-title" style="margin-top:0;">KPI principaux</div>
+        <table class="kpi-table">
+            <tr>
+                <td>
+                    <span class="kpi-label">Total rendez-vous</span>
+                    <span class="kpi-value">{{ stats.total }}</span>
+                </td>
+                <td>
+                    <span class="kpi-label">Taux d'annulation</span>
+                    <span class="kpi-value">{{ stats.tauxAnnulation }}%</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="kpi-label">Taux de confirmation</span>
+                    <span class="kpi-value">{{ stats.tauxConfirmation }}%</span>
+                </td>
+                <td>
+                    <span class="kpi-label">Statuts detectes</span>
+                    <span class="kpi-value">{{ stats.byStatus|length }}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section-title">Table RDV par statut</div>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Statut</th>
+                <th class="text-right">Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for statut, count in stats.byStatus %}
+                <tr>
+                    <td>{{ statut }}</td>
+                    <td class="text-right">{{ count }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2" class="muted">Aucune donnee.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Table RDV par type</div>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Type rendez-vous ID</th>
+                <th class="text-right">Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for typeId, count in stats.byType %}
+                <tr>
+                    <td>{{ typeId }}</td>
+                    <td class="text-right">{{ count }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2" class="muted">Aucune donnee.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Table RDV par jour</div>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th class="text-right">Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dateKey, count in stats.byDay %}
+                <tr>
+                    <td>{{ dateKey }}</td>
+                    <td class="text-right">{{ count }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2" class="muted">Aucune donnee.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

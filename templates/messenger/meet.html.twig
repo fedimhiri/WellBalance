@@ -1,0 +1,53 @@
+{% extends base_template %}
+
+{% block title %}Visio{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body { overflow: hidden !important; }
+        #header, footer, .scroll-top, #preloader, .header { display: none !important; }
+        #layout-menu, .layout-navbar { display: none !important; }
+        .layout-page, .layout-wrapper, .layout-container, .content-wrapper, main, .main { padding: 0 !important; margin: 0 !important; height: 100% !important; min-height: 100% !important; }
+        .container-xxl, .container-fluid { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+        .meet-page { height: 100vh; display: flex; flex-direction: column; padding: 15px !important; margin: 0; box-sizing: border-box; }
+        .meet-toolbar { flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+        .meet-container { flex: 1 1 auto; position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #212529; }
+        #jitsi { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-3 meet-page">
+    <div class="meet-toolbar">
+        <div>
+            <h4 class="mb-0">Visio</h4>
+            <small class="text-muted">Salle {{ room }}</small>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">Retour</a>
+        </div>
+    </div>
+    <div class="meet-container border rounded shadow-sm bg-dark" id="jitsi"></div>
+</div>
+<script src="https://{{ domain }}/external_api.js"></script>
+<script>
+    (function() {
+        var domain = '{{ domain }}';
+        var options = {
+            roomName: '{{ room }}',
+            parentNode: document.querySelector('#jitsi'),
+            userInfo: { displayName: '{{ displayName|e('js') }}' },
+            configOverwrite: {
+                prejoinPageEnabled: false,
+                disableDeepLinking: true
+            },
+            interfaceConfigOverwrite: {
+                TILE_VIEW_MAX_COLUMNS: 4
+            }
+        };
+        var api = new JitsiMeetExternalAPI(domain, options);
+    })();
+</script>
+{% endblock %}

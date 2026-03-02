@@ -1,0 +1,324 @@
+{% extends 'backend/baseend.html.twig' %}
+{% block title %}Modifier Repas{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Modifier Repas #{{ repa.id }}</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">
+                <a href="{{ path('admin_repas_index') }}" class="text-muted">Nutrition / Repas</a>
+                / #{{ repa.id }} / Modifier
+            </h6>
+        </nav>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_repas_show', {'id': repa.id}) }}" class="btn btn-outline-primary">
+            <i class="bx bx-show me-2"></i>Voir
+        </a>
+        <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">
+            <i class="bx bx-arrow-back me-2"></i>Retour
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+
+                <div class="alert alert-success border d-flex flex-column gap-2 mb-3">
+                    <div class="fw-bold">
+                        <i class="bx bx-brain me-2"></i>Recommandations (IA) selon objectif
+                    </div>
+                    <div class="small text-muted">
+                        Objectif : <strong>{{ repa.planNutrition ? repa.planNutrition.objectif : 'N/A' }}</strong>
+                    </div>
+
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label">Recherche</label>
+                            <input type="text" id="recoQuery" class="form-control" placeholder="Ex: lait, thon, yaourt...">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" id="btnReco" class="btn btn-dark w-100">
+                                <i class="bx bx-brain me-2"></i>Reco IA
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="recoLoading" class="small text-muted d-none">
+                        <i class="bx bx-loader-alt bx-spin me-2"></i>Calcul des scores...
+                    </div>
+
+                    <div id="recoResults" class="list-group d-none"></div>
+                </div>
+
+                <div class="alert alert-light border d-flex flex-column gap-2 mb-3">
+                    <div class="fw-bold"><i class="bx bx-search me-2"></i>Recherche produit (objectif)</div>
+
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label">Nom du produit</label>
+                            <input type="text" id="searchName" class="form-control" placeholder="Ex: Nutella, lait, yaourt...">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" id="btnSearchName" class="btn btn-outline-dark w-100">
+                                <i class="bx bx-search me-2"></i>Rechercher (objectif)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="searchLoading" class="small text-muted d-none">
+                        <i class="bx bx-loader-alt bx-spin me-2"></i>Recherche + tri...
+                    </div>
+
+                    <div id="searchResults" class="list-group d-none"></div>
+                </div>
+
+                <div class="alert alert-info d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <div class="fw-bold"><i class="bx bx-cloud-download me-2"></i>Remplir automatiquement via code-barres</div>
+                        <div class="small text-muted">Saisis un code-barres puis clique sur “Remplir depuis API”.</div>
+                    </div>
+                    <button type="button" id="btnFillApi" class="btn btn-outline-primary">
+                        <i class="bx bx-search me-2"></i>Remplir depuis API
+                    </button>
+                </div>
+
+                <div id="apiResult" class="alert d-none"></div>
+
+                {{ form_start(form) }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">{{ form_row(form.typeRepas) }}</div>
+                    <div class="col-md-6 mb-3">{{ form_row(form.barcode) }}</div>
+                    <div class="col-md-6 mb-3">{{ form_row(form.portionSize) }}</div>
+                    <div class="col-md-6 mb-3">{{ form_row(form.calories) }}</div>
+                    <div class="col-md-4 mb-3">{{ form_row(form.proteines) }}</div>
+                    <div class="col-md-4 mb-3">{{ form_row(form.glucides) }}</div>
+                    <div class="col-md-4 mb-3">{{ form_row(form.lipides) }}</div>
+                    <div class="col-md-6 mb-3">{{ form_row(form.dateRepas) }}</div>
+                    <div class="col-md-6 mb-3">{{ form_row(form.planNutrition) }}</div>
+                    <div class="col-12 mb-3">{{ form_row(form.description) }}</div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-primary"><i class="bx bx-save me-2"></i>Enregistrer</button>
+                    <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">Annuler</a>
+                </div>
+                {{ form_end(form) }}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header"><h6 class="mb-0"><i class="bx bx-info-circle me-2"></i>Informations</h6></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted small">ID :</span>
+                    <p class="fw-medium mb-0">#{{ repa.id }}</p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small">Date repas :</span>
+                    <p class="fw-medium mb-0">{{ repa.dateRepas ? repa.dateRepas|date('d/m/Y H:i') : 'Non défini' }}</p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small">Plan associé :</span>
+                    <p class="fw-medium mb-0">
+                        {% if repa.planNutrition %}
+                            <a href="{{ path('admin_plan_nutrition_show', {'id': repa.planNutrition.id}) }}">{{ repa.planNutrition.objectif }}</a>
+                        {% else %}
+                            <span class="text-muted">Aucun</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const apiBox = document.getElementById('apiResult');
+    const btnFill = document.getElementById('btnFillApi');
+
+    const barcodeInput = document.querySelector('#{{ form.barcode.vars.id }}');
+    const caloriesInput = document.querySelector('#{{ form.calories.vars.id }}');
+    const pInput = document.querySelector('#{{ form.proteines.vars.id }}');
+    const cInput = document.querySelector('#{{ form.glucides.vars.id }}');
+    const fInput = document.querySelector('#{{ form.lipides.vars.id }}');
+    const portionInput = document.querySelector('#{{ form.portionSize.vars.id }}');
+
+    const planId = {{ repa.planNutrition ? repa.planNutrition.id : 0 }};
+
+    const recoQuery = document.getElementById('recoQuery');
+    const btnReco = document.getElementById('btnReco');
+    const recoResults = document.getElementById('recoResults');
+    const recoLoading = document.getElementById('recoLoading');
+
+    const searchName = document.getElementById('searchName');
+    const btnSearchName = document.getElementById('btnSearchName');
+    const searchResults = document.getElementById('searchResults');
+    const searchLoading = document.getElementById('searchLoading');
+
+    function esc(s){
+        return (s ?? '').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function showApiMessage(type, msg) {
+        apiBox.classList.remove('d-none', 'alert-success', 'alert-warning', 'alert-danger', 'alert-info');
+        apiBox.classList.add('alert-' + type);
+        apiBox.innerHTML = msg;
+        apiBox.classList.remove('d-none');
+    }
+
+    function fillFromReco(it) {
+        if ((it.code || it.barcode) && barcodeInput) barcodeInput.value = it.code || it.barcode;
+        if (it.calories != null && caloriesInput) caloriesInput.value = Math.round(it.calories);
+        if (it.protein != null && pInput) pInput.value = it.protein;
+        if (it.carbs != null && cInput) cInput.value = it.carbs;
+        if (it.fat != null && fInput) fInput.value = it.fat;
+        if (it.serving_size && portionInput && !portionInput.value) portionInput.value = it.serving_size;
+    }
+
+    function renderRecoList(container, items, emptyText) {
+        container.classList.remove('d-none');
+        container.innerHTML = '';
+
+        if (!items.length) {
+            container.innerHTML = `<div class="list-group-item text-muted">${esc(emptyText)}</div>`;
+            return;
+        }
+
+        items.forEach((it) => {
+            const label = it.label || 'Produit';
+            const brand = it.brand ? ` <span class="text-muted small">(${esc(it.brand)})</span>` : '';
+            const serving = it.serving_size ? `<div class="small text-muted">Portion: ${esc(it.serving_size)}</div>` : '';
+            const kcal = (it.calories ?? '-');
+            const prot = (it.protein ?? '-');
+            const carbs = (it.carbs ?? '-');
+            const fat = (it.fat ?? '-');
+            const score = Math.round(it.score ?? 0);
+
+            const row = document.createElement('button');
+            row.type = 'button';
+            row.className = 'list-group-item list-group-item-action';
+            row.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="fw-bold">${esc(label)}${brand}</div>
+                        ${serving}
+                        <div class="small text-muted">Code: <code>${esc(it.code || it.barcode || '')}</code></div>
+                        <div class="small">
+                            kcal: <strong>${esc(kcal)}</strong> • prot: <strong>${esc(prot)}</strong> • gluc: <strong>${esc(carbs)}</strong> • lip: <strong>${esc(fat)}</strong>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success mb-2">Score ${score}</span><br>
+                        <span class="badge bg-primary">Choisir</span>
+                    </div>
+                </div>
+            `;
+
+            row.addEventListener('click', () => {
+                fillFromReco(it);
+                showApiMessage('success', `✅ Produit recommandé choisi : <strong>${esc(label)}</strong> (Score ${score})`);
+            });
+
+            container.appendChild(row);
+        });
+    }
+
+    async function fetchReco(q) {
+        if (!planId) throw new Error('Plan introuvable pour ce repas.');
+        const res = await fetch(`/admin/nutrition/plans/${planId}/produits/reco?q=${encodeURIComponent(q)}`);
+        if (!res.ok) {
+            const txt = await res.text();
+            throw new Error('HTTP ' + res.status + ' ' + txt.slice(0,120));
+        }
+        return await res.json();
+    }
+
+    async function runRecoIA() {
+        const q = (recoQuery?.value || '').trim();
+        if (!q) { alert('Tape un mot clé.'); return; }
+
+        btnReco.disabled = true;
+        recoLoading.classList.remove('d-none');
+        recoResults.classList.add('d-none');
+        recoResults.innerHTML = '';
+
+        try {
+            const data = await fetchReco(q);
+            renderRecoList(recoResults, data.items || [], 'Aucune recommandation');
+        } catch (e) {
+            recoResults.classList.remove('d-none');
+            recoResults.innerHTML = `<div class="list-group-item text-danger">Erreur: ${esc(e.message)}</div>`;
+        } finally {
+            btnReco.disabled = false;
+            recoLoading.classList.add('d-none');
+        }
+    }
+
+    btnReco.addEventListener('click', runRecoIA);
+    recoQuery.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); runRecoIA(); } });
+
+    btnSearchName.addEventListener('click', async () => {
+        const q = (searchName?.value || '').trim();
+        if (!q) { alert('Tape un nom de produit.'); return; }
+
+        btnSearchName.disabled = true;
+        searchLoading.classList.remove('d-none');
+        searchResults.classList.add('d-none');
+        searchResults.innerHTML = '';
+
+        try {
+            const data = await fetchReco(q);
+            renderRecoList(searchResults, data.items || [], 'Aucun résultat recommandé');
+        } catch (e) {
+            searchResults.classList.remove('d-none');
+            searchResults.innerHTML = `<div class="list-group-item text-danger">Erreur: ${esc(e.message)}</div>`;
+        } finally {
+            btnSearchName.disabled = false;
+            searchLoading.classList.add('d-none');
+        }
+    });
+
+    // Remplir par barcode (on garde)
+    btnFill.addEventListener('click', async () => {
+        const code = (barcodeInput?.value || '').trim();
+        if (!code) { showApiMessage('warning', '⚠️ Veuillez saisir un code-barres.'); return; }
+
+        btnFill.disabled = true;
+        btnFill.innerHTML = '<i class="bx bx-loader-alt bx-spin me-2"></i>Chargement...';
+
+        try {
+            const res = await fetch(`/api/nutrition/barcode/${encodeURIComponent(code)}`);
+            const data = await res.json();
+
+            if (!data.found || !data.item) { showApiMessage('danger', "❌ Produit introuvable."); return; }
+
+            const it = data.item;
+            if (it.barcode && barcodeInput) barcodeInput.value = it.barcode;
+            if (it.calories != null && caloriesInput) caloriesInput.value = Math.round(it.calories);
+            if (it.protein != null && pInput) pInput.value = it.protein;
+            if (it.carbs != null && cInput) cInput.value = it.carbs;
+            if (it.fat != null && fInput) fInput.value = it.fat;
+            if (it.serving_size && portionInput && !portionInput.value) portionInput.value = it.serving_size;
+
+            showApiMessage('success', `✅ Données récupérées : <strong>${esc(it.label || 'Produit')}</strong>`);
+        } catch (e) {
+            showApiMessage('danger', '❌ Erreur API.');
+        } finally {
+            btnFill.disabled = false;
+            btnFill.innerHTML = '<i class="bx bx-search me-2"></i>Remplir depuis API';
+        }
+    });
+
+});
+</script>
+{% endblock %}

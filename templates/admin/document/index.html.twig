@@ -1,0 +1,100 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Gestion des documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><i class="bx bx-file me-2"></i>Documents</h4>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_document_stats') }}" class="btn btn-outline-primary">
+                <i class="bx bx-bar-chart-alt-2 me-1"></i> Statistiques
+            </a>
+            <a href="{{ path('admin_document_dashboard') }}" class="btn btn-outline-info">
+                <i class="bx bx-dashboard me-1"></i> Dashboard
+            </a>
+            <a href="{{ path('admin_document_new') }}" class="btn btn-success">
+                <i class="bx bx-plus me-1"></i> Créer un document
+            </a>
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Catégorie</th>
+                        <th>Utilisateur</th>
+                        <th>Type</th>
+                        <th>Réf. assurance</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for document in documents %}
+                        <tr>
+                            <td>{{ document.titre }}</td>
+                            <td>{{ document.categorie ? document.categorie.nom : '—' }}</td>
+                            <td>{{ document.user ? document.user.displayName : '—' }}</td>
+                            <td><span class="badge bg-primary">{{ document.typeDocument }}</span></td>
+                            <td>{{ document.insuranceReference ?? '—' }}</td>
+                            <td>{{ document.dateUpload|date('d/m/Y H:i') }}</td>
+                            <td class="text-end">
+                                <a href="{{ path('admin_document_show', {id: document.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                                    <i class="bx bx-show"></i> View
+                                </a>
+                                <a href="{{ path('admin_document_edit', {id: document.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                    <i class="bx bx-edit"></i> Edit
+                                </a>
+                                <a href="{{ path('admin_document_download', {id: document.id}) }}" class="btn btn-sm btn-secondary" title="Télécharger">
+                                    <i class="bx bx-download"></i> Download
+                                </a>
+                                <form method="post" action="{{ path('admin_document_delete', {id: document.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce document ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_document_' ~ document.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                        <i class="bx bx-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Aucun document.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if total_pages > 1 %}
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{ page <= 1 ? 'disabled' }}">
+                <a class="page-link" href="{{ path('admin_document_index', {page: page - 1}) }}">Précédent</a>
+            </li>
+            {% for p in 1..total_pages %}
+                <li class="page-item {{ p == page ? 'active' }}">
+                    <a class="page-link" href="{{ path('admin_document_index', {page: p}) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+            <li class="page-item {{ page >= total_pages ? 'disabled' }}">
+                <a class="page-link" href="{{ path('admin_document_index', {page: page + 1}) }}">Suivant</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

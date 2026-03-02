@@ -1,6 +1,7 @@
 {# templates/frontend/partials/_header.html.twig #}
+
 <header id="header" class="header fixed-top">
-    
+
     <!-- Top Bar -->
     <div class="topbar d-flex align-items-center dark-background">
         <div class="container d-flex justify-content-center justify-content-md-between">
@@ -12,76 +13,211 @@
                     <span>{{ phone_number|default('+1 5589 55488 55') }}</span>
                 </i>
             </div>
-            <div class="social-links d-none d-md-flex align-items-center">
-                <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-                <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-            </div>
         </div>
-    </div><!-- End Top Bar -->
-    
+    </div>
+
     <!-- Main Header -->
     <div class="branding d-flex align-items-center">
         <div class="container position-relative d-flex align-items-center justify-content-between">
+
             <!-- Logo -->
             <a href="{{ path('app_frontend_vue') }}" class="logo d-flex align-items-center">
                 <h1 class="sitename">{{ site_name|default('Clinique Médicale') }}</h1>
             </a>
-            
+
             <!-- Navigation -->
             <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li><a href="{{ path('app_frontend_vue') }}" class="active">Accueil</a></li>
-                    <li><a href="{{ path('app_frontend_vue') }}">À propos</a></li>
-                    <li><a href="{{ path('app_frontend_vue') }}">Départements</a></li>
-                    <li><a href="{{ path('app_frontend_vue') }}">Services</a></li>
-                    <li><a href="{{ path('app_frontend_vue') }}">Médecins</a></li>
-                    <li class="dropdown">
-                        <a href="#">
-                            <span>Plus</span>
-                            <i class="bi bi-chevron-down toggle-dropdown"></i>
-                        </a>
-                        <ul>
-                            <li><a href="{{ path('app_frontend_vue') }}">Prendre rendez-vous</a></li>
-                            <li><a href="{{ path('app_frontend_vue') }}">Témoignages</a></li>
-                            <li><a href="{{ path('app_frontend_vue') }}">FAQ</a></li>
-                            <li><a href="{{ path('app_frontend_vue') }}">Galerie</a></li>
-                        </ul>
+                <ul class="d-flex align-items-center">
+
+                    <li>
+                        <a href="{{ path('app_frontend_vue') }}">Accueil</a>
                     </li>
-                    <li><a href="{{ path('app_frontend_vue') }}">Contact</a></li>
-                    <li><a href="{{ path('app_login') }}">Se Connecter</a></li>
-                    
-                    
-                    {% if app.user and app.request.attributes.get('_route') not in ['app_login', 'app_register'] %}
 
-    {# Bouton Profil (USER + ADMIN) #}
-    <li class="nav-item ms-3">
-        <a href="{{ path('frontend_profile') }}"
-           class="btn btn-sm btn-outline-success">
-            <i class="bi bi-person-circle me-1"></i>
-            Mon profil
-        </a>
-    </li>
+                    {% if not app.user %}
+                        {# 🔓 NON CONNECTÉ #}
 
-    {# Bouton Admin (ADMIN uniquement) #}
-    {% if is_granted('ROLE_ADMIN') %}
-        <li class="nav-item ms-3">
-            <a href="{{ path('admin_dashboard') }}"
-               class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-speedometer2 me-1"></i>
-                Admin
-            </a>
-        </li>
-    {% endif %}
+                        <li class="ms-3">
+                            <a href="{{ path('app_login') }}"
+                               class="btn btn-sm btn-outline-primary">
+                                Se connecter
+                            </a>
+                        </li>
 
-{% endif %}
+                        <li class="ms-2">
+                            <a href="{{ path('app_register') }}"
+                               class="btn btn-sm btn-primary">
+                                S’inscrire
+                            </a>
+                        </li>
+
+                    {% else %}
+                        {# 🔐 CONNECTÉ #}
+
+                        <li>
+                            <a href="{{ path('front_messenger_index') }}">
+                                <i class="bi bi-chat-dots me-1"></i>Messagerie
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ path('front_document_front_documents') }}">
+                                <i class="bi bi-file-earmark me-1"></i>My Documents
+                            </a>
+                        </li>
+
+                        {# ✅ Nouveau menu Nutrition #}
+                        <li class="dropdown ms-2">
+                            <a href="#"
+                               class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="bi bi-egg-fried me-1"></i>Nutrition
+                            </a>
+
+                            <ul class="dropdown-menu shadow">
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('front_plan_nutrition_index') }}">
+                                        <i class="bi bi-journal-text me-2"></i>Mes plans
+                                    </a>
+                                </li>
+
+                                {# Active ces liens فقط si les routes existent dans ton projet #}
+                                {#
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('front_repas_index') }}">
+                                        <i class="bi bi-basket me-2"></i>Mes repas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('front_suivi_nutrition_index') }}">
+                                        <i class="bi bi-graph-up me-2"></i>Mon suivi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('nutrition_chat_page') }}">
+                                        <i class="bi bi-chat-left-dots me-2"></i>Chat nutrition
+                                    </a>
+                                </li>
+                                #}
+                            </ul>
+                        </li>
+
+                        <li class="dropdown ms-2">
+                            <a href="#"
+                               class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="bi bi-calendar-check me-1"></i>Rendez-vous
+                            </a>
+                            <ul class="dropdown-menu shadow">
+                                {% if is_granted('ROLE_MEDECIN') %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('medecin_rendez_vous_index') }}">
+                                            <i class="bi bi-clipboard2-pulse me-2"></i>Liste des rendez-vous
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('medecin_stats_dashboard') }}">
+                                            <i class="bi bi-bar-chart-line me-2"></i>Dashboard statistique
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('rendez_vous_new') }}">
+                                            <i class="bi bi-plus-circle me-2"></i>Nouvelle demande
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('rendez_vous_suivi') }}">
+                                            <i class="bi bi-list-check me-2"></i>Suivi des demandes
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('admin_type_rendez_vous_index') }}">
+                                            <i class="bi bi-tags me-2"></i>Types de rendez-vous
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+
+                        <li class="dropdown ms-4">
+
+                            <a href="#"
+                               class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                {# Gestion avatar #}
+                                {% if app.user.avatar %}
+                                    {% if app.user.avatar starts with 'http' %}
+                                        <img src="{{ app.user.avatar }}"
+                                             class="rounded-circle border"
+                                             width="36"
+                                             height="36">
+                                    {% else %}
+                                        <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}"
+                                             class="rounded-circle border"
+                                             width="36"
+                                             height="36">
+                                    {% endif %}
+                                {% else %}
+                                    <img src="{{ asset('assets_frontend/img/default-avatar.png') }}"
+                                         class="rounded-circle border"
+                                         width="36"
+                                         height="36">
+                                {% endif %}
+
+                                <span class="ms-2 fw-semibold">
+                                    {{ app.user.username }}
+                                </span>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="{{ path('frontend_profile') }}">
+                                        <i class="bi bi-person me-2"></i>
+                                        Mon profil
+                                    </a>
+                                </li>
+
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="{{ path('admin_dashboard') }}">
+                                            <i class="bi bi-speedometer2 me-2"></i>
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <a class="dropdown-item text-danger"
+                                       href="{{ path('app_logout_admin') }}">
+                                        <i class="bi bi-box-arrow-right me-2"></i>
+                                        Déconnexion
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                        </li>
+
+                    {% endif %}
 
                 </ul>
+
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
-            
+
         </div>
     </div>
-    
+
 </header>

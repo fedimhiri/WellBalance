@@ -9,3 +9,11 @@
 
 controllers:
     resource: routing.controllers
+
+# Redirect /Vue/documents to /documents
+vue_documents:
+    path: /Vue/documents
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+    defaults:
+        route: front_document_front_documents
+        permanent: true

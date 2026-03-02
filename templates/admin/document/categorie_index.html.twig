@@ -1,0 +1,69 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Admin — Catégories de Documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bx bx-category me-2"></i>Catégories de Documents
+        </h4>
+        <div>
+            <a href="{{ path('admin_document_dashboard') }}" class="btn btn-outline-secondary me-2">
+                <i class="bx bx-arrow-back me-1"></i> Dashboard
+            </a>
+            <a href="{{ path('admin_categorie_document_new') }}" class="btn btn-primary">
+                <i class="bx bx-plus me-1"></i> Nouvelle catégorie
+            </a>
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categorie in categories %}
+                        <tr>
+                            <td>{{ categorie.id }}</td>
+                            <td class="fw-semibold">{{ categorie.nom }}</td>
+                            <td>{{ categorie.description ?? '—' }}</td>
+                            <td class="text-center">
+                                <a href="{{ path('admin_categorie_document_edit', {id: categorie.id}) }}" class="btn btn-sm btn-outline-warning">
+                                    <i class="bx bx-edit"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_categorie_document_delete', {id: categorie.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette catégorie ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_categorie_' ~ categorie.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">Aucune catégorie.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

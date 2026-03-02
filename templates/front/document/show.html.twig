@@ -1,0 +1,115 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Détails du document - WellBalance{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <a href="{{ path('front_documents') }}" class="btn btn-outline-secondary me-3" title="Retour à la liste">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h2 class="mb-0">Détails du document</h2>
+        </div>
+        <a href="{{ path('app_frontend_vue') }}" class="btn btn-outline-primary" title="Accueil">
+            <i class="bi bi-house-door me-1"></i> Accueil
+        </a>
+    </div>
+
+    {# Flash messages #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <table class="table table-bordered mb-0">
+                <tbody>
+                    <tr>
+                        <th style="width: 200px;">Titre</th>
+                        <td>{{ document.titre|default('-') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td><span class="badge bg-info text-dark">{{ document.typeDocument|default('-') }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Catégorie</th>
+                        <td>
+                            {% if document.categorie is defined and document.categorie %}
+                                {{ document.categorie.nom|default('-') }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Date d'upload</th>
+                        <td>
+                            {% if document.dateUpload is defined and document.dateUpload %}
+                                {{ document.dateUpload|date('d/m/Y H:i') }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Résumé IA</th>
+                        <td>
+                            {% if document.resumeAi is defined and document.resumeAi %}
+                                {{ document.resumeAi }}
+                            {% else %}
+                                <span class="text-muted">Aucun résumé disponible</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Mots-clés</th>
+                        <td>
+                            {% if document.motsCles is defined and document.motsCles %}
+                                {% for mot in document.motsCles %}
+                                    <span class="badge bg-secondary me-1">{{ mot }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">Aucun mot-clé</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Fichier</th>
+                        <td>
+                            {% if document.cheminFichier is defined and document.cheminFichier %}
+                                <a href="{{ path('front_document_download', {id: document.id}) }}" 
+                                   class="btn btn-outline-primary btn-sm" 
+                                   target="_blank">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> Ouvrir le fichier
+                                </a>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        {% if document.cheminFichier is defined and document.cheminFichier %}
+            <a class="btn btn-outline-primary" href="{{ path('front_document_download', {id: document.id}) }}">
+                <i class="bi bi-download me-1"></i> Télécharger
+            </a>
+        {% endif %}
+        {% include 'front/document/_delete_form.html.twig' with { document: document, btn_class: 'btn-danger' } %}
+    </div>
+</div>
+{% endblock %}

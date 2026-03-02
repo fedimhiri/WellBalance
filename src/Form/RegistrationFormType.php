@@ -37,28 +37,36 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
 
-            // MOT DE PASSE + CONFIRMATION
             ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'mapped' => false,
-                'first_options' => [
-                    'label' => false,
-                    'constraints' => [
-                        new NotBlank([
-                            'message' => 'Veuillez saisir un mot de passe',
-                        ]),
-                        new Length([
-                            'min' => 6,
-                            'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
-                            'max' => 4096,
-                        ]),
-                    ],
-                ],
-                'second_options' => [
-                    'label' => false,
-                ],
-                'invalid_message' => 'Les mots de passe doivent être identiques.',
-            ]);
+    'type' => PasswordType::class,
+    'mapped' => false,
+    'first_options' => [
+        'label' => false,
+        'attr' => [
+            'id' => 'password',
+            'autocomplete' => 'new-password'
+        ],
+        'constraints' => [
+            new NotBlank([
+                'message' => 'Veuillez saisir un mot de passe',
+            ]),
+            new Length([
+                'min' => 8,
+                'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
+                'max' => 4096,
+            ]),
+        ],
+    ],
+    'second_options' => [
+        'label' => false,
+        'attr' => [
+            'id' => 'confirm_password',
+            'autocomplete' => 'new-password'
+        ],
+    ],
+    'invalid_message' => 'Les mots de passe doivent être identiques.',
+]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

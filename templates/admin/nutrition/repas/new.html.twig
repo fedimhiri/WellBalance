@@ -1,0 +1,278 @@
+{% extends 'backend/baseend.html.twig' %}
+{% block title %}Nouveau Repas{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Nouveau Repas</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Nutrition / Repas / Nouveau</h6>
+        </nav>
+    </div>
+    <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">
+        <i class="bx bx-arrow-back me-2"></i>Retour à la liste
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+        {# ✅ REPAS PRÉCIS SELON OBJECTIF #}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">
+                    <i class="bx bx-list-check me-2"></i>Repas recommandés selon l’objectif
+                </h6>
+                <div class="small text-muted mb-3">
+                    Objectif : <strong>{{ plan.objectif }}</strong> — clique un repas → formulaire rempli + recherche automatique.
+                </div>
+
+                <div class="row g-2">
+                    {% for p in presets %}
+                        <div class="col-md-6 col-lg-4">
+                            <button type="button"
+                                    class="btn btn-outline-primary w-100 text-start preset-btn"
+                                    data-type="{{ p.typeRepasValue|e('html_attr') }}"
+                                    data-desc="{{ p.description|e('html_attr') }}"
+                                    data-q="{{ (p.queries|first)|e('html_attr') }}">
+                                <div class="fw-bold">{{ p.category }} : {{ p.title }}</div>
+                                <div class="small text-muted">Recherche: “{{ p.queries|first }}”</div>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {# ✅ Recherche produit (API) - déclenchée par les presets #}
+        <div class="alert alert-light border d-flex flex-column gap-2 mb-3">
+            <div class="fw-bold"><i class="bx bx-search me-2"></i>Recherche produit (API OpenFoodFacts)</div>
+
+            <div class="row g-2 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label">Recherche automatique</label>
+                    <input type="text" id="searchName" class="form-control" placeholder="Clique un repas ci-dessus pour lancer la recherche...">
+                    <div class="form-text">La recherche est pilotée par les repas recommandés du plan.</div>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" id="btnSearchName" class="btn btn-outline-dark w-100">
+                        <i class="bx bx-search me-2"></i>Rechercher
+                    </button>
+                </div>
+            </div>
+
+            <div id="searchResults" class="list-group d-none"></div>
+        </div>
+
+        {# ✅ Remplir via barcode #}
+        <div class="alert alert-info d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <div class="fw-bold"><i class="bx bx-cloud-download me-2"></i>Remplir automatiquement via code-barres</div>
+                <div class="small text-muted">
+                    Saisis un code-barres puis clique sur “Remplir depuis API”.
+                </div>
+            </div>
+            <button type="button" id="btnFillApi" class="btn btn-outline-primary">
+                <i class="bx bx-search me-2"></i>Remplir depuis API
+            </button>
+        </div>
+
+        <div id="apiResult" class="alert d-none"></div>
+
+        {{ form_start(form) }}
+        <div class="row">
+            <div class="col-md-6 mb-3">{{ form_row(form.typeRepas) }}</div>
+            <div class="col-md-6 mb-3">{{ form_row(form.barcode) }}</div>
+            <div class="col-md-6 mb-3">{{ form_row(form.portionSize) }}</div>
+            <div class="col-md-6 mb-3">{{ form_row(form.calories) }}</div>
+            <div class="col-md-4 mb-3">{{ form_row(form.proteines) }}</div>
+            <div class="col-md-4 mb-3">{{ form_row(form.glucides) }}</div>
+            <div class="col-md-4 mb-3">{{ form_row(form.lipides) }}</div>
+            <div class="col-md-6 mb-3">{{ form_row(form.dateRepas) }}</div>
+            <div class="col-md-6 mb-3">{{ form_row(form.planNutrition) }}</div>
+            <div class="col-12 mb-3">{{ form_row(form.description) }}</div>
+        </div>
+
+        <div class="d-flex gap-3">
+            <button class="btn btn-primary" type="submit">
+                <i class="bx bx-save me-2"></i>Enregistrer
+            </button>
+            <a href="{{ path('admin_repas_index') }}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+        {{ form_end(form) }}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const apiBox = document.getElementById('apiResult');
+    const btnFill = document.getElementById('btnFillApi');
+
+    const barcodeInput  = document.querySelector('#{{ form.barcode.vars.id }}');
+    const caloriesInput = document.querySelector('#{{ form.calories.vars.id }}');
+    const pInput        = document.querySelector('#{{ form.proteines.vars.id }}');
+    const cInput        = document.querySelector('#{{ form.glucides.vars.id }}');
+    const fInput        = document.querySelector('#{{ form.lipides.vars.id }}');
+    const portionInput  = document.querySelector('#{{ form.portionSize.vars.id }}');
+
+    const typeRepasSelect = document.querySelector('#{{ form.typeRepas.vars.id }}');
+    const descInput       = document.querySelector('#{{ form.description.vars.id }}');
+
+    const searchName = document.getElementById('searchName');
+    const btnSearchName = document.getElementById('btnSearchName');
+    const searchResults = document.getElementById('searchResults');
+
+    function esc(s){
+        return (s ?? '').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function showApiMessage(type, msg) {
+        apiBox.classList.remove('d-none', 'alert-success', 'alert-warning', 'alert-danger', 'alert-info');
+        apiBox.classList.add('alert-' + type);
+        apiBox.innerHTML = msg;
+        apiBox.classList.remove('d-none');
+    }
+
+    function fillFromItem(it) {
+        if (it.barcode && barcodeInput) barcodeInput.value = it.barcode;
+        if (it.calories != null && caloriesInput) caloriesInput.value = Math.round(it.calories);
+        if (it.protein != null && pInput) pInput.value = it.protein;
+        if (it.carbs != null && cInput) cInput.value = it.carbs;
+        if (it.fat != null && fInput) fInput.value = it.fat;
+        if (it.serving_size && portionInput && !portionInput.value) portionInput.value = it.serving_size;
+    }
+
+    // ✅ Rechercher (OpenFoodFacts)
+    async function runSearch() {
+        const q = (searchName?.value || '').trim();
+        if (!q) { alert('Clique un repas recommandé d’abord (ou écris un mot clé).'); return; }
+
+        btnSearchName.disabled = true;
+        btnSearchName.innerHTML = '<i class="bx bx-loader-alt bx-spin me-2"></i>Recherche...';
+
+        searchResults.classList.add('d-none');
+        searchResults.innerHTML = '';
+
+        try {
+            const res = await fetch(`/api/nutrition/search?q=${encodeURIComponent(q)}`);
+            if (!res.ok) {
+                const txt = await res.text();
+                alert('API search HTTP ' + res.status + '\\n' + txt.slice(0, 300));
+                return;
+            }
+
+            const data = await res.json();
+            const items = data.items || [];
+
+            searchResults.classList.remove('d-none');
+
+            if (!items.length) {
+                searchResults.innerHTML = `<div class="list-group-item text-muted">Aucun résultat</div>`;
+                return;
+            }
+
+            items.forEach((it) => {
+                const label = it.label || 'Produit';
+                const brand = it.brand ? ` <span class="text-muted small">(${esc(it.brand)})</span>` : '';
+                const serving = it.serving_size ? `<div class="small text-muted">Portion: ${esc(it.serving_size)}</div>` : '';
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'list-group-item list-group-item-action';
+                btn.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold">${esc(label)}${brand}</div>
+                            ${serving}
+                            <div class="small text-muted">Code: <code>${esc(it.code)}</code></div>
+                        </div>
+                        <span class="badge bg-primary">Choisir</span>
+                    </div>
+                `;
+
+                btn.addEventListener('click', async () => {
+                    if (barcodeInput) barcodeInput.value = it.code;
+                    showApiMessage('info', `⏳ Chargement pour <strong>${esc(label)}</strong>...`);
+
+                    const r2 = await fetch(`/api/nutrition/barcode/${encodeURIComponent(it.code)}`);
+                    if (!r2.ok) {
+                        const txt2 = await r2.text();
+                        showApiMessage('danger', '❌ HTTP ' + r2.status + '<br>' + esc(txt2).slice(0, 200));
+                        return;
+                    }
+
+                    const d2 = await r2.json();
+                    if (!d2.found || !d2.item) {
+                        showApiMessage('warning', "⚠️ Détails nutritionnels indisponibles.");
+                        return;
+                    }
+
+                    fillFromItem(d2.item);
+                    showApiMessage('success', `✅ Produit sélectionné : <strong>${esc(d2.item.label || label)}</strong>`);
+                });
+
+                searchResults.appendChild(btn);
+            });
+
+        } catch (e) {
+            alert('Erreur réseau: ' + e.message);
+        } finally {
+            btnSearchName.disabled = false;
+            btnSearchName.innerHTML = '<i class="bx bx-search me-2"></i>Rechercher';
+        }
+    }
+
+    btnSearchName.addEventListener('click', runSearch);
+
+    // ✅ Click sur un repas recommandé -> remplit + lance recherche
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type || '';
+            const desc = btn.dataset.desc || '';
+            const q = btn.dataset.q || '';
+
+            if (typeRepasSelect && type) typeRepasSelect.value = type;
+            if (descInput && desc) descInput.value = desc;
+
+            if (searchName && q) searchName.value = q;
+            runSearch();
+        });
+    });
+
+    // ✅ Remplir depuis API (barcode)
+    btnFill.addEventListener('click', async () => {
+        const code = (barcodeInput?.value || '').trim();
+        if (!code) {
+            showApiMessage('warning', '⚠️ Veuillez saisir un code-barres.');
+            return;
+        }
+
+        btnFill.disabled = true;
+        btnFill.innerHTML = '<i class="bx bx-loader-alt bx-spin me-2"></i>Chargement...';
+
+        try {
+            const res = await fetch(`/api/nutrition/barcode/${encodeURIComponent(code)}`);
+            const data = await res.json();
+
+            if (!data.found || !data.item) {
+                showApiMessage('danger', "❌ Produit introuvable.");
+                return;
+            }
+
+            fillFromItem(data.item);
+            showApiMessage('success', `✅ Données récupérées : <strong>${esc(data.item.label || 'Produit')}</strong>`);
+        } catch (e) {
+            showApiMessage('danger', '❌ Erreur API.');
+        } finally {
+            btnFill.disabled = false;
+            btnFill.innerHTML = '<i class="bx bx-search me-2"></i>Remplir depuis API';
+        }
+    });
+
+});
+</script>
+{% endblock %}

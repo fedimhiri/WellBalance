@@ -1,0 +1,313 @@
+﻿{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Demandes de rendez-vous{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .rdv-table thead th {
+            background: #1f2937;
+            color: #ffffff;
+            font-weight: 700;
+            border: 0;
+        }
+        .rdv-table tbody td {
+            color: #111827;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+        .rdv-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .rdv-table .badge {
+            font-size: 0.82rem;
+            padding: 0.45rem 0.65rem;
+        }
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .legend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .legend-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 999px;
+            display: inline-block;
+        }
+        .legend-dot.available { background: #10b981; }
+        .legend-dot.unavailable { background: #9ca3af; }
+        .legend-dot.busy { background: #ef4444; }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+        .calendar-cell {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            background: #f8fafc;
+            cursor: pointer;
+            min-height: 94px;
+            text-align: left;
+        }
+        .calendar-cell.is-selected {
+            outline: 2px solid #2563eb;
+            background: #eff6ff;
+        }
+        .calendar-cell.status-AVAILABLE {
+            background: #ecfdf5;
+            border-color: #86efac;
+        }
+        .calendar-cell.status-BUSY {
+            background: #fff7ed;
+            border-color: #fdba74;
+        }
+        .calendar-cell.status-UNAVAILABLE {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        .calendar-day-number {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.35rem;
+        }
+        .calendar-state-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 0.2rem 0.45rem;
+            margin-bottom: 0.35rem;
+        }
+        .calendar-state-badge.AVAILABLE {
+            color: #065f46;
+            background: #d1fae5;
+        }
+        .calendar-state-badge.UNAVAILABLE {
+            color: #374151;
+            background: #e5e7eb;
+        }
+        .calendar-state-badge.BUSY {
+            color: #7f1d1d;
+            background: #fee2e2;
+        }
+        .calendar-slots {
+            max-height: 260px;
+            overflow: auto;
+        }
+        .calendar-slot-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+        .calendar-slot-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 0.22rem 0.5rem;
+        }
+        .calendar-slot-badge.AVAILABLE {
+            color: #065f46;
+            background: #d1fae5;
+        }
+        .calendar-slot-badge.BUSY {
+            color: #9a3412;
+            background: #fed7aa;
+        }
+        .calendar-slot-badge.UNAVAILABLE {
+            color: #374151;
+            background: #e5e7eb;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="rdv-config"
+         data-endpoint="{{ path('medecin_rendez_vous_search') }}"
+         data-show-url-template="{{ path('medecin_rendez_vous_show', { id: '__id__' }) }}"
+         data-edit-url-template="{{ path('medecin_rendez_vous_edit', { id: '__id__' }) }}"
+         data-accept-url-template="{{ path('medecin_rendez_vous_accepter', { id: '__id__' }) }}"
+         data-refuse-url-template="{{ path('medecin_rendez_vous_refuser', { id: '__id__' }) }}"
+         data-delete-url-template="{{ path('medecin_rendez_vous_delete', { id: '__id__' }) }}"
+         data-calendar-endpoint="{{ path('calendar_doctor_get') }}"
+         data-sort="{{ filters.sort }}"
+         data-direction="{{ filters.direction }}"
+         data-page="{{ pagination.page }}"
+         data-limit="{{ pagination.limit }}"
+         data-medecin-id="{{ calendarMedecinId ?? '' }}">
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Demandes de rendez-vous</h1>
+        <a class="btn btn-primary" href="{{ path('medecin_rendez_vous_new') }}">Nouveau</a>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label for="rdv-search" class="form-label">Recherche</label>
+                    <input id="rdv-search" class="form-control" type="text" value="{{ filters.q }}" placeholder="Titre, patient, type, statut...">
+                </div>
+                <div class="col-md-2">
+                    <label for="rdv-statut" class="form-label">Statut</label>
+                    <select id="rdv-statut" class="form-select">
+                        <option value="">TOUS</option>
+                        <option value="EN_COURS" {% if filters.statut == 'EN_COURS' %}selected{% endif %}>EN_COURS</option>
+                        <option value="ACCEPTE" {% if filters.statut == 'ACCEPTE' %}selected{% endif %}>ACCEPTE</option>
+                        <option value="REFUSE" {% if filters.statut == 'REFUSE' %}selected{% endif %}>REFUSE</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="rdv-sort" class="form-label">Trier par</label>
+                    <select id="rdv-sort" class="form-select">
+                        <option value="dateRdv" {% if filters.sort == 'dateRdv' %}selected{% endif %}>Date</option>
+                        <option value="statut" {% if filters.sort == 'statut' %}selected{% endif %}>Statut</option>
+                        <option value="type" {% if filters.sort == 'type' %}selected{% endif %}>Type</option>
+                        <option value="patient" {% if filters.sort == 'patient' %}selected{% endif %}>Patient</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="rdv-direction" class="form-label">Ordre</label>
+                    <select id="rdv-direction" class="form-select">
+                        <option value="asc" {% if filters.direction == 'asc' %}selected{% endif %}>ASC</option>
+                        <option value="desc" {% if filters.direction == 'desc' %}selected{% endif %}>DESC</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="rdv-type" class="form-label">Type</label>
+                    <select id="rdv-type" class="form-select">
+                        <option value="">TOUS</option>
+                        {% for type in types %}
+                            <option value="{{ type.id }}" {% if filters.type is same as(type.id) %}selected{% endif %}>{{ type.nomType }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <h2 class="h5 mb-0">Calendrier disponibilites medecin</h2>
+                <div class="calendar-legend">
+                    <span class="legend-pill"><span class="legend-dot available"></span>Disponible</span>
+                    <span class="legend-pill"><span class="legend-dot unavailable"></span>Non disponible</span>
+                    <span class="legend-pill"><span class="legend-dot busy"></span>Occupe</span>
+                </div>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <label class="form-label" for="calendar-from">Du</label>
+                    <input id="calendar-from" class="form-control" type="date">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="calendar-to">Au</label>
+                    <input id="calendar-to" class="form-control" type="date">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="calendar-view">Vue</label>
+                    <select id="calendar-view" class="form-select">
+                        <option value="month">Mois</option>
+                        <option value="week">Semaine</option>
+                        <option value="day">Jour</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button id="calendar-refresh" type="button" class="btn btn-outline-primary w-100">Actualiser</button>
+                </div>
+            </div>
+            <div id="doctor-calendar-grid" class="calendar-grid"></div>
+            <div class="mt-3">
+                <h3 class="h6 mb-2">Detail du jour selectionne</h3>
+                <div id="doctor-calendar-day-summary" class="mb-2 text-muted">Selectionnez un jour.</div>
+                <div id="doctor-calendar-slots" class="calendar-slots"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0 rdv-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th><button type="button" class="btn btn-link p-0 text-reset rdv-sort" data-sort="dateRdv">DATE <span class="rdv-sort-indicator" data-for="dateRdv">↕</span></button></th>
+                    <th>HEURE</th>
+                    <th><button type="button" class="btn btn-link p-0 text-reset rdv-sort" data-sort="patient">PATIENT <span class="rdv-sort-indicator" data-for="patient">↕</span></button></th>
+                    <th><button type="button" class="btn btn-link p-0 text-reset rdv-sort" data-sort="statut">STATUT <span class="rdv-sort-indicator" data-for="statut">↕</span></button></th>
+                    <th>ACTION</th>
+                </tr>
+                </thead>
+                <tbody id="rdv-tbody">
+                {% for rdv in rendezVousList %}
+                    <tr>
+                        <td>{{ rdv.id }}</td>
+                        <td>{{ rdv.date ? rdv.date|date('d/m/Y') : '-' }}</td>
+                        <td>{{ rdv.heure ?: '-' }}</td>
+                        <td>{{ rdv.patient ?: 'Inconnu' }}</td>
+                        <td>
+                            {% if rdv.statut == constant('App\\Entity\\RendezVous::STATUT_EN_COURS') %}
+                                <span class="badge bg-warning text-dark">EN_COURS</span>
+                            {% elseif rdv.statut == constant('App\\Entity\\RendezVous::STATUT_ACCEPTE') %}
+                                <span class="badge bg-success">ACCEPTE</span>
+                            {% elseif rdv.statut == constant('App\\Entity\\RendezVous::STATUT_REFUSE') %}
+                                <span class="badge bg-danger">REFUSE</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ rdv.statut }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ path('medecin_rendez_vous_show', {id: rdv.id}) }}">Voir</a>
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ path('medecin_rendez_vous_edit', {id: rdv.id}) }}">Edit</a>
+                            {% if rdv.canAcceptOrReject %}
+                                <form class="d-inline" method="post" action="{{ path('medecin_rendez_vous_accepter', {id: rdv.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ rdv.csrfActionToken }}">
+                                    <button class="btn btn-sm btn-success" type="submit">Accepter</button>
+                                </form>
+                                <form class="d-inline" method="post" action="{{ path('medecin_rendez_vous_refuser', {id: rdv.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ rdv.csrfActionToken }}">
+                                    <button class="btn btn-sm btn-danger" type="submit">Refuser</button>
+                                </form>
+                            {% endif %}
+                            <form class="d-inline" method="post" action="{{ path('medecin_rendez_vous_delete', {id: rdv.id}) }}" onsubmit="return confirm('Confirmer la suppression de ce rendez-vous ?');">
+                                <input type="hidden" name="_token" value="{{ rdv.csrfDeleteToken }}">
+                                <button class="btn btn-sm btn-dark" type="submit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6">Aucun rendez-vous</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="rdv-pagination"
+         class="mt-3"
+         data-page="{{ pagination.page }}"
+         data-pages="{{ pagination.pages }}"
+         data-total="{{ pagination.total }}"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/rdv-search.js') }}"></script>
+    <script src="{{ asset('js/doctor-calendar.js') }}"></script>
+{% endblock %}

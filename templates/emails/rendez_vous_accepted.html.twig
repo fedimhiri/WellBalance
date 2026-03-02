@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+<body style="font-family: Arial, sans-serif; color: #1f2937;">
+    <h2>Votre rendez-vous est accepte</h2>
+
+    <p>
+        Bonjour {{ patient.displayName|default(patient.email) }},
+    </p>
+
+    <p>Le statut de votre rendez-vous a ete mis a jour.</p>
+
+    <ul>
+        <li><strong>RDV:</strong> {{ rdv.titre }}</li>
+        <li><strong>Date/Heure:</strong> {{ rdv.dateRdv|date('Y-m-d') }} a {{ rdv.heureRdv|date('H:i') }}</li>
+        <li><strong>Type:</strong> {{ rdv.typeRendezVous ? rdv.typeRendezVous.nomType : '—' }}</li>
+        <li><strong>Medecin:</strong> {{ medecinNomComplet }}</li>
+        <li><strong>Statut:</strong> {{ statusLabel }}</li>
+    </ul>
+
+    {% if message is not empty %}
+        <p><strong>Message:</strong> {{ message }}</p>
+    {% endif %}
+
+    <p>Merci,<br>WellBalance</p>
+</body>
+</html>

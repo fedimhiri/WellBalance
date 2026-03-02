@@ -1,0 +1,125 @@
+{% extends 'backend/baseend.html.twig' %} 
+
+{% block title %}Détails Plan Nutrition{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Plan Nutrition #{{ plan_nutrition.id }}</h4>
+    <h6 class="fw-normal text-muted mb-0">
+      <a href="{{ path('admin_plan_nutrition_index') }}" class="text-muted">
+        Nutrition / Plans
+      </a> / #{{ plan_nutrition.id }}
+    </h6>
+  </div>
+
+  <!-- ✅ BOUTONS PDF / EDIT / IA / SUIVIS / RETOUR -->
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{{ path('admin_plan_nutrition_pdf', {'id': plan_nutrition.id}) }}"
+       class="btn btn-outline-danger">
+      <i class="bx bxs-file-pdf me-2"></i>PDF
+    </a>
+
+    <a href="{{ path('admin_plan_nutrition_edit', {'id': plan_nutrition.id}) }}"
+       class="btn btn-warning">
+      <i class="bx bx-edit me-2"></i>Modifier
+    </a>
+
+    {# ✅ NOUVEAU : Bouton Analyse IA #}
+    <a href="{{ path('admin_plan_nutrition_analyze', {'id': plan_nutrition.id}) }}"
+       class="btn btn-outline-primary">
+      <i class="bx bx-brain me-2"></i>Analyser IA
+    </a>
+
+    <a href="{{ path('admin_suivi_index', { id: plan_nutrition.id }) }}"
+       class="btn btn-outline-primary">
+      <i class="bx bx-line-chart me-2"></i>Suivis ({{ suivis_count|default(0) }})
+    </a>
+
+    <a href="{{ path('admin_plan_nutrition_index') }}"
+       class="btn btn-outline-secondary">
+      <i class="bx bx-arrow-back me-2"></i>Retour
+    </a>
+  </div>
+</div>
+
+{# ✅ ALERTES ACTIVES #}
+{% if alertes is defined and alertes|length > 0 %}
+  <div class="alert alert-warning mb-4">
+    <h6 class="mb-2">⚠ Alertes actives ({{ alertes|length }})</h6>
+    <ul class="mb-0">
+      {% for a in alertes %}
+        <li>
+          <strong>{{ a.severity }}</strong> — {{ a.message }}
+          <small class="text-muted">({{ a.createdAt|date('d/m/Y H:i') }})</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <div class="alert alert-success mb-4">
+    ✅ Aucune alerte active pour ce plan.
+  </div>
+{% endif %}
+
+<!-- INFOS PLAN -->
+<div class="card mb-4">
+  <div class="card-body">
+    <p><strong>Objectif :</strong> {{ plan_nutrition.objectif }}</p>
+    <p><strong>Utilisateur (patient) :</strong> {{ plan_nutrition.user.email }}</p>
+
+    {% if plan_nutrition.nutritionniste %}
+      <p><strong>Nutritionniste :</strong> {{ plan_nutrition.nutritionniste.email }}</p>
+    {% endif %}
+
+    <p><strong>Période :</strong> {{ plan_nutrition.periode }}</p>
+    <p>
+      <strong>Statut :</strong>
+      {% if plan_nutrition.dateFin > date() %}
+        <span class="badge bg-success">Actif</span>
+      {% else %}
+        <span class="badge bg-secondary">Terminé</span>
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+<!-- REPAS -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Repas ({{ plan_nutrition.repas|length }})</h5>
+
+    <a class="btn btn-success btn-sm"
+       href="{{ path('admin_repas_new', { plan_id: plan_nutrition.id }) }}">
+      + Ajouter repas
+    </a>
+  </div>
+
+  <div class="card-body">
+    {% if plan_nutrition.repas|length == 0 %}
+      <p class="text-muted">Aucun repas.</p>
+    {% else %}
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Calories</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in plan_nutrition.repas %}
+            <tr>
+              <td>{{ r.typeRepas }}</td>
+              <td>{{ r.description }}</td>
+              <td>{{ r.calories }} kcal</td>
+              <td>{{ r.dateRepas|date('d/m/Y H:i') }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

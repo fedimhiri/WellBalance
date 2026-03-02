@@ -1,0 +1,22 @@
+{#
+    CSRF-safe delete form partial
+    Usage: {% include 'front/document/_delete_form.html.twig' with { document: document } %}
+           {% include 'front/document/_delete_form.html.twig' with { document: document, btn_class: 'btn-danger' } %}
+    
+    Parameters:
+    - document: The Document entity (required)
+    - btn_class: Optional button class (default: 'btn-outline-danger')
+#}
+
+{% set button_class = btn_class|default('btn-outline-danger') %}
+{% set csrf_token_name = 'delete_document_' ~ document.id %}
+
+<form method="post" 
+      action="{{ path('front_document_delete', {id: document.id}) }}" 
+      class="d-inline"
+      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.');">
+    <input type="hidden" name="_token" value="{{ csrf_token(csrf_token_name) }}">
+    <button class="btn {{ button_class }} btn-sm" type="submit" title="Supprimer">
+        <i class="bi bi-trash"></i>
+    </button>
+</form>

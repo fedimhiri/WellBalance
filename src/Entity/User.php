@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -51,7 +53,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    // =================== GETTERS / SETTERS ===================
+    #[ORM\Column(type: 'boolean')]
+    private bool $isBanned = false;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
+    /**
+     * @var Collection<int, RendezVous>
+     */
+    #[ORM\OneToMany(mappedBy: 'patient', targetEntity: RendezVous::class)]
+    private Collection $patientRendezVous;
+
+    /**
+     * @var Collection<int, RendezVous>
+     */
+    #[ORM\OneToMany(mappedBy: 'medecin', targetEntity: RendezVous::class)]
+    private Collection $medecinRendezVous;
+
+    public function __construct()
+    {
+        $this->patientRendezVous = new ArrayCollection();
+        $this->medecinRendezVous = new ArrayCollection();
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->isBanned;
+    }
+
+
+    public function setIsBanned(bool $isBanned): self
+    {
+        $this->isBanned = $isBanned;
+
+        return $this;
+    }
+
 
     public function getId(): ?int
     {
@@ -119,4 +169,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function eraseCredentials(): void {}
+
+    public function getDisplayName(): string
+    {
+        $username = trim((string) $this->username);
+        if ('' !== $username) {
+            return $username;
+        }
+
+        return (string) ($this->email ?? 'Utilisateur');
+    }
+
+    /**
+     * @return Collection<int, RendezVous>
+     */
+    public function getPatientRendezVous(): Collection
+    {
+        return $this->patientRendezVous;
+    }
+
+    /**
+     * @return Collection<int, RendezVous>
+     */
+    public function getMedecinRendezVous(): Collection
+    {
+        return $this->medecinRendezVous;
+    }
 }

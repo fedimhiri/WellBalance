@@ -1,0 +1,134 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Stats Plans Nutrition{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">Statistiques - Plans Nutrition</h4>
+    <h6 class="fw-normal text-muted mb-0">Nutrition / Plans / Stats</h6>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ path('admin_plan_nutrition_index') }}" class="btn btn-outline-secondary">
+      <i class="bx bx-left-arrow-alt me-2"></i>Retour
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-4 col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <span class="text-muted small">Total Plans</span>
+        <h3 class="fw-bold mt-2 mb-0">{{ global.total }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <span class="text-muted small">Plans Actifs</span>
+        <h3 class="fw-bold mt-2 mb-0">{{ global.actifs }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <span class="text-muted small">Plans Terminés</span>
+        <h3 class="fw-bold mt-2 mb-0">{{ global.termines }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Plans créés (6 derniers mois)</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="plansPerMonth" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Répartition par objectif</h5>
+      </div>
+      <div class="card-body">
+        {% if byObjectif is empty %}
+          <div class="text-muted">Pas de données.</div>
+        {% else %}
+          <canvas id="objectifChart" height="220"></canvas>
+          <hr>
+          <div class="small text-muted">
+            {% for row in byObjectif %}
+              <div class="d-flex justify-content-between">
+                <span>{{ row.objectif }}</span>
+                <strong>{{ row.count }}</strong>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Plans par mois
+  const monthLabels = {{ perMonth.labels|json_encode|raw }};
+  const monthValues = {{ perMonth.values|json_encode|raw }};
+
+  const ctx1 = document.getElementById('plansPerMonth');
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: monthLabels,
+        datasets: [{
+          label: 'Nombre de plans',
+          data: monthValues
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: true } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
+
+  // Objectif pie
+  const objectifRows = {{ byObjectif|json_encode|raw }};
+  const objLabels = objectifRows.map(r => r.objectif);
+  const objValues = objectifRows.map(r => Number(r.count));
+
+  const ctx2 = document.getElementById('objectifChart');
+  if (ctx2 && objLabels.length) {
+    new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: objLabels,
+        datasets: [{
+          data: objValues
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  }
+</script>
+{% endblock %}

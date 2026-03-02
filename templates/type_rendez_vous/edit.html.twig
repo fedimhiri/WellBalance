@@ -1,0 +1,25 @@
+{% extends 'backend/baseend.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Modifier type de rendez-vous{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Modifier type #{{ type.id }}</h1>
+        <a href="{{ path('admin_type_rendez_vous_index') }}" class="btn btn-outline-secondary">Retour</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form, { attr: { class: 'row g-3', novalidate: 'novalidate' } }) }}
+                <div class="col-12">{{ form_errors(form) }}</div>
+                <div class="col-md-6">{{ form_row(form.nomType) }}</div>
+                <div class="col-12">{{ form_row(form.description) }}</div>
+                <div class="col-12 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Mettre a jour</button>
+                    <a href="{{ path('admin_type_rendez_vous_show', { id: type.id }) }}" class="btn btn-outline-secondary">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Gestion des rendez-vous{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Rendez-vous</h1>
+        <a href="{{ path('admin_rendez_vous_new') }}" class="btn btn-primary">Nouveau rendez-vous</a>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Patient</th>
+                    <th>Medecin</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for rdv in rendezVousList %}
+                    <tr>
+                        <td>{{ rdv.id }}</td>
+                        <td>{{ rdv.titre }}</td>
+                        <td>{{ rdv.dateRdv|date('d/m/Y') }}</td>
+                        <td>{{ rdv.heureRdv|date('H:i') }}</td>
+                        <td>{{ rdv.patient ? rdv.patient.displayName : '-' }}</td>
+                        <td>{{ rdv.medecin ? rdv.medecin.displayName : '-' }}</td>
+                        <td>{% include 'rendez_vous/_status_badge.html.twig' with { statut: rdv.statut } only %}</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ path('admin_rendez_vous_show', {id: rdv.id}) }}">Voir</a>
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ path('admin_rendez_vous_edit', {id: rdv.id}) }}">Editer</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8">Aucun rendez-vous trouve.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

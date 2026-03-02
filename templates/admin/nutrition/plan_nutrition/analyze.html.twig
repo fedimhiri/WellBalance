@@ -1,0 +1,109 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Analyse IA - Plan #{{ plan_nutrition.id }}{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-0">
+      Analyse IA - Plan #{{ plan_nutrition.id }}
+    </h4>
+    <h6 class="fw-normal text-muted mb-0">
+      {{ plan_nutrition.objectif }} • {{ plan_nutrition.periode }}
+    </h6>
+  </div>
+
+  <a class="btn btn-outline-secondary"
+     href="{{ path('admin_plan_nutrition_show', {id: plan_nutrition.id}) }}">
+    <i class="bx bx-arrow-back me-2"></i>Retour
+  </a>
+</div>
+
+{# ✅ Résumé rapide du plan #}
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-4">
+        <strong>Patient :</strong><br>
+        {{ plan_nutrition.user.email }}
+      </div>
+      <div class="col-md-4">
+        <strong>Nutritionniste :</strong><br>
+        {{ plan_nutrition.nutritionniste ? plan_nutrition.nutritionniste.email : '—' }}
+      </div>
+      <div class="col-md-4">
+        <strong>Statut :</strong><br>
+        {% if plan_nutrition.dateFin > date() %}
+          <span class="badge bg-success">Actif</span>
+        {% else %}
+          <span class="badge bg-secondary">Terminé</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ✅ Résultat IA #}
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">
+      <i class="bx bx-brain me-2"></i>Résultat Analyse IA
+    </h5>
+
+    <span class="badge bg-dark">
+      {{ risks|length }} risque(s)
+    </span>
+  </div>
+
+  <div class="card-body">
+
+    {% if risks is empty %}
+      <div class="alert alert-success mb-0">
+        ✅ Aucun risque détecté. Le plan est stable.
+      </div>
+    {% else %}
+
+      {% for r in risks %}
+        <div class="card mb-3 border-0 shadow-sm">
+          <div class="card-body
+              {% if r.severity == 'CRIT' %}
+                  border-start border-4 border-danger
+              {% elseif r.severity == 'WARN' %}
+                  border-start border-4 border-warning
+              {% else %}
+                  border-start border-4 border-info
+              {% endif %}
+          ">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="fw-bold">
+                {{ r.type }}
+              </div>
+
+              <span class="badge
+                {% if r.severity == 'CRIT' %}
+                    bg-danger
+                {% elseif r.severity == 'WARN' %}
+                    bg-warning text-dark
+                {% else %}
+                    bg-info
+                {% endif %}
+              ">
+                {{ r.severity }}
+              </span>
+            </div>
+
+            <div>
+              {{ r.message }}
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

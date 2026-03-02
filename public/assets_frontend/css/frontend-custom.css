@@ -614,3 +614,42 @@ a {
         font-size: 28px;
     }
 }
+/* ==========================
+   FIX: Header fixed-top cache le contenu
+   ========================== */
+main.main {
+  padding-top: 120px; /* ajuste: 90/110/140 selon ton header */
+}
+
+/* Si certaines pages ont encore un petit décalage */
+body.index-page main.main {
+  padding-top: 120px;
+}
+
+/* ==========================
+   FIX: "zone floue" = preloader/overlay qui reste
+   ========================== */
+
+/* Désactive le preloader (souvent responsable de l'écran sombre) */
+#preloader {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Empêche un backdrop invisible de bloquer l'écran */
+.layout-overlay,
+.content-backdrop,
+.modal-backdrop {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Au cas où le thème applique un blur */
+body, main, .main, .container {
+  filter: none !important;
+  backdrop-filter: none !important;
+}

@@ -1,0 +1,13 @@
+{% set statusValue = statut is defined and statut is not empty ? statut|upper : 'EN_COURS' %}
+{% set badgeClass = {
+    'EN_COURS': 'bg-warning text-dark',
+    'ACCEPTE': 'bg-success',
+    'REFUSE': 'bg-danger'
+}[statusValue]|default('bg-secondary') %}
+{% set statusLabel = {
+    'EN_COURS': 'EN_COURS',
+    'ACCEPTE': 'ACCEPTE',
+    'REFUSE': 'REFUSE'
+}[statusValue]|default(statusValue) %}
+
+<span class="badge {{ badgeClass }}">{{ statusLabel }}</span>

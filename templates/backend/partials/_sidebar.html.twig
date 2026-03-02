@@ -1,6 +1,6 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     
-    <!-- App Brand corrigé -->
+    <!-- App Brand -->
     <div class="app-brand demo mb-3">
         <a href="{{ path('admin_dashboard') }}" class="app-brand-link gap-2">
             <span class="app-brand-logo">
@@ -32,23 +32,14 @@
             <a href="{{ path('admin_dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div>Dashboard</div>
-                {% if app.request.get('_route') == 'admin_dashboard' %}
-                <span class="badge bg-primary rounded-pill ms-auto">●</span>
-                {% endif %}
             </a>
         </li>
 
-
-
-
-         <!-- Go To Front -->
+        <!-- Front Office -->
         <li class="menu-item {% if app.request.get('_route') == 'app_frontend_vue' %}active{% endif %}">
             <a href="{{ path('app_frontend_vue') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <i class="menu-icon tf-icons bx bx-globe"></i>
                 <div>Front Office</div>
-                {% if app.request.get('_route') == 'app_frontend_vue' %}
-                <span class="badge bg-primary rounded-pill ms-auto">●</span>
-                {% endif %}
             </a>
         </li>
 
@@ -59,7 +50,7 @@
 
         <!-- Utilisateurs -->
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ path('admin_dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user"></i>
                 <div>Utilisateurs</div>
                 <span class="badge bg-label-primary rounded-pill ms-auto">24</span>
@@ -68,70 +59,66 @@
 
         <!-- Projets -->
         <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <a href="{{ path('admin_dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-briefcase"></i>
                 <div>Projets</div>
             </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div class="d-flex align-items-center">
-                            <i class="bx bx-circle me-2 fs-6"></i>
-                            <div>Tous les projets</div>
-                        </div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div class="d-flex align-items-center justify-content-between w-100">
-                            <div class="d-flex align-items-center">
-                                <i class="bx bx-circle me-2 fs-6"></i>
-                                <div>En cours</div>
-                            </div>
-                            <span class="badge bg-label-warning rounded-pill">12</span>
-                        </div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div class="d-flex align-items-center justify-content-between w-100">
-                            <div class="d-flex align-items-center">
-                                <i class="bx bx-circle me-2 fs-6"></i>
-                                <div>Terminés</div>
-                            </div>
-                            <span class="badge bg-label-success rounded-pill">8</span>
-                        </div>
-                    </a>
-                </li>
-            </ul>
         </li>
 
         <!-- Commandes -->
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ path('admin_dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-cart"></i>
                 <div>Commandes</div>
                 <span class="badge bg-label-danger rounded-pill ms-auto">3</span>
             </a>
         </li>
 
-        <!-- Analytics -->
-        <li class="menu-item">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-chart"></i>
-                <div>Analytics</div>
-                <span class="badge bg-label-info rounded-pill ms-auto">
-                    <i class="bx bx-up-arrow-alt me-1"></i>24%
-                </span>
+        <!-- Statistiques -->
+        <li class="menu-item {% if app.request.get('_route') starts with 'medecin_stats_' %}active{% endif %}">
+            <a href="{{ path('medecin_stats_dashboard') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-line-chart"></i>
+                <div>Statistiques</div>
             </a>
         </li>
 
         <!-- Messages -->
-        <li class="menu-item">
-            <a href="#" class="menu-link">
+        <li class="menu-item {% if app.request.get('_route') starts with 'admin_messenger_' %}active{% endif %}">
+            <a href="{{ path('admin_messenger_index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-message"></i>
                 <div>Messages</div>
-                <span class="badge bg-primary rounded-pill ms-auto">5</span>
+            </a>
+        </li>
+
+        <!-- Documents -->
+        <li class="menu-item {% if app.request.get('_route') starts with 'admin_document_' %}active{% endif %}">
+            <a href="{{ path('admin_document_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-file"></i>
+                <div>Documents</div>
+            </a>
+        </li>
+
+        <!-- Catégories documents -->
+        <li class="menu-item {% if app.request.get('_route') starts with 'admin_categorie_' %}active{% endif %}">
+            <a href="{{ path('admin_categorie_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-folder"></i>
+                <div>Catégories documents</div>
+            </a>
+        </li>
+
+        <!-- Type rendez-vous -->
+        <li class="menu-item {% if app.request.get('_route') starts with 'admin_type_rendez_vous_' %}active{% endif %}">
+            <a href="{{ path('admin_type_rendez_vous_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-tag"></i>
+                <div>Type rendez-vous</div>
+            </a>
+        </li>
+
+        <!-- Liste des rendez-vous -->
+        <li class="menu-item {% if app.request.get('_route') starts with 'medecin_rendez_vous_' %}active{% endif %}">
+            <a href="{{ path('medecin_rendez_vous_index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-calendar"></i>
+                <div>Liste des rendez-vous</div>
             </a>
         </li>
 
@@ -142,7 +129,7 @@
 
         <!-- Paramètres -->
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ path('admin_profile') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-cog"></i>
                 <div>Paramètres</div>
             </a>
@@ -150,10 +137,9 @@
 
         <!-- Support -->
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ path('admin_dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-help-circle"></i>
                 <div>Aide & Support</div>
-                <span class="badge bg-label-dark rounded-pill ms-auto">Nouveau</span>
             </a>
         </li>
 

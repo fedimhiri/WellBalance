@@ -1,0 +1,207 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Statistiques des rendez-vous{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .stats-kpi-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #ffffff;
+            padding: 1rem;
+        }
+        .stats-kpi-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6b7280;
+        }
+        .stats-kpi-value {
+            margin-top: 0.45rem;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.1;
+        }
+        .stats-meta-line {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .chart-box {
+            position: relative;
+            height: 360px;
+            padding-bottom: 0.5rem;
+        }
+        .chart-box canvas {
+            width: 100% !important;
+            height: calc(100% - 28px) !important;
+        }
+        .stats-card-title {
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            color: #334155;
+        }
+        .stats-top-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.45rem 0;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .stats-top-list li:last-child {
+            border-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="stats-dashboard-config"
+         data-main-endpoint="{{ path('api_stats_medecin_index') }}"
+         data-monthly-endpoint="{{ path('api_stats_medecin_mensuel') }}"
+         data-pdf-endpoint="{{ path('api_stats_medecin_pdf') }}"
+         data-default-medecin-id="{{ defaultMedecinId }}"
+         data-default-from="{{ defaultFrom }}"
+         data-default-to="{{ defaultTo }}"
+         data-default-year="{{ defaultYear }}"
+         data-default-include-zero="{{ defaultIncludeZeroDaysForMin ? '1' : '0' }}">
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 mb-0">Dashboard statistiques rendez-vous</h1>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="stats-filter-form" class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label" for="stats-medecin-id">Medecin ID</label>
+                    <input id="stats-medecin-id" type="number" min="1" class="form-control" value="{{ defaultMedecinId }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="stats-from">Du</label>
+                    <input id="stats-from" type="date" class="form-control" value="{{ defaultFrom }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="stats-to">Au</label>
+                    <input id="stats-to" type="date" class="form-control" value="{{ defaultTo }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="stats-year">Annee</label>
+                    <input id="stats-year" type="number" min="2000" max="2100" class="form-control" value="{{ defaultYear }}">
+                </div>
+                <div class="col-md-4 ms-md-auto">
+                    <div class="d-flex gap-2 justify-content-md-end justify-content-start w-100">
+                        <button class="btn btn-primary px-4" type="submit">Actualiser</button>
+                        <a id="stats-export-pdf-btn" class="btn btn-outline-primary px-4 text-nowrap" href="#" target="_blank" rel="noopener">Exporter PDF</a>
+                    </div>
+                </div>
+            </form>
+            <div id="stats-error" class="alert alert-danger mt-3 d-none mb-0"></div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stats-kpi-card">
+                <div class="stats-kpi-label">Total rendez-vous</div>
+                <div id="kpi-total" class="stats-kpi-value">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-kpi-card">
+                <div class="stats-kpi-label">Taux annulation</div>
+                <div id="kpi-cancel-rate" class="stats-kpi-value">0%</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-kpi-card">
+                <div class="stats-kpi-label">Taux confirmation</div>
+                <div id="kpi-confirm-rate" class="stats-kpi-value">0%</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-kpi-card">
+                <div class="stats-kpi-label">Moyenne / jour</div>
+                <div id="kpi-average-per-day" class="stats-kpi-value">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div id="stats-meta" class="stats-meta-line">Aucune periode chargee.</div>
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <strong>Jour le plus charge:</strong> <span id="stats-busiest-day">-</span>
+                </div>
+                <div class="col-md-6">
+                    <strong>Jour le moins charge:</strong> <span id="stats-least-day">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-8">
+            <div class="card h-100">
+                <div class="card-body chart-box">
+                    <h2 class="h6 stats-card-title">Rendez-vous par jour</h2>
+                    <canvas id="chart-by-day"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card h-100">
+                <div class="card-body chart-box">
+                    <h2 class="h6 stats-card-title">Par statut</h2>
+                    <canvas id="chart-by-status"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card h-100">
+                <div class="card-body chart-box">
+                    <h2 class="h6 stats-card-title">Par type de rendez-vous</h2>
+                    <canvas id="chart-by-type"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card h-100">
+                <div class="card-body chart-box">
+                    <h2 class="h6 stats-card-title">Top 5 heures</h2>
+                    <canvas id="chart-top-hours"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-8">
+            <div class="card h-100">
+                <div class="card-body chart-box">
+                    <h2 class="h6 stats-card-title">Rendez-vous par mois</h2>
+                    <canvas id="chart-by-month"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Top 3 types</h2>
+                    <ul id="top-types-list" class="list-unstyled mb-0 stats-top-list">
+                        <li><span>Aucune donnee</span><span>-</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/stats-dashboard.js') }}"></script>
+{% endblock %}

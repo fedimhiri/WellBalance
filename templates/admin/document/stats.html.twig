@@ -1,0 +1,150 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Statistiques des documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><i class="bx bx-bar-chart-alt-2 me-2"></i>Statistiques des documents</h4>
+        <a href="{{ path('admin_document_index') }}" class="btn btn-outline-secondary">
+            <i class="bx bx-arrow-back me-1"></i> Retour
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total documents</h5>
+                    <h2>{{ total_documents }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Documents par catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartCategory" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Documents par mois</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartMonth" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Documents par utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartUser" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Références assurance les plus utilisées</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartInsurance" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+(function() {
+    const colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1', '#fd7e14', '#20c997'];
+
+    new Chart(document.getElementById('chartCategory'), {
+        type: 'bar',
+        data: {
+            labels: {{ by_category|map(c => c.nom)|json_encode|raw }},
+            datasets: [{
+                label: 'Documents',
+                data: {{ by_category|map(c => c.count)|json_encode|raw }},
+                backgroundColor: colors.slice(0, {{ by_category|length }})
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('chartMonth'), {
+        type: 'line',
+        data: {
+            labels: {{ by_month|map(m => m.month)|json_encode|raw }},
+            datasets: [{
+                label: 'Documents',
+                data: {{ by_month|map(m => m.count)|json_encode|raw }},
+                borderColor: '#0d6efd',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('chartUser'), {
+        type: 'pie',
+        data: {
+            labels: {{ by_user|map(u => u.user_name)|json_encode|raw }},
+            datasets: [{
+                data: {{ by_user|map(u => u.count)|json_encode|raw }},
+                backgroundColor: colors
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    new Chart(document.getElementById('chartInsurance'), {
+        type: 'bar',
+        data: {
+            labels: {{ by_insurance|map(i => i.insurance_reference)|json_encode|raw }},
+            datasets: [{
+                label: 'Utilisations',
+                data: {{ by_insurance|map(i => i.count)|json_encode|raw }},
+                backgroundColor: '#198754'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+})();
+    </script>
+{% endblock %}

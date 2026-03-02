@@ -1,0 +1,17 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Type de rendez-vous{% endblock %}
+
+{% block body %}
+    <h1 class="h4 mb-4">Type de rendez-vous #{{ type.id }}</h1>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Nom:</strong> {{ type.nomType }}</p>
+            <p class="mb-0"><strong>Description:</strong> {{ type.description ?: '-' }}</p>
+        </div>
+    </div>
+
+    <a class="btn btn-secondary" href="{{ path('admin_type_rendez_vous_index') }}">Retour</a>
+    <a class="btn btn-primary" href="{{ path('admin_type_rendez_vous_edit', {id: type.id}) }}">Editer</a>
+{% endblock %}

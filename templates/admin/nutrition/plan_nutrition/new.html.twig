@@ -1,0 +1,110 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Nouveau Plan Nutrition{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">Nouveau Plan Nutrition</h4>
+        <nav class="d-flex">
+            <h6 class="fw-normal text-muted mb-0">Nutrition / Plans / Nouveau</h6>
+        </nav>
+    </div>
+    <a href="{{ path('admin_plan_nutrition_index') }}" class="btn btn-outline-secondary">
+        <i class="bx bx-arrow-back me-2"></i>Retour
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {{ form_start(form) }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.objectif) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.user) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.dateDebut) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.dateFin) }}
+                </div>
+                <div class="col-12 mb-3">
+                    {{ form_row(form.description) }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form_row(form.periode) }}
+                </div>
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bx bx-save me-2"></i>Enregistrer
+                </button>
+                <a href="{{ path('admin_plan_nutrition_index') }}" class="btn btn-outline-secondary">
+                    Annuler
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const start = document.getElementById('{{ form.dateDebut.vars.id }}');
+  const end   = document.getElementById('{{ form.dateFin.vars.id }}');
+  const per   = document.getElementById('{{ form.periode.vars.id }}');
+
+  if (!start || !end) return;
+
+  const calcPeriode = () => {
+    if (!start.value || !end.value || !per) return;
+
+    const d1 = new Date(start.value);
+    const d2 = new Date(end.value);
+
+    if (isNaN(d1) || isNaN(d2)) return;
+
+    const diffMs = d2 - d1;
+    const jours = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (jours < 0) {
+      per.value = '';
+      return;
+    }
+
+    if (jours >= 30) {
+      const mois = Math.floor(jours / 30);
+      per.value = mois + ' mois' + (mois > 1 ? 's' : '');
+    } else {
+      per.value = jours + ' jour' + (jours > 1 ? 's' : '');
+    }
+  };
+
+  const syncMin = () => {
+    if (start.value) {
+      end.min = start.value;
+
+      // si l'utilisateur a mis une date fin avant début, on la corrige automatiquement
+      if (end.value && end.value < start.value) {
+        end.value = start.value;
+      }
+    } else {
+      end.removeAttribute('min');
+    }
+    calcPeriode();
+  };
+
+  start.addEventListener('change', syncMin);
+  end.addEventListener('change', calcPeriode);
+
+  // init
+  syncMin();
+  calcPeriode();
+});
+</script>
+{% endblock %}

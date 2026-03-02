@@ -1,0 +1,56 @@
+{% extends (viewerType is defined and viewerType == 'admin') ? 'messenger/_base_admin.html.twig' : (app.user and 'ROLE_ADMIN' in app.user.roles ? 'messenger/_base_admin.html.twig' : 'messenger/_base_front.html.twig') %}
+
+{% block title %}Modifier le message{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">Modifier le message</h4>
+            {% if viewerType == 'user' %}
+                <a href="{{ path('front_messenger_show', {id: message.conversation.id}) }}" class="text-decoration-none">← Retour à la conversation</a>
+            {% else %}
+                <a href="{{ path('admin_messenger_show', {id: message.conversation.id}) }}" class="text-decoration-none">← Retour à la conversation</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            
+            <div class="mb-3">
+                {{ form_label(form.content) }}
+                {{ form_widget(form.content, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+                {{ form_errors(form.content) }}
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check me-2"></i>Enregistrer les modifications
+                </button>
+                {% if viewerType == 'user' %}
+                    <a href="{{ path('front_messenger_show', {id: message.conversation.id}) }}" class="btn btn-outline-secondary">
+                        Annuler
+                    </a>
+                {% else %}
+                    <a href="{{ path('admin_messenger_show', {id: message.conversation.id}) }}" class="btn btn-outline-secondary">
+                        Annuler
+                    </a>
+                {% endif %}
+            </div>
+            
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

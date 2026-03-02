@@ -1,0 +1,128 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Admin — Document {{ document.titre }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bx bx-file-find me-2"></i>{{ document.titre }}
+        </h4>
+        <a href="{{ path('admin_document_crud_index') }}" class="btn btn-outline-secondary">
+            <i class="bx bx-arrow-back me-1"></i> Retour
+        </a>
+    </div>
+
+    {# Flash messages #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="card-title mb-0">Détails</h5></div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr><td class="fw-semibold" style="width:35%">ID</td><td>{{ document.id }}</td></tr>
+                        <tr><td class="fw-semibold">Titre</td><td>{{ document.titre }}</td></tr>
+                        <tr><td class="fw-semibold">Type</td><td><span class="badge bg-label-primary">{{ document.typeDocument }}</span></td></tr>
+                        <tr><td class="fw-semibold">Catégorie</td><td>{{ document.categorie ? document.categorie.nom : '—' }}</td></tr>
+                        <tr><td class="fw-semibold">Utilisateur</td><td>{{ document.user ? document.user.displayName : '—' }}</td></tr>
+                        <tr><td class="fw-semibold">Email</td><td>{{ document.user ? document.user.email : '—' }}</td></tr>
+                        <tr><td class="fw-semibold">Téléphone</td><td>{{ document.user.telephone|default('—') }}</td></tr>
+                        <tr><td class="fw-semibold">Date</td><td>{{ document.dateUpload|date('d/m/Y H:i') }}</td></tr>
+                        <tr>
+                            <td class="fw-semibold">Fichier</td>
+                            <td><a href="{{ asset(document.cheminFichier) }}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bx bx-download me-1"></i>Télécharger</a></td>
+                        </tr>
+                        {% if document.insuranceReference %}
+                        <tr><td class="fw-semibold">Réf. Assurance</td><td><span class="badge bg-label-success">{{ document.insuranceReference }}</span></td></tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            {# Notifications Card #}
+            <div class="card mb-4 border-info">
+                <div class="card-header bg-info text-white"><h5 class="card-title mb-0"><i class="bx bx-bell me-2"></i>Notifications</h5></div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">Envoyer une notification au patient concernant ce document</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="bx bx-phone me-1"></i> SMS</label>
+                        {% if document.user and document.user.telephone %}
+                            <form method="post" action="{{ path('admin_document_send_sms', {id: document.id}) }}" class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('send_sms_' ~ document.id) }}">
+                                <button type="submit" class="btn btn-primary btn-sm w-100" onclick="return confirm('Envoyer un SMS à {{ document.user.displayName }} ?')">
+                                    <i class="bx bx-message-detail me-1"></i> Envoyer SMS à {{ document.user.telephone }}
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                <i class="bx bx-x-circle me-1"></i> Aucun téléphone disponible
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label class="form-label fw-bold"><i class="bx bx-envelope me-1"></i> Email</label>
+                        {% if document.user and document.user.email %}
+                            <form method="post" action="{{ path('admin_document_send_email', {id: document.id}) }}" class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('send_email_' ~ document.id) }}">
+                                <button type="submit" class="btn btn-success btn-sm w-100" onclick="return confirm('Envoyer un email à {{ document.user.displayName }} ?')">
+                                    <i class="bx bx-send me-1"></i> Envoyer Email à {{ document.user.email }}
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                <i class="bx bx-x-circle me-1"></i> Aucun email disponible
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="card-title mb-0"><i class="bx bx-brain me-2"></i>Analyse IA</h5></div>
+                <div class="card-body">
+                    <p><strong>Type détecté :</strong>
+                        {% if document.typeDetecte %}
+                            <span class="badge bg-label-info">{{ document.typeDetecte }}</span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Résumé :</strong><br>{{ document.resumeAi ?? 'Aucun' }}</p>
+                    <p><strong>Mots-clés :</strong><br>
+                        {% if document.motsCles %}
+                            {% for mot in document.motsCles %}
+                                <span class="badge bg-secondary me-1 mb-1">{{ mot }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">Aucun</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" action="{{ path('admin_document_crud_delete', {id: document.id}) }}" onsubmit="return confirm('Supprimer ce document ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_document_' ~ document.id) }}">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bx bx-trash me-1"></i> Supprimer ce document
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

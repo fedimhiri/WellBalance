@@ -1,0 +1,31 @@
+{% extends 'frontend/base_frontend.html.twig' %}
+
+{% block title %}Detail rendez-vous{% endblock %}
+
+{% block body %}
+    <section class="section py-5">
+        <div class="container">
+            <h1 class="h4 mb-4">Rendez-vous #{{ rendezVous.id }}</h1>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p><strong>Titre:</strong> {{ rendezVous.titre }}</p>
+                    <p><strong>Description:</strong> {{ rendezVous.description ?: '-' }}</p>
+                    <p><strong>Date:</strong> {{ rendezVous.dateRdv|date('d/m/Y') }}</p>
+                    <p><strong>Heure:</strong> {{ rendezVous.heureRdv|date('H:i') }}</p>
+                    <p><strong>Type:</strong> {{ rendezVous.typeRendezVous.nomType }}</p>
+                    <p><strong>Medecin:</strong> {{ rendezVous.medecin ? rendezVous.medecin.displayName : '-' }}</p>
+                    <p class="mb-0">
+                        <strong>Statut:</strong>
+                        {% include 'rendez_vous/_status_badge.html.twig' with { statut: rendezVous.statut } only %}
+                    </p>
+                </div>
+            </div>
+
+            <a href="{{ path('patient_rendez_vous_index') }}" class="btn btn-secondary">Retour</a>
+            {% if rendezVous.statut == constant('App\\\\Entity\\\\RendezVous::STATUT_EN_ATTENTE') %}
+                <a href="{{ path('patient_rendez_vous_edit', {id: rendezVous.id}) }}" class="btn btn-primary">Editer</a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

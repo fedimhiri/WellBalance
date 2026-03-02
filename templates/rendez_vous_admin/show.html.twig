@@ -1,0 +1,26 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Detail rendez-vous{% endblock %}
+
+{% block body %}
+    <h1 class="h4 mb-4">Rendez-vous #{{ rendezVous.id }}</h1>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Titre:</strong> {{ rendezVous.titre }}</p>
+            <p><strong>Description:</strong> {{ rendezVous.description ?: '-' }}</p>
+            <p><strong>Date:</strong> {{ rendezVous.dateRdv|date('d/m/Y') }}</p>
+            <p><strong>Heure:</strong> {{ rendezVous.heureRdv|date('H:i') }}</p>
+            <p><strong>Type:</strong> {{ rendezVous.typeRendezVous.nomType }}</p>
+            <p><strong>Patient:</strong> {{ rendezVous.patient ? rendezVous.patient.displayName : '-' }}</p>
+            <p><strong>Medecin:</strong> {{ rendezVous.medecin ? rendezVous.medecin.displayName : '-' }}</p>
+            <p class="mb-0">
+                <strong>Statut:</strong>
+                {% include 'rendez_vous/_status_badge.html.twig' with { statut: rendezVous.statut } only %}
+            </p>
+        </div>
+    </div>
+
+    <a class="btn btn-secondary" href="{{ path('admin_rendez_vous_index') }}">Retour</a>
+    <a class="btn btn-primary" href="{{ path('admin_rendez_vous_edit', {id: rendezVous.id}) }}">Editer</a>
+{% endblock %}

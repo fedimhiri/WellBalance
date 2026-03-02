@@ -1,0 +1,20 @@
+{# templates/emails/emergency_notification.html.twig #}
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+    <div style="background-color: #dc3545; color: white; padding: 15px 20px;">
+        <h2 style="margin: 0;">🚨 URGENCE : Nouveau message</h2>
+    </div>
+    <div style="padding: 20px;">
+        <p>Bonjour Dr. <strong>{{ medecin.username }}</strong>,</p>
+        <p>Le patient <strong>{{ patient.username }}</strong> vous a envoyé un message dans une conversation marquée comme urgente.</p>
+        
+        <div style="background-color: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <h4 style="margin-top: 0; color: #842029;">Sujet : {{ conversation.sujet }}</h4>
+            <p style="margin-bottom: 0; font-style: italic;">{{ message.content|nl2br }}</p>
+        </div>
+        
+        <p>Veuillez vous connecter à la plateforme pour répondre dans les plus brefs délais.</p>
+    </div>
+    <div style="background-color: #f8f9fa; padding: 15px 20px; text-align: center; color: #6c757d; font-size: 12px;">
+        Ceci est un message automatique, merci de ne pas y répondre directement.
+    </div>
+</div>

@@ -1,0 +1,127 @@
+{% extends 'backend/baseend.html.twig' %}
+
+{% block title %}Admin — Documents{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bx bx-file me-2"></i>Administration des Documents
+        </h4>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_document_stats') }}" class="btn btn-outline-primary">
+                <i class="bx bx-bar-chart-alt-2 me-1"></i> Statistiques
+            </a>
+            <a href="{{ path('admin_document_dashboard') }}" class="btn btn-outline-info">
+                <i class="bx bx-dashboard me-1"></i> Dashboard
+            </a>
+            <a href="{{ path('admin_document_crud_index') }}" class="btn btn-outline-secondary">
+                <i class="bx bx-arrow-back me-1"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ path('admin_document_crud_index') }}" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Rechercher</label>
+                    <input type="text" name="search" class="form-control" placeholder="Titre ou type..." value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Trier par</label>
+                    <select name="sort" class="form-select">
+                        <option value="dateUpload" {{ sort == 'dateUpload' ? 'selected' }}>Date</option>
+                        <option value="titre" {{ sort == 'titre' ? 'selected' }}>Titre</option>
+                        <option value="typeDocument" {{ sort == 'typeDocument' ? 'selected' }}>Type</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Ordre</label>
+                    <select name="direction" class="form-select">
+                        <option value="DESC" {{ direction == 'DESC' ? 'selected' }}>DESC</option>
+                        <option value="ASC" {{ direction == 'ASC' ? 'selected' }}>ASC</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="bx bx-search me-1"></i> Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Titre</th>
+                        <th>Type</th>
+                        <th>Utilisateur</th>
+                        <th>Type IA</th>
+                        <th>Assurance</th>
+                        <th>Date</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for document in documents %}
+                        <tr>
+                            <td>{{ document.id }}</td>
+                            <td>
+                                <a href="{{ path('admin_document_crud_show', {id: document.id}) }}">
+                                    {{ document.titre }}
+                                </a>
+                            </td>
+                            <td><span class="badge bg-label-primary">{{ document.typeDocument }}</span></td>
+                            <td>{{ document.user ? document.user.displayName : '—' }}</td>
+                            <td>
+                                {% if document.typeDetecte %}
+                                    <span class="badge bg-label-info">{{ document.typeDetecte }}</span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if document.insuranceReference %}
+                                    <span class="badge bg-label-success">{{ document.insuranceReference }}</span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ document.dateUpload|date('d/m/Y') }}</td>
+                            <td class="text-center">
+                                <a href="{{ path('admin_document_crud_show', {id: document.id}) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="bx bx-show"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_document_crud_delete', {id: document.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_document_' ~ document.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">Aucun document.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
