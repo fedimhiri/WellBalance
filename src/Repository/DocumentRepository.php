@@ -15,9 +15,11 @@ use Doctrine\Persistence\ManagerRegistry;
 class DocumentRepository extends ServiceEntityRepository
 {
     private const ALLOWED_SORT_FIELDS = [
+        'id',
         'dateUpload',
         'titre',
         'typeDocument',
+        'createdAt',
     ];
 
     public function __construct(ManagerRegistry $registry)
@@ -214,5 +216,73 @@ class DocumentRepository extends ServiceEntityRepository
             $qb->andWhere('d.user = :user')->setParameter('user', $user);
         }
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Admin search with filtering, sorting and pagination
+     *
+     * @return array{documents: Document[], total: int}
+     */
+    public function adminSearch(?string $search, string $sortField, string $direction, int $page, int $limit): array
+    {
+        // Validate sort field
+        if (!\in_array($sortField, self::ALLOWED_SORT_FIELDS, true)) {
+            $sortField = 'dateUpload';
+        }
+
+        // Validate direction
+        $direction = strtoupper($direction);
+        if (!\in_array($direction, ['ASC', 'DESC'], true)) {
+            $direction = 'DESC';
+        }
+
+        $qb = $this->createQueryBuilder('d')
+            ->leftJoin('d.categorie', 'c')
+            ->leftJoin('d.user', 'u');
+
+        // Search filter - handle id as numeric, others as text
+        if (null !== $search && '' !== trim($search)) {
+            $searchTerm = trim($search);
+            
+            // Check if search is numeric (could be id)
+            if (is_numeric($searchTerm)) {
+                $qb->andWhere('d.id = :searchId')
+                    ->setParameter('searchId', (int) $searchTerm);
+            } else {
+                // Text search in other fields
+                $searchPattern = '%' . $searchTerm . '%';
+                $qb->andWhere(
+                    $qb->expr()->orX(
+                        'd.titre LIKE :search',
+                        'd.typeDocument LIKE :search',
+                        'd.insuranceReference LIKE :search',
+                        'd.resumeAi LIKE :search',
+                        'd.typeDetecte LIKE :search',
+                        'c.nom LIKE :search',
+                        'u.email LIKE :search',
+                        'u.username LIKE :search'
+                    )
+                )->setParameter('search', $searchPattern);
+            }
+        }
+
+        // Count total
+        $countQb = clone $qb;
+        $total = (int) $countQb->select('COUNT(DISTINCT d.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Get paginated results
+        $documents = $qb
+            ->orderBy('d.' . $sortField, $direction)
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return [
+            'documents' => $documents,
+            'total' => $total,
+        ];
     }
 }

@@ -1,164 +1,231 @@
-{% extends 'backend/baseend.html.twig' %}
+{% extends 'frontend/base_frontend.html.twig' %}
 
-{% block title %}{{ document.titre }} — Document{% endblock %}
+{% block title %}{{ document.titre }} — Document - WellBalance{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">
-            <i class="bx bx-file-find me-2"></i>{{ document.titre }}
-        </h4>
-        <a href="{{ path('app_document_index') }}" class="btn btn-outline-secondary">
-            <i class="bx bx-arrow-back me-1"></i> Retour à la liste
-        </a>
-    </div>
-
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-    {% endfor %}
-
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Informations du document</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Titre</div>
-                        <div class="col-sm-8">{{ document.titre }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Type de document</div>
-                        <div class="col-sm-8"><span class="badge bg-label-primary">{{ document.typeDocument }}</span></div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Catégorie</div>
-                        <div class="col-sm-8">{{ document.categorie ? document.categorie.nom : '—' }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Date d'upload</div>
-                        <div class="col-sm-8">{{ document.dateUpload|date('d/m/Y à H:i') }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Fichier</div>
-                        <div class="col-sm-8">
-                            <a href="{{ asset(document.cheminFichier) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="bx bx-download me-1"></i> Télécharger le PDF
-                            </a>
-                        </div>
-                    </div>
-                    {% if document.insuranceReference %}
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Réf. Assurance</div>
-                        <div class="col-sm-8"><span class="badge bg-label-success">{{ document.insuranceReference }}</span></div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-brain me-2"></i>Analyse IA</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Type détecté</div>
-                        <div class="col-sm-8">
-                            {% if document.typeDetecte %}
-                                <span class="badge bg-label-info">{{ document.typeDetecte }}</span>
-                            {% else %}
-                                <span class="text-muted">Non analysé</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Résumé IA</div>
-                        <div class="col-sm-8">{{ document.resumeAi ?? 'Aucun résumé disponible.' }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4 fw-semibold">Mots-clés</div>
-                        <div class="col-sm-8">
-                            {% if document.motsCles %}
-                                {% for mot in document.motsCles %}
-                                    <span class="badge bg-secondary me-1">{{ mot }}</span>
-                                {% endfor %}
-                            {% else %}
-                                <span class="text-muted">Aucun</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Actions rapides</h5>
-                </div>
-                <div class="card-body">
-                    <a href="{{ path('app_document_export_pdf', {id: document.id}) }}" class="btn btn-outline-secondary w-100 mb-3">
-                        <i class="bx bx-download me-1"></i> Exporter en PDF
+    <section class="section py-5" style="background-color: #fff; min-height: auto;">
+        <div class="container" style="min-height: auto;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    <a href="{{ path('app_document_index') }}" class="btn btn-outline-secondary me-3" title="Retour à la liste">
+                        <i class="bi bi-arrow-left"></i>
                     </a>
-
-                    <form method="post" action="{{ path('app_document_send_insurance', {id: document.id}) }}" class="mb-3">
-                        <input type="hidden" name="_token" value="{{ csrf_token('insurance_document_' ~ document.id) }}">
-                        <button type="submit" class="btn btn-outline-success w-100" {{ document.insuranceReference ? 'disabled' : '' }}>
-                            <i class="bx bx-shield me-1"></i> Soumettre à l'assurance
-                        </button>
-                    </form>
-
-                    <form method="post" action="{{ path('app_document_delete', {id: document.id}) }}" onsubmit="return confirm('Supprimer ce document ?')">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete_document_' ~ document.id) }}">
-                        <button type="submit" class="btn btn-outline-danger w-100">
-                            <i class="bx bx-trash me-1"></i> Supprimer
-                        </button>
-                    </form>
+                    <h1 class="h4 mb-0">
+                        <i class="bi bi-file-earmark-text me-2"></i>{{ document.titre }}
+                    </h1>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary" onclick="analyzeDocument({{ document.id }})">
+                        <i class="bi bi-cpu me-1"></i> Analyze with AI
+                    </button>
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-message-dots me-2"></i>Envoyer par SMS</h5>
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+
+            {# AI Analysis Result #}
+            <div id="ai-analysis-result" class="card mb-4" style="display: none;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-robot me-2"></i>Analysis Result</h5>
                 </div>
-                <div class="card-body">
-                    <form method="post" action="{{ path('app_document_send_sms', {id: document.id}) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('sms_document_' ~ document.id) }}">
-                        <div class="mb-3">
-                            <label class="form-label">Numéro de téléphone</label>
-                            <input type="tel" name="phone" class="form-control" placeholder="+216XXXXXXXX" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bx bx-send me-1"></i> Envoyer SMS
-                        </button>
-                    </form>
+                <div class="card-body" id="ai-analysis-content">
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bx bx-envelope me-2"></i>Envoyer par Email</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post" action="{{ path('app_document_send_email', {id: document.id}) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('email_document_' ~ document.id) }}">
-                        <div class="mb-3">
-                            <label class="form-label">Adresse email</label>
-                            <input type="email" name="email" class="form-control" placeholder="destinataire@email.com" required>
+            <div class="row" style="height: auto; min-height: unset;">
+                <div class="col-lg-8" style="height: auto;">
+                    <div class="card mb-4" style="height: auto;">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Informations du document</h5>
                         </div>
-                        <button type="submit" class="btn btn-info w-100">
-                            <i class="bx bx-mail-send me-1"></i> Envoyer Email
-                        </button>
-                    </form>
+                        <div class="card-body" style="overflow: visible;">
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">ID</div>
+                                <div class="col-sm-8">#{{ document.id }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Titre</div>
+                                <div class="col-sm-8">{{ document.titre }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Type de document</div>
+                                <div class="col-sm-8"><span class="badge bg-info text-dark">{{ document.typeDocument }}</span></div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Catégorie</div>
+                                <div class="col-sm-8">{{ document.categorie ? document.categorie.nom : '—' }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Date d'upload</div>
+                                <div class="col-sm-8">{{ document.dateUpload|date('d/m/Y à H:i') }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Fichier</div>
+                                <div class="col-sm-8">
+                                    <a href="{{ asset(document.cheminFichier) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-download me-1"></i> Télécharger le PDF
+                                    </a>
+                                </div>
+                            </div>
+                            {% if document.insuranceReference %}
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Réf. Assurance</div>
+                                <div class="col-sm-8"><span class="badge bg-success">{{ document.insuranceReference }}</span></div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4" style="height: auto;">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-robot me-2"></i>Analyse IA</h5>
+                        </div>
+                        <div class="card-body" style="overflow: visible;">
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Type détecté</div>
+                                <div class="col-sm-8">
+                                    {% if document.typeDetecte %}
+                                        <span class="badge bg-info text-dark">{{ document.typeDetecte }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Non analysé</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Résumé IA</div>
+                                <div class="col-sm-8">{{ document.resumeAi ?? 'Aucun résumé disponible.' }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4 fw-semibold">Mots-clés</div>
+                                <div class="col-sm-8">
+                                    {% if document.motsCles %}
+                                        {% for mot in document.motsCles %}
+                                            <span class="badge bg-secondary me-1">{{ mot }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">Aucun</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4" style="height: auto;">
+                    <div class="card mb-4" style="height: auto;">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Actions rapides</h5>
+                        </div>
+                        <div class="card-body" style="overflow: visible;">
+                            <a href="{{ path('app_document_export_pdf', {id: document.id}) }}" class="btn btn-outline-secondary w-100 mb-3">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> Exporter en PDF
+                            </a>
+
+                            <form method="post" action="{{ path('app_document_send_insurance', {id: document.id}) }}" class="mb-3">
+                                <input type="hidden" name="_token" value="{{ csrf_token('insurance_document_' ~ document.id) }}">
+                                <button type="submit" class="btn btn-outline-success w-100" {{ document.insuranceReference ? 'disabled' : '' }}>
+                                    <i class="bi bi-shield-check me-1"></i> Soumettre à l'assurance
+                                </button>
+                            </form>
+
+                            <form method="post" action="{{ path('app_document_delete', {id: document.id}) }}" onsubmit="return confirm('Supprimer ce document ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_document_' ~ document.id) }}">
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="bi bi-trash me-1"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4" style="height: auto;">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-chat-dots me-2"></i>Envoyer par SMS</h5>
+                        </div>
+                        <div class="card-body" style="overflow: visible;">
+                            <form method="post" action="{{ path('app_document_send_sms', {id: document.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('sms_document_' ~ document.id) }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Numéro de téléphone</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+216XXXXXXXX" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-send me-1"></i> Envoyer SMS
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4" style="height: auto;">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-envelope me-2"></i>Envoyer par Email</h5>
+                        </div>
+                        <div class="card-body" style="overflow: visible;">
+                            <form method="post" action="{{ path('app_document_send_email', {id: document.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('email_document_' ~ document.id) }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Adresse email</label>
+                                    <input type="email" name="email" class="form-control" placeholder="destinataire@email.com" required>
+                                </div>
+                                <button type="submit" class="btn btn-info w-100">
+                                    <i class="bi bi-send me-1"></i> Envoyer Email
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    <script>
+    async function analyzeDocument(id) {
+        const resultDiv = document.getElementById('ai-analysis-result');
+        const contentDiv = document.getElementById('ai-analysis-content');
+        
+        // Show loading
+        resultDiv.style.display = 'block';
+        contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><p class="mt-2">Analyse en cours...</p></div>';
+        
+        try {
+            const response = await fetch(`/api/analyze/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const analysis = data.data;
+                contentDiv.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>Type détecté:</strong><br>
+                            <span class="badge bg-info text-dark">${analysis.type_detecte || 'N/A'}</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Mots-clés:</strong><br>
+                            ${analysis.mots_cles && analysis.mots_cles.length > 0 
+                                ? analysis.mots_cles.map(k => `<span class="badge bg-secondary me-1">${k}</span>`).join('') 
+                                : '<span class="text-muted">Aucun</span>'}
+                        </div>
+                        <div class="col-12">
+                            <strong>Résumé:</strong><br>
+                            <p class="mb-0">${analysis.resume || 'Aucun résumé disponible.'}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = `<div class="alert alert-danger">${data.error || 'Erreur lors de l\'analyse'}</div>`;
+            }
+        } catch (error) {
+            contentDiv.innerHTML = `<div class="alert alert-danger">Erreur de connexion: ${error.message}</div>`;
+        }
+    }
+    </script>
 {% endblock %}

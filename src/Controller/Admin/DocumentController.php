@@ -37,16 +37,29 @@ class DocumentController extends AbstractController
     {
         $page = max(1, (int) $request->query->get('page', 1));
         $limit = 15;
+        $search = $request->query->get('search', '');
+        $sort = $request->query->get('sort', 'dateUpload');
+        $direction = $request->query->get('direction', 'DESC');
 
-        $documents = $this->documentRepository->findPaginated($page, $limit, null);
-        $total = $this->documentRepository->countPaginated(null);
+        $result = $this->documentRepository->adminSearch(
+            $search ?: null,
+            $sort,
+            $direction,
+            $page,
+            $limit
+        );
+
+        $total = $result['total'];
         $totalPages = (int) ceil($total / $limit);
 
         return $this->render('admin/document/index.html.twig', [
-            'documents' => $documents,
+            'documents' => $result['documents'],
             'page' => $page,
             'total_pages' => $totalPages,
             'total' => $total,
+            'search' => $search,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 

@@ -28,23 +28,98 @@
         {% endfor %}
     {% endfor %}
 
+    {# Search and Filter Form #}
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ path('admin_document_index') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Rechercher (ID, titre, type, description...)</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="ID, titre, type, résumé IA..." 
+                           value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Trier par</label>
+                    <select name="sort" class="form-select">
+                        <option value="id" {{ sort == 'id' ? 'selected' }}>ID</option>
+                        <option value="dateUpload" {{ sort == 'dateUpload' ? 'selected' }}>Date</option>
+                        <option value="titre" {{ sort == 'titre' ? 'selected' }}>Titre</option>
+                        <option value="typeDocument" {{ sort == 'typeDocument' ? 'selected' }}>Type</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Ordre</label>
+                    <select name="direction" class="form-select">
+                        <option value="DESC" {{ direction == 'DESC' ? 'selected' }}>Décroissant</option>
+                        <option value="ASC" {{ direction == 'ASC' ? 'selected' }}>Croissant</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bx bx-search me-1"></i> Filtrer
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <a href="{{ path('admin_document_index') }}" class="btn btn-outline-secondary w-100" title="Réinitialiser">
+                        <i class="bx bx-reset"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Results count #}
+    <div class="mb-2 text-muted">
+        <small>{{ total }} document(s) trouvé(s)</small>
+    </div>
+
     <div class="card">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Titre</th>
+                        <th>
+                            {% set new_direction = (sort == 'id' and direction == 'ASC') ? 'DESC' : 'ASC' %}
+                            <a href="{{ path('admin_document_index', {search: search, sort: 'id', direction: new_direction, page: 1}) }}" 
+                               class="text-decoration-none {{ sort == 'id' ? 'text-primary' : 'text-dark' }}">
+                                ID 
+                                {% if sort == 'id' %}<i class="bx bx-sort-{{ direction|lower }}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            {% set new_direction = (sort == 'titre' and direction == 'ASC') ? 'DESC' : 'ASC' %}
+                            <a href="{{ path('admin_document_index', {search: search, sort: 'titre', direction: new_direction, page: 1}) }}" 
+                               class="text-decoration-none {{ sort == 'titre' ? 'text-primary' : 'text-dark' }}">
+                                Titre 
+                                {% if sort == 'titre' %}<i class="bx bx-sort-{{ direction|lower }}"></i>{% endif %}
+                            </a>
+                        </th>
                         <th>Catégorie</th>
                         <th>Utilisateur</th>
-                        <th>Type</th>
+                        <th>
+                            {% set new_direction = (sort == 'typeDocument' and direction == 'ASC') ? 'DESC' : 'ASC' %}
+                            <a href="{{ path('admin_document_index', {search: search, sort: 'typeDocument', direction: new_direction, page: 1}) }}" 
+                               class="text-decoration-none {{ sort == 'typeDocument' ? 'text-primary' : 'text-dark' }}">
+                                Type 
+                                {% if sort == 'typeDocument' %}<i class="bx bx-sort-{{ direction|lower }}"></i>{% endif %}
+                            </a>
+                        </th>
                         <th>Réf. assurance</th>
-                        <th>Date</th>
+                        <th>
+                            {% set new_direction = (sort == 'dateUpload' and direction == 'ASC') ? 'DESC' : 'ASC' %}
+                            <a href="{{ path('admin_document_index', {search: search, sort: 'dateUpload', direction: new_direction, page: 1}) }}" 
+                               class="text-decoration-none {{ sort == 'dateUpload' ? 'text-primary' : 'text-dark' }}">
+                                Date 
+                                {% if sort == 'dateUpload' %}<i class="bx bx-sort-{{ direction|lower }}"></i>{% endif %}
+                            </a>
+                        </th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for document in documents %}
                         <tr>
+                            <td><strong>#{{ document.id }}</strong></td>
                             <td>{{ document.titre }}</td>
                             <td>{{ document.categorie ? document.categorie.nom : '—' }}</td>
                             <td>{{ document.user ? document.user.displayName : '—' }}</td>
@@ -71,7 +146,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-muted">Aucun document.</td>
+                            <td colspan="8" class="text-center py-4 text-muted">Aucun document.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -83,15 +158,15 @@
     <nav class="mt-3">
         <ul class="pagination justify-content-center">
             <li class="page-item {{ page <= 1 ? 'disabled' }}">
-                <a class="page-link" href="{{ path('admin_document_index', {page: page - 1}) }}">Précédent</a>
+                <a class="page-link" href="{{ path('admin_document_index', {search: search, sort: sort, direction: direction, page: page - 1}) }}">Précédent</a>
             </li>
             {% for p in 1..total_pages %}
                 <li class="page-item {{ p == page ? 'active' }}">
-                    <a class="page-link" href="{{ path('admin_document_index', {page: p}) }}">{{ p }}</a>
+                    <a class="page-link" href="{{ path('admin_document_index', {search: search, sort: sort, direction: direction, page: p}) }}">{{ p }}</a>
                 </li>
             {% endfor %}
             <li class="page-item {{ page >= total_pages ? 'disabled' }}">
-                <a class="page-link" href="{{ path('admin_document_index', {page: page + 1}) }}">Suivant</a>
+                <a class="page-link" href="{{ path('admin_document_index', {search: search, sort: sort, direction: direction, page: page + 1}) }}">Suivant</a>
             </li>
         </ul>
     </nav>

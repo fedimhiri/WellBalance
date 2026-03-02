@@ -1,6 +1,6 @@
 {# templates/frontend/base_frontend.html.twig #}
 <!DOCTYPE html>
-<html lang="fr" class="light-style" dir="ltr" data-theme="theme-default">
+<html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,21 +28,46 @@
     <!-- Custom CSS Frontend -->
     <link href="{{ asset('assets_frontend/css/frontend-custom.css') }}" rel="stylesheet">
     
+    <style>
+        html, body {
+            height: auto;
+            min-height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+        footer {
+            position: relative;
+        }
+    </style>
+    
     {% block stylesheets %}{% endblock %}
 </head>
 
-<body class="index-page">
-    
-    <!-- Header -->
-    {% include 'frontend/partials/_header.html.twig' %}
-    
-    <!-- Main Content -->
-    <main class="main">
-        {% block body %}{% endblock %}
-    </main>
-    
-    <!-- Footer -->
-    {% include 'frontend/partials/_footer.html.twig' %}
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        {% include 'frontend/partials/_header.html.twig' %}
+        
+        <!-- Main Content -->
+        <main>
+            {% block body %}{% endblock %}
+        </main>
+        
+        <!-- Footer -->
+        {% include 'frontend/partials/_footer.html.twig' %}
+    </div>
     
     <!-- Scroll Top -->
     <a href="#!" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">

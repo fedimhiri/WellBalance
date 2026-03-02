@@ -1,73 +1,70 @@
 {% extends 'frontend/base_frontend.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
 
 {% block title %}Nouveau document - WellBalance{% endblock %}
 
 {% block body %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Nouveau document</h2>
-        <a href="{{ path('front_documents') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Retour
-        </a>
-    </div>
+    <section class="section py-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0">Nouveau document</h1>
+                <a href="{{ path('front_documents') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour
+                </a>
+            </div>
 
-    {# Flash messages #}
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            {# Flash messages #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('danger') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form, { 
+                        attr: { 
+                            enctype: 'multipart/form-data'
+                        }
+                    }) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.titre, 'Titre du document', { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.titre, { attr: { class: 'form-control', placeholder: 'Ex: Ordonnance Dr. Martin' } }) }}
+                        {{ form_errors(form.titre, { attr: { class: 'invalid-feedback d-block' } }) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.typeDocument, 'Type de document', { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.typeDocument, { attr: { class: 'form-select' } }) }}
+                        {{ form_errors(form.typeDocument, { attr: { class: 'invalid-feedback d-block' } }) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.categorie, 'Catégorie (optionnel)', { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.categorie, { attr: { class: 'form-select' } }) }}
+                        {{ form_errors(form.categorie, { attr: { class: 'invalid-feedback d-block' } }) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.fichier, 'Fichier PDF', { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.fichier, { attr: { class: 'form-control', accept: '.pdf' } }) }}
+                        {{ form_errors(form.fichier, { attr: { class: 'invalid-feedback d-block' } }) }}
+                        <div class="form-text">Formats acceptés: PDF (max 5 Mo)</div>
+                    </div>
+
+                    {{ form_rest(form) }}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-check-circle me-1"></i> Enregistrer
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
         </div>
-    {% endfor %}
-    {% for message in app.flashes('danger') %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
-
-    <div class="card">
-        <div class="card-body">
-            {{ form_start(form, { 
-                attr: { 
-                    enctype: 'multipart/form-data'
-                }
-            }) }}
-            
-            <div class="mb-3">
-                {{ form_label(form.titre, 'Titre du document', { label_attr: { class: 'form-label' } }) }}
-                {{ form_widget(form.titre, { attr: { class: 'form-control', placeholder: 'Ex: Ordonnance Dr. Martin' } }) }}
-                {{ form_errors(form.titre, { attr: { class: 'invalid-feedback d-block' } }) }}
-            </div>
-
-            <div class="mb-3">
-                {{ form_label(form.typeDocument, 'Type de document', { label_attr: { class: 'form-label' } }) }}
-                {{ form_widget(form.typeDocument, { attr: { class: 'form-select' } }) }}
-                {{ form_errors(form.typeDocument, { attr: { class: 'invalid-feedback d-block' } }) }}
-            </div>
-
-            <div class="mb-3">
-                {{ form_label(form.categorie, 'Catégorie (optionnel)', { label_attr: { class: 'form-label' } }) }}
-                {{ form_widget(form.categorie, { attr: { class: 'form-select' } }) }}
-                {{ form_errors(form.categorie, { attr: { class: 'invalid-feedback d-block' } }) }}
-            </div>
-
-            <div class="mb-3">
-                {{ form_label(form.fichier, 'Fichier PDF', { label_attr: { class: 'form-label' } }) }}
-                {{ form_widget(form.fichier, { attr: { class: 'form-control', accept: '.pdf' } }) }}
-                {{ form_errors(form.fichier, { attr: { class: 'invalid-feedback d-block' } }) }}
-                <div class="form-text">Formats acceptés: PDF Mo)</div>
- (max 5            </div>
-
-            {{ form_rest(form) }}
-
-            <div class="d-flex gap-2 mt-4">
-                <button class="btn btn-primary" type="submit">
-                    <i class="bi bi-check-circle me-1"></i> Enregistrer
-                </button>
-            </div>
-            
-            {{ form_end(form) }}
-        </div>
-    </div>
-</div>
+    </section>
 {% endblock %}

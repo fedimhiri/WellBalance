@@ -3,131 +3,120 @@
 {% block title %}Mes documents - WellBalance{% endblock %}
 
 {% block body %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center">
-            <a href="{{ path('app_frontend_vue') }}" class="btn btn-outline-secondary me-3" title="Retour à l'accueil">
-                <i class="bi bi-house-door"></i>
-            </a>
-            <h2 class="mb-0">Mes documents</h2>
-        </div>
-        <a href="{{ path('front_document_new') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Nouveau document
-        </a>
-    </div>
+    <section class="section py-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0">Mes documents</h1>
+                <a href="{{ path('front_document_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Nouveau document
+                </a>
+            </div>
 
-    {# Flash messages #}
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
-    {% for message in app.flashes('danger') %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {% endfor %}
+            {# Flash messages #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('danger') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
 
-    {# Documents table #}
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Titre</th>
-                            <th>Type</th>
-                            <th>Catégorie</th>
-                            <th>Date</th>
-                            <th style="width: 150px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if documents is defined and documents is not empty %}
-                            {% for document in documents %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ document.titre|default('-') }}</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info text-dark">{{ document.typeDocument|default('-') }}</span>
-                                    </td>
-                                    <td>
-                                        {% if document.categorie is defined and document.categorie %}
-                                            {{ document.categorie.nom|default('-') }}
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if document.dateUpload is defined and document.dateUpload %}
-                                            {{ document.dateUpload|date('d/m/Y') }}
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a class="btn btn-outline-primary" 
-                                               href="{{ path('front_document_show', {id: document.id}) }}" 
-                                               title="Voir">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            {% if document.cheminFichier is defined and document.cheminFichier %}
-                                                <a class="btn btn-outline-secondary" 
-                                                   href="{{ path('front_document_download', {id: document.id}) }}" 
-                                                   title="Télécharger" target="_blank">
-                                                    <i class="bi bi-download"></i>
-                                                </a>
+            {# Documents table #}
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Catégorie</th>
+                                <th>Date</th>
+                                <th style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if documents is defined and documents is not empty %}
+                                {% for document in documents %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ document.titre|default('-') }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info text-dark">{{ document.typeDocument|default('-') }}</span>
+                                        </td>
+                                        <td>
+                                            {% if document.categorie is defined and document.categorie %}
+                                                {{ document.categorie.nom|default('-') }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
                                             {% endif %}
-                                            {% include 'front/document/_delete_form.html.twig' with { document: document } %}
-                                        </div>
+                                        </td>
+                                        <td>
+                                            {% if document.dateUpload is defined and document.dateUpload %}
+                                                {{ document.dateUpload|date('d/m/Y') }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a class="btn btn-outline-primary" 
+                                                   href="{{ path('front_document_show', {id: document.id}) }}" 
+                                                   title="Voir">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                {% if document.cheminFichier is defined and document.cheminFichier %}
+                                                    <a class="btn btn-outline-secondary" 
+                                                       href="{{ path('front_document_download', {id: document.id}) }}" 
+                                                       title="Télécharger" target="_blank">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                {% endif %}
+                                                {% include 'front/document/_delete_form.html.twig' with { document: document } %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="bi bi-folder2-open display-6 d-block mb-2"></i>
+                                        Aucun document trouvé.
+                                        <br>
+                                        <a href="{{ path('front_document_new') }}" class="btn btn-primary mt-2">
+                                            Ajouter votre premier document
+                                        </a>
                                     </td>
                                 </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <i class="bi bi-folder2-open display-6 d-block mb-2"></i>
-                                    Aucun document trouvé.
-                                    <br>
-                                    <a href="{{ path('front_document_new') }}" class="btn btn-primary mt-2">
-                                        Ajouter votre premier document
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </div>
 
-    {# Pagination #}
-    {% if total_pages is defined and total_pages > 1 %}
-        <nav aria-label="Pagination des documents">
-            <ul class="pagination justify-content-center">
-                {% if page > 1 %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ path('front_documents', {page: page - 1}) }}">Précédent</a>
-                    </li>
-                {% endif %}
-                
-                {% for i in 1..total_pages %}
-                    <li class="page-item {{ i == page ? 'active' : '' }}">
-                        <a class="page-link" href="{{ path('front_documents', {page: i}) }}">{{ i }}</a>
-                    </li>
-                {% endfor %}
-                
-                {% if page < total_pages %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ path('front_documents', {page: page + 1}) }}">Suivant</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    {% endif %}
-</div>
+            {# Pagination #}
+            {% if total_pages is defined and total_pages > 1 %}
+                <nav aria-label="Pagination des documents">
+                    <ul class="pagination justify-content-center">
+                        {% if page > 1 %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ path('front_documents', {page: page - 1}) }}">Précédent</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for i in 1..total_pages %}
+                            <li class="page-item {{ i == page ? 'active' : '' }}">
+                                <a class="page-link" href="{{ path('front_documents', {page: i}) }}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+                        
+                        {% if page < total_pages %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ path('front_documents', {page: page + 1}) }}">Suivant</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}

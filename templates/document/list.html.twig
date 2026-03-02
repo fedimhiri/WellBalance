@@ -1,129 +1,129 @@
-{% extends 'backend/baseend.html.twig' %}
+{% extends 'frontend/base_frontend.html.twig' %}
 
-{% block title %}Mes Documents Médicaux{% endblock %}
+{% block title %}Mes Documents Médicaux - WellBalance{% endblock %}
 
 {% block body %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">
-            <i class="bx bx-file me-2"></i>Mes Documents Médicaux
-        </h4>
-        <a href="{{ path('app_document_new') }}" class="btn btn-success">
-            <i class="bx bx-plus me-1"></i> Nouveau document
-        </a>
-    </div>
-
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <section class="section py-5" style="background-color: #fff;">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h4 mb-0">
+                    <i class="bi bi-file-earmark-medical me-2"></i>Mes Documents Médicaux
+                </h1>
+                <a href="{{ path('app_document_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Nouveau document
+                </a>
             </div>
-        {% endfor %}
-    {% endfor %}
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" action="{{ path('app_document_index') }}" class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label">Rechercher</label>
-                    <input type="text" name="search" class="form-control" placeholder="Titre ou type..." value="{{ search }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Trier par</label>
-                    <select name="sort" class="form-select">
-                        <option value="dateUpload" {{ sort == 'dateUpload' ? 'selected' }}>Date d'upload</option>
-                        <option value="titre" {{ sort == 'titre' ? 'selected' }}>Titre</option>
-                        <option value="typeDocument" {{ sort == 'typeDocument' ? 'selected' }}>Type</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Ordre</label>
-                    <select name="direction" class="form-select">
-                        <option value="DESC" {{ direction == 'DESC' ? 'selected' }}>Décroissant</option>
-                        <option value="ASC" {{ direction == 'ASC' ? 'selected' }}>Croissant</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-outline-primary w-100">
-                        <i class="bx bx-search me-1"></i> Filtrer
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
 
-    <div class="card">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Titre</th>
-                        <th>Type</th>
-                        <th>Catégorie</th>
-                        <th>Type détecté (IA)</th>
-                        <th>Date d'upload</th>
-                        <th>Assurance</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for document in documents %}
-                        <tr>
-                            <td>{{ document.id }}</td>
-                            <td>
-                                <a href="{{ path('app_document_show', {id: document.id}) }}" class="fw-semibold text-decoration-none">
-                                    {{ document.titre }}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="badge bg-label-primary">{{ document.typeDocument }}</span>
-                            </td>
-                            <td>{{ document.categorie ? document.categorie.nom : '—' }}</td>
-                            <td>
-                                {% if document.typeDetecte %}
-                                    <span class="badge bg-label-info">{{ document.typeDetecte }}</span>
-                                {% else %}
-                                    <span class="text-muted">Non analysé</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ document.dateUpload|date('d/m/Y H:i') }}</td>
-                            <td>
-                                {% if document.insuranceReference %}
-                                    <span class="badge bg-label-success">{{ document.insuranceReference }}</span>
-                                {% else %}
-                                    <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <a href="{{ path('app_document_show', {id: document.id}) }}" class="btn btn-outline-info" title="Voir">
-                                        <i class="bx bx-show"></i>
-                                    </a>
-                                    <a href="{{ path('app_document_export_pdf', {id: document.id}) }}" class="btn btn-outline-primary" title="Export PDF">
-                                        <i class="bx bx-download"></i>
-                                    </a>
-                                    <form method="post" action="{{ path('app_document_delete', {id: document.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce document ?')">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_document_' ~ document.id) }}">
-                                        <button type="submit" class="btn btn-outline-danger" title="Supprimer">
-                                            <i class="bx bx-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">
-                                <i class="bx bx-folder-open bx-lg"></i>
-                                <p class="mt-2">Aucun document trouvé.</p>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{{ path('app_document_index') }}" class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">Rechercher</label>
+                            <input type="text" name="search" class="form-control" placeholder="Titre ou type..." value="{{ search }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Trier par</label>
+                            <select name="sort" class="form-select">
+                                <option value="dateUpload" {{ sort == 'dateUpload' ? 'selected' }}>Date d'upload</option>
+                                <option value="titre" {{ sort == 'titre' ? 'selected' }}>Titre</option>
+                                <option value="typeDocument" {{ sort == 'typeDocument' ? 'selected' }}>Type</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ordre</label>
+                            <select name="direction" class="form-select">
+                                <option value="DESC" {{ direction == 'DESC' ? 'selected' }}>Décroissant</option>
+                                <option value="ASC" {{ direction == 'ASC' ? 'selected' }}>Croissant</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-search me-1"></i> Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Catégorie</th>
+                                <th>Type détecté (IA)</th>
+                                <th>Date d'upload</th>
+                                <th>Assurance</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for document in documents %}
+                                <tr>
+                                    <td>{{ document.id }}</td>
+                                    <td>
+                                        <a href="{{ path('app_document_show', {id: document.id}) }}" class="fw-semibold text-decoration-none">
+                                            {{ document.titre }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">{{ document.typeDocument }}</span>
+                                    </td>
+                                    <td>{{ document.categorie ? document.categorie.nom : '—' }}</td>
+                                    <td>
+                                        {% if document.typeDetecte %}
+                                            <span class="badge bg-info text-dark">{{ document.typeDetecte }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Non analysé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ document.dateUpload|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        {% if document.insuranceReference %}
+                                            <span class="badge bg-success">{{ document.insuranceReference }}</span>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ path('app_document_show', {id: document.id}) }}" class="btn btn-outline-info" title="Voir">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_document_export_pdf', {id: document.id}) }}" class="btn btn-outline-primary" title="Export PDF">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_document_delete', {id: document.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce document ?')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_document_' ~ document.id) }}">
+                                                <button type="submit" class="btn btn-outline-danger" title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        <i class="bi bi-folder-open display-6 d-block mb-2"></i>
+                                        <p class="mt-2">Aucun document trouvé.</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    </section>
+
 {% endblock %}
