@@ -8,9 +8,23 @@
         <h4 class="fw-bold mb-0">
             <i class="bx bx-file-find me-2"></i>{{ document.titre }}
         </h4>
-        <a href="{{ path('admin_document_crud_index') }}" class="btn btn-outline-secondary">
-            <i class="bx bx-arrow-back me-1"></i> Retour
-        </a>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary" onclick="analyzeDocument({{ document.id }})">
+                <i class="bx bx-cpu me-1"></i> Analyze with AI
+            </button>
+            <a href="{{ path('admin_document_crud_index') }}" class="btn btn-outline-secondary">
+                <i class="bx bx-arrow-back me-1"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    {# AI Analysis Result #}
+    <div id="ai-analysis-result" class="card mb-4 border-primary" style="display: none;">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0"><i class="bx bx-brain me-2"></i>Analysis Result</h5>
+        </div>
+        <div class="card-body" id="ai-analysis-content">
+        </div>
     </div>
 
     {# Flash messages #}
@@ -125,4 +139,57 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extrajavascripts %}
+<script>
+async function analyzeDocument(id) {
+    const resultDiv = document.getElementById('ai-analysis-result');
+    const contentDiv = document.getElementById('ai-analysis-content');
+    
+    // Show loading
+    resultDiv.style.display = 'block';
+    contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><p class="mt-2">Analyse en cours...</p></div>';
+    
+    // Scroll to result
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    try {
+        const response = await fetch(`/api/analyze/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const analysis = data.data;
+            contentDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Type détecté:</strong><br>
+                        <span class="badge bg-info text-dark">${analysis.type || 'N/A'}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Mots-clés:</strong><br>
+                        ${analysis.mots_cles && analysis.mots_cles.length > 0 
+                            ? analysis.mots_cles.map(k => `<span class="badge bg-secondary me-1">${k}</span>`).join('') 
+                            : '<span class="text-muted">Aucun</span>'}
+                    </div>
+                    <div class="col-12">
+                        <strong>Résumé:</strong><br>
+                        <p class="mb-0">${analysis.summary || 'Aucun résumé disponible.'}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `<div class="alert alert-danger">${data.error || 'Erreur lors de l\'analyse'}</div>`;
+        }
+    } catch (error) {
+        contentDiv.innerHTML = `<div class="alert alert-danger">Erreur de connexion: ${error.message}</div>`;
+    }
+}
+</script>
 {% endblock %}

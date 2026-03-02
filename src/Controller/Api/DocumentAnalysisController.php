@@ -49,22 +49,47 @@ class DocumentAnalysisController extends AbstractController
             return $this->json([
                 'success' => true,
                 'data' => [
-                    'type_detecte' => $document->getTypeDetecte(),
-                    'resume' => $document->getResumeAi(),
-                    'mots_cles' => $document->getMotsCles(),
+                    'type' => $document->getTypeDetecte(),
+                    'summary' => $document->getResumeAi(),
+                    'mots_cles' => $document->getMotsCles() ?? [],
                 ],
             ]);
         }
 
-        // For now, return a message that analysis is not available
-        // In production, you would integrate with OCR/AI service here
-        return $this->json([
-            'success' => true,
-            'data' => [
-                'type_detecte' => $document->getTypeDetecte() ?? 'Non analysé',
-                'resume' => $document->getResumeAi() ?? 'Analyse non disponible. Le document doit être analysé lors de l\'upload.',
-                'mots_cles' => $document->getMotsCles() ?? [],
-            ],
-        ]);
+        // Analyze the PDF on-the-fly
+        $pdfPath = $document->getCheminFichier();
+        
+        if (null === $pdfPath || !file_exists($this->getParameter('kernel.project_dir') . '/public/' . $pdfPath)) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Fichier PDF non trouvé',
+            ], 404);
+        }
+
+        try {
+            // Analyze the PDF
+            $analysisResult = $this->analyzerService->analyzePdf($pdfPath);
+            
+            // Update the document with analysis results
+            $document->setTypeDetecte($analysisResult['type_detecte']);
+            $document->setResumeAi($analysisResult['resume']);
+            $document->setMotsCles($analysisResult['mots_cles']);
+            
+            $this->entityManager->flush();
+            
+            return $this->json([
+                'success' => true,
+                'data' => [
+                    'type' => $analysisResult['type_detecte'],
+                    'summary' => $analysisResult['resume'],
+                    'mots_cles' => $analysisResult['mots_cles'],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Erreur lors de l\'analyse: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

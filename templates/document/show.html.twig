@@ -97,7 +97,7 @@
                             </div>
                             <div class="row mb-3">
                                 <div class="col-sm-4 fw-semibold">Résumé IA</div>
-                                <div class="col-sm-8">{{ document.resumeAi ?? 'Aucun résumé disponible.' }}</div>
+                                <div class="col-sm-8">{{ document.resumeAi ?? 'Cliquez sur "Analyze with AI" pour analyser ce document.' }}</div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-sm-4 fw-semibold">Mots-clés</div>
@@ -190,6 +190,9 @@
         resultDiv.style.display = 'block';
         contentDiv.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><p class="mt-2">Analyse en cours...</p></div>';
         
+        // Scroll to result
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+        
         try {
             const response = await fetch(`/api/analyze/${id}`, {
                 method: 'POST',
@@ -206,7 +209,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <strong>Type détecté:</strong><br>
-                            <span class="badge bg-info text-dark">${analysis.type_detecte || 'N/A'}</span>
+                            <span class="badge bg-info text-dark">${analysis.type || 'N/A'}</span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <strong>Mots-clés:</strong><br>
@@ -216,7 +219,7 @@
                         </div>
                         <div class="col-12">
                             <strong>Résumé:</strong><br>
-                            <p class="mb-0">${analysis.resume || 'Aucun résumé disponible.'}</p>
+                            <p class="mb-0">${analysis.summary || 'Aucun résumé disponible.'}</p>
                         </div>
                     </div>
                 `;

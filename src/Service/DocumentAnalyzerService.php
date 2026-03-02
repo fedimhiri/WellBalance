@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Psr\Log\LoggerInterface;
+use Smalot\PdfParser\Parser;
 
 class DocumentAnalyzerService
 {
@@ -17,6 +18,7 @@ class DocumentAnalyzerService
 
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly string $projectDir,
     ) {
     }
 
@@ -48,6 +50,67 @@ class DocumentAnalyzerService
             'type_detecte' => $typeDetecte,
             'has_anomaly' => $hasAnomaly,
         ];
+    }
+
+    /**
+     * Extract text from PDF file and analyze it
+     * 
+     * @return array{resume: string, mots_cles: string[], type_detecte: string, has_anomaly: bool}
+     */
+    public function analyzePdf(string $pdfPath): array
+    {
+        try {
+            $text = $this->extractTextFromPdf($pdfPath);
+            
+            if (empty($text)) {
+                $this->logger->warning('No text extracted from PDF', ['path' => $pdfPath]);
+                return [
+                    'resume' => 'Impossible d\'extraire le texte du PDF.',
+                    'mots_cles' => [],
+                    'type_detecte' => 'Inconnu',
+                    'has_anomaly' => false,
+                ];
+            }
+            
+            return $this->analyze($text);
+        } catch (\Exception $e) {
+            $this->logger->error('PDF analysis failed', [
+                'path' => $pdfPath,
+                'error' => $e->getMessage(),
+            ]);
+            
+            return [
+                'resume' => 'Erreur lors de l\'analyse du PDF: ' . $e->getMessage(),
+                'mots_cles' => [],
+                'type_detecte' => 'Erreur',
+                'has_anomaly' => false,
+            ];
+        }
+    }
+
+    /**
+     * Extract text from a PDF file
+     */
+    private function extractTextFromPdf(string $pdfPath): string
+    {
+        // Handle relative paths
+        if (!file_exists($pdfPath)) {
+            $fullPath = $this->projectDir . '/' . $pdfPath;
+            if (!file_exists($fullPath)) {
+                throw new \RuntimeException('PDF file not found: ' . $pdfPath);
+            }
+            $pdfPath = $fullPath;
+        }
+
+        $parser = new Parser();
+        $pdf = $parser->parseFile($pdfPath);
+        
+        $text = '';
+        foreach ($pdf->getPages() as $page) {
+            $text .= $page->getText() . "\n";
+        }
+
+        return $text;
     }
 
     private function containsAnomalyKeyword(string $text): bool
@@ -126,10 +189,12 @@ class DocumentAnalyzerService
 
         $sentences = array_map('trim', $sentences);
         $sentences = array_filter($sentences, static fn (string $s): bool => mb_strlen($s) > 10);
-        $summary = implode('. ', array_slice(array_values($sentences), 0, 3));
+        
+        // Get 5-7 sentences as requested
+        $summary = implode('. ', array_slice(array_values($sentences), 0, 6));
 
-        if (mb_strlen($summary) > 200) {
-            $summary = mb_substr($summary, 0, 197) . '...';
+        if (mb_strlen($summary) > 500) {
+            $summary = mb_substr($summary, 0, 497) . '...';
         }
 
         return $summary . '.';
